@@ -34,4 +34,18 @@ public class User {
 
     private LocalDateTime createdAt;
 
+    @Builder
+    public User(String name, String email, String password, String phone,
+                UUID userId, UserRole userRole, LocalDateTime createdAt){
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+    }
+
+    public void setUser(UUID userId, UserRole userRole, LocalDateTime createdAt){
+        this.userId = userId;
+        this.userRole = userRole;
+        this.createdAt = createdAt;
+    }
 }
