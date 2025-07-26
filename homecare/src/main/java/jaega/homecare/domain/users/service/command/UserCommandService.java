@@ -28,7 +28,7 @@ public class UserCommandService {
     @Transactional
     public void createConsumer(UserCreateRequest request){
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다.");
         }
 
         String password = passwordEncoder.encode(request.password());

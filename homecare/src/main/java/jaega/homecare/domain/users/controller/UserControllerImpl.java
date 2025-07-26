@@ -20,7 +20,7 @@ public class UserControllerImpl implements UserController{
     private final UserQueryService userQueryService;
 
     @Override
-    public ResponseEntity<Void> createConsumer(UserCreateRequest request) {
+    public ResponseEntity<Void> createConsumer(@RequestBody UserCreateRequest request) {
         userCommandService.createConsumer(request);
         return ResponseEntity.noContent().build();
     }
