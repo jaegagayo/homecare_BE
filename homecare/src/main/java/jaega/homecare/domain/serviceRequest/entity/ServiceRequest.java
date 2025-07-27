@@ -38,7 +38,7 @@ public class ServiceRequest {
 
     private String personalityType;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "service_request_days", joinColumns = @JoinColumn(name = "service_request_id"))
     @Column(name = "requested_days")
     private Set<Integer> requestedDays; // ex : 1, 3, 5, ...
