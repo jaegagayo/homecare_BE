@@ -24,7 +24,7 @@ public class UserCommandService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void createConsumer(UserCreateRequest request){
+    public void createUser(UserCreateRequest request, UserRole role){
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
@@ -32,7 +32,7 @@ public class UserCommandService {
         String password = passwordEncoder.encode(request.password());
 
         User user = userMapper.toEntity(request, password);
-        user.setUser(UUID.randomUUID(), UserRole.ROLE_CAREGIVER, LocalDateTime.now());
+        user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
         userRepository.save(user);
     }
 
