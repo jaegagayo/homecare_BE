@@ -12,6 +12,7 @@ public interface ConsumerMapper {
     @Mapping(target = "email", source = "request.email")
     @Mapping(target = "password", source = "password")
     @Mapping(target = "phone", source = "request.phone")
+    @Mapping(target = "birthDate", source = "request.birthDate")
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "userRole", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
