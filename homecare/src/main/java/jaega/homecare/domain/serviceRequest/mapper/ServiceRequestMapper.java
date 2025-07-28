@@ -17,6 +17,7 @@ public interface ServiceRequestMapper {
     @Mapping(target = "preferred_time_end", source = "request.preferred_time_end")
     @Mapping(target = "serviceType", source = "request.serviceType")
     @Mapping(target = "personalityType", source = "request.personalityType")
+    @Mapping(target = "additionalInformation", source = "request.additionalInformation")
     @Mapping(target = "requestedDays", ignore = true)
     @Mapping(target = "serviceRequestId", ignore = true)
     @Mapping(target = "user", ignore = true)
