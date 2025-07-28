@@ -1,6 +1,6 @@
 package jaega.homecare.domain.users.dto.req;
 
-public record UserCreateRequest(
+public record ConsumerCreateRequest(
         String name,
         String email,
         String password,

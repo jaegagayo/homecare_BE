@@ -1,9 +1,7 @@
 package jaega.homecare.domain.users.controller;
 
-import jaega.homecare.domain.users.dto.req.UserCreateRequest;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.users.dto.res.UserLoginResponse;
-import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.service.command.UserCommandService;
 import jaega.homecare.domain.users.service.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +17,6 @@ public class UserControllerImpl implements UserController{
 
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
-
-    @Override
-    public ResponseEntity<Void> createConsumer(@RequestBody UserCreateRequest request) {
-        userCommandService.createUser(request, UserRole.ROLE_CONSUMER);
-        return ResponseEntity.noContent().build();
-    }
 
     @Override
     public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginRequest request) {

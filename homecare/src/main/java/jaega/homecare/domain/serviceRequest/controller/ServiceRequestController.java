@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "ServiceRequest", description = "ServiceRequest API")
+@Tag(name = "ServiceRequest", description = "Consumer의 서비스 신청 API")
 @RequestMapping("/api/consumer/request")
 public interface ServiceRequestController {
 
