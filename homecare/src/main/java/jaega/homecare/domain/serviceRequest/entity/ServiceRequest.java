@@ -43,15 +43,18 @@ public class ServiceRequest {
     @Column(name = "requested_days")
     private Set<Integer> requestedDays; // ex : 1, 3, 5, ...
 
+    private String additionalInformation;
+
     @Builder
     public ServiceRequest(UUID serviceRequestId, User user, String location, LocalDateTime preferred_time_start, LocalDateTime preferred_time_end,
-                          String serviceType, ServiceRequestStatus status, String personalityType, Set<Integer> requestedDays){
+                          String serviceType, ServiceRequestStatus status, String personalityType, Set<Integer> requestedDays, String additionalInformation){
         this.location = location;
         this.preferred_time_start = preferred_time_start;
         this.preferred_time_end = preferred_time_end;
         this.serviceType = serviceType;
         this.personalityType = personalityType;
         this.requestedDays = requestedDays;
+        this.additionalInformation = additionalInformation;
     }
 
     public void setServiceRequest(UUID serviceRequestId, User user, ServiceRequestStatus status, Set<Integer> requestedDays){
