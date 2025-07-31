@@ -4,6 +4,7 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
+import jaega.homecare.domain.center.dto.res.GetMatchingResultResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
@@ -42,5 +43,11 @@ public class CenterControllerImpl implements CenterController{
     public ResponseEntity<List<GetCaregiverResponse>> getAllCaregivers(@PathVariable UUID centerId){
         List<GetCaregiverResponse> caregivers = caregiverQueryService.getAllCaregiversByCenter(centerId);
         return ResponseEntity.ok(caregivers);
+    }
+
+    @Override
+    public ResponseEntity<List<GetMatchingResultResponse>> getAllMatchingResult(){
+        List<GetMatchingResultResponse> matchingList = null;
+        return ResponseEntity.ok(matchingList);
     }
 }

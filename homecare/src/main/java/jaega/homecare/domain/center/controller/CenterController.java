@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
+import jaega.homecare.domain.center.dto.res.GetMatchingResultResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,4 +26,9 @@ public interface CenterController {
     @ApiResponse(responseCode = "200", description = "요양 보호사 전체 조회 성공")
     @GetMapping("/{centerId}/caregiver")
     ResponseEntity<List<GetCaregiverResponse>> getAllCaregivers(@PathVariable UUID centerId);
+
+    @Operation(summary = "배정 내역 전체 조회 API", description = "배정된 신청자-요양보호사 전체 목록을 최신순으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양 보호사 전체 조회 성공")
+    @GetMapping("/request")
+    ResponseEntity<List<GetMatchingResultResponse>> getAllMatchingResult();
 }
