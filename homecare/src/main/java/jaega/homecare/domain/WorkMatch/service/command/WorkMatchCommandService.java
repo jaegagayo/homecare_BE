@@ -1,5 +1,7 @@
 package jaega.homecare.domain.WorkMatch.service.command;
 
+import jaega.homecare.domain.WorkLog.dto.req.CreateWorkLogRequest;
+import jaega.homecare.domain.WorkLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
 import jaega.homecare.domain.WorkMatch.mapper.WorkMatchMapper;
@@ -21,6 +23,7 @@ public class WorkMatchCommandService {
 
     private final WorkMatchRepository workMatchRepository;
     private final CaregiverQueryService caregiverQueryService;
+    private final WorkLogCommandService workLogCommandService;
     private final WorkMatchMapper workMatchMapper;
 
     public void createWorkMatch(CreateWorkMatchRequest request){
@@ -41,6 +44,11 @@ public class WorkMatchCommandService {
 
         workMatchRepository.saveAll(workMatches);
 
+        // 💡 WorkLog도 함께 생성
+        for (WorkMatch match : workMatches) {
+            CreateWorkLogRequest logRequest = workMatchMapper.toWorkLogCreateRequest(request, match);
+            workLogCommandService.createWorkLog(logRequest);
+        }
     }
 
 }
