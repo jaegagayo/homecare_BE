@@ -15,13 +15,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ConsumerCommandService {
 
     private final UserRepository userRepository;
     private final ConsumerMapper consumerMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     public void createUser(ConsumerCreateRequest request, UserRole role){
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");

@@ -24,10 +24,10 @@ public interface ServiceRequestController {
     @Operation(summary  = "수요자가 신청한 서비스 내역 조회 API", description = "수요자가 신청한 서비스를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 조회 성공")
     @GetMapping
-    public ResponseEntity<List<ConsumerServiceResponse>> getConsumerServiceRequest(@RequestParam UUID userId);
+    ResponseEntity<List<ConsumerServiceResponse>> getConsumerServiceRequest(@RequestParam UUID userId);
 
     @Operation(summary  = "수요자가 신청한 서비스 내역 조회 API (신청 서비스 상태 조건)", description = "수요자가 신청한 서비스를 신청한 서비스의 상태를 조건으로 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 신청 상태를 조건으로 조회 성공")
     @GetMapping("/status")
-    public ResponseEntity<List<ConsumerServiceResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID userId, ServiceRequestStatus status);
+    ResponseEntity<List<ConsumerServiceResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID userId, ServiceRequestStatus status);
 }
