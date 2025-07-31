@@ -1,5 +1,8 @@
 package jaega.homecare.domain.users.controller;
 
+import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
+import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
+import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.users.dto.req.ConsumerCreateRequest;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.service.command.ConsumerCommandService;
@@ -15,10 +18,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConsumerControllerImpl implements ConsumerController {
 
     private final ConsumerCommandService consumerCommandService;
+    private final WorkMatchCommandService workMatchCommandService;
 
     @Override
     public ResponseEntity<Void> createConsumer(@RequestBody ConsumerCreateRequest request) {
         consumerCommandService.createUser(request, UserRole.ROLE_CONSUMER);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request){
+
+        CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(request.caregiverId(),
+                request.workTime_start(),
+                request.workTime_end(),
+                request.working_days(),
+                request.distanceLog());
+        workMatchCommandService.createWorkMatch(createWorkMatchRequest);
+
         return ResponseEntity.noContent().build();
     }
 
