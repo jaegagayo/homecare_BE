@@ -2,7 +2,9 @@ package jaega.homecare.domain.serviceRequest.dto.res;
 
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
 import java.util.UUID;
 
 public record GetServiceRequestResponse(
@@ -13,6 +15,6 @@ public record GetServiceRequestResponse(
         String serviceType,
         ServiceRequestStatus status,
         String personalityType,
-        String requestedDays
+        Set<LocalDate> requestedDays
 ) {
 }
