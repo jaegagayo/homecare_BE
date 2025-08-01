@@ -27,7 +27,7 @@ public class WorkMatch {
     private Caregiver caregiver;
 
     @Column(name = "work_date")
-    private LocalDate workingDate;
+    private LocalDate workDate;
 
     @Column(name = "start_time")
     private LocalTime startTime;
@@ -40,10 +40,10 @@ public class WorkMatch {
     private WorkStatus status;
 
     @Builder
-    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workingDate, LocalTime startTime, LocalTime endTime, WorkStatus status){
+    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime, WorkStatus status){
         this.workMatchId = workMatchId;
         this.caregiver = caregiver;
-        this.workingDate = workingDate;
+        this.workDate = workDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = WorkStatus.PLANNED;
