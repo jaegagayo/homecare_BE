@@ -40,4 +40,7 @@ public class WorkLogQueryService {
         return workLogQueryRepository.findWorkLogsByDate(date);
     }
 
+    public List<GetWorkLogByPaid> getWorkLogByPaid(Boolean isPaid){
+        return workLogQueryRepository.findWorkLogsByPaid(isPaid);
+    }
 }

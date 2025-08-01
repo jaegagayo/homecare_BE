@@ -33,4 +33,9 @@ public class WorkLogControllerImpl implements WorkLogController{
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<List<GetWorkLogByPaid>> getWorkLogByPaid(Boolean isPaid) {
+        List<GetWorkLogByPaid> response = workLogQueryService.getWorkLogByPaid(isPaid);
+        return ResponseEntity.ok(response);
+    }
 }

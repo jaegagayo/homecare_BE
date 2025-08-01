@@ -1,6 +1,8 @@
 package jaega.homecare.domain.WorkLog.mapper;
 
 import jaega.homecare.domain.WorkLog.dto.req.CreateWorkLogRequest;
+import jaega.homecare.domain.WorkLog.dto.res.GetWorkLogByPaid;
+import jaega.homecare.domain.WorkLog.dto.res.GetWorkLogResponse;
 import jaega.homecare.domain.WorkLog.entity.WorkLog;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,4 +17,12 @@ public interface WorkLogMapper {
     @Mapping(target = "workLogId", ignore = true)
     @Mapping(target = "isPaid", ignore = true)
     WorkLog toEntity(CreateWorkLogRequest request);
+
+    @Mapping(source = "workTime_start", target = "workTime_start")
+    @Mapping(source = "workTime_end", target = "workTime_end")
+    @Mapping(source = "distanceLog", target = "distanceLog")
+    @Mapping(source = "paid", target = "isPaid")
+    GetWorkLogResponse toGetResponse(WorkLog workLog);
+
+
 }

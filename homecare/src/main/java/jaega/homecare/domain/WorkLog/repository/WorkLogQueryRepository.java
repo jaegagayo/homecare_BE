@@ -42,4 +42,23 @@ public class WorkLogQueryRepository {
                 .fetch();
     }
 
+    public List<GetWorkLogByPaid> findWorkLogsByPaid(Boolean isPaid) {
+        QWorkLog workLog = QWorkLog.workLog;
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser user = QUser.user;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetWorkLogByPaid.class,
+                        workMatch.workDate,
+                        caregiver.user.name
+                ))
+                .from(workLog)
+                .join(workLog.workMatch, workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiver.user, user)
+                .where(workLog.isPaid.eq(isPaid))
+                .fetch();
+    }
 }
