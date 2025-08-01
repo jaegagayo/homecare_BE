@@ -1,8 +1,10 @@
 package jaega.homecare.domain.WorkMatch.service.query;
 
+import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
 import jaega.homecare.domain.WorkMatch.mapper.WorkMatchMapper;
+import jaega.homecare.domain.WorkMatch.repository.WorkMatchQueryRepository;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class WorkMatchQueryService {
 
     private final WorkMatchRepository workMatchRepository;
+    private final WorkMatchQueryRepository workMatchQueryRepository;
     private final CaregiverQueryService caregiverQueryService;
     private final WorkMatchMapper workMatchMapper;
 
@@ -34,5 +37,8 @@ public class WorkMatchQueryService {
         return workMatchMapper.toGetResponseByCaregiverList(workMatches);
     }
 
+    public List<GetCaregiverMatchesByMonth> getWorkMatchesByMonth(int year, int month) {
+        return workMatchQueryRepository.findWorkMatchesByMonth(year, month);
+    }
 
 }
