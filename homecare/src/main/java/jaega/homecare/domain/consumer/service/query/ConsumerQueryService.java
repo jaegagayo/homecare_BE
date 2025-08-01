@@ -1,4 +1,4 @@
-package jaega.homecare.domain.users.service.query;
+package jaega.homecare.domain.consumer.service.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

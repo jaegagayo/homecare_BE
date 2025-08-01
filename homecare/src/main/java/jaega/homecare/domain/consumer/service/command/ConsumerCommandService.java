@@ -1,9 +1,9 @@
-package jaega.homecare.domain.users.service.command;
+package jaega.homecare.domain.consumer.service.command;
 
-import jaega.homecare.domain.users.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
-import jaega.homecare.domain.users.mapper.ConsumerMapper;
+import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

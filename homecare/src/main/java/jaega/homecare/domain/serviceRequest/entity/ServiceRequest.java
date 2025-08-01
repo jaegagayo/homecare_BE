@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,11 +25,14 @@ public class ServiceRequest {
     @JoinColumn(name = "users_userId")
     private User user;
 
-    private String location;
+    private String address;
 
-    private LocalDateTime preferred_time_start;
+    @Embedded
+    private Location location;
 
-    private LocalDateTime preferred_time_end;
+    private LocalTime preferred_time_start;
+
+    private LocalTime preferred_time_end;
 
     private String serviceType;
 
@@ -46,8 +49,9 @@ public class ServiceRequest {
     private String additionalInformation;
 
     @Builder
-    public ServiceRequest(UUID serviceRequestId, User user, String location, LocalDateTime preferred_time_start, LocalDateTime preferred_time_end,
+    public ServiceRequest(UUID serviceRequestId, User user, String address, Location location, LocalTime preferred_time_start, LocalTime preferred_time_end,
                           String serviceType, ServiceRequestStatus status, String personalityType, Set<Integer> requestedDays, String additionalInformation){
+        this.address = address;
         this.location = location;
         this.preferred_time_start = preferred_time_start;
         this.preferred_time_end = preferred_time_end;

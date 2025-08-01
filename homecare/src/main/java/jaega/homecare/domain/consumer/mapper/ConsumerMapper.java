@@ -1,6 +1,6 @@
-package jaega.homecare.domain.users.mapper;
+package jaega.homecare.domain.consumer.mapper;
 
-import jaega.homecare.domain.users.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
 import jaega.homecare.domain.users.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
