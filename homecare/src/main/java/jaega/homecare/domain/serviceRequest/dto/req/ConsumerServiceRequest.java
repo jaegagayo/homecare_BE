@@ -6,7 +6,8 @@ import java.util.UUID;
 
 public record ConsumerServiceRequest(
         UUID userId,
-        String location,
+        String address,
+        LocationDto location,
         LocalTime preferred_time_start,
         LocalTime preferred_time_end,
         String serviceType,

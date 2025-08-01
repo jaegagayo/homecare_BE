@@ -25,7 +25,10 @@ public class ServiceRequest {
     @JoinColumn(name = "users_userId")
     private User user;
 
-    private String location;
+    private String address;
+
+    @Embedded
+    private Location location;
 
     private LocalTime preferred_time_start;
 
@@ -46,8 +49,9 @@ public class ServiceRequest {
     private String additionalInformation;
 
     @Builder
-    public ServiceRequest(UUID serviceRequestId, User user, String location, LocalTime preferred_time_start, LocalTime preferred_time_end,
+    public ServiceRequest(UUID serviceRequestId, User user, String address, Location location, LocalTime preferred_time_start, LocalTime preferred_time_end,
                           String serviceType, ServiceRequestStatus status, String personalityType, Set<Integer> requestedDays, String additionalInformation){
+        this.address = address;
         this.location = location;
         this.preferred_time_start = preferred_time_start;
         this.preferred_time_end = preferred_time_end;

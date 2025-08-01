@@ -5,9 +5,9 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import java.time.LocalTime;
 import java.util.UUID;
 
-public record ConsumerServiceResponse(
+public record GetServiceRequestResponse(
         UUID serviceRequestId,
-        String location,
+        String address,
         LocalTime preferred_time_start,
         LocalTime preferred_time_end,
         String serviceType,

@@ -1,6 +1,6 @@
 package jaega.homecare.domain.serviceRequest.service.query;
 
-import jaega.homecare.domain.serviceRequest.dto.res.ConsumerServiceResponse;
+import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.mapper.ServiceRequestMapper;
@@ -45,7 +45,7 @@ public class ServiceRequestQueryService {
         return requests;
     }
 
-    public List<ConsumerServiceResponse> findConsumerRequests(UUID userId){
+    public List<GetServiceRequestResponse> findConsumerRequests(UUID userId){
         User user = userQueryService.getUser(userId);
         List<ServiceRequest> serviceRequests = getServiceRequestsByUser(user);
 
@@ -54,7 +54,7 @@ public class ServiceRequestQueryService {
                 .collect(Collectors.toList());
     }
 
-    public List<ConsumerServiceResponse> findConsumerRequestsByStatus(UUID userId, ServiceRequestStatus status){
+    public List<GetServiceRequestResponse> findConsumerRequestsByStatus(UUID userId, ServiceRequestStatus status){
         User user = userQueryService.getUser(userId);
         List<ServiceRequest> serviceRequests = getServiceRequestByUserAndStatus(user, status);
 
