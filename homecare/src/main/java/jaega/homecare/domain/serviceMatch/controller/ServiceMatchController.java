@@ -16,8 +16,4 @@ import java.util.UUID;
 @RequestMapping("/api/consumerSchedule")
 public interface ServiceMatchController {
 
-    @Operation(summary = "특정 센터의 요양보호사-수요자간 매칭 결과 조회")
-    @ApiResponse(responseCode = "200", description = "특정 센터의 요양보호사-수요자간 매칭 결과 조회 성공")
-    @GetMapping("/{centerId}/notifications")
-    ResponseEntity<List<ServiceMatchNotificationResponse>> getCenterNotifications(@PathVariable UUID centerId);
 }

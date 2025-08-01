@@ -38,6 +38,7 @@ public class ServiceMatchQueryRepository {
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceMatch.caregiver, caregiver)
                 .where(caregiver.center.centerId.eq(centerId))
+                .orderBy(serviceMatch.serviceDate.desc())
                 .fetch();
     }
 }

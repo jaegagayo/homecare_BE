@@ -18,9 +18,5 @@ public class ServiceMatchControllerImpl implements ServiceMatchController{
 
     private final ServiceMatchQueryService serviceMatchQueryService;
 
-    @Override
-    public ResponseEntity<List<ServiceMatchNotificationResponse>> getCenterNotifications(@PathVariable UUID centerId) {
-        List<ServiceMatchNotificationResponse> notifications = serviceMatchQueryService.getMatchesByCenter(centerId);
-        return ResponseEntity.ok(notifications);
-    }
+
 }

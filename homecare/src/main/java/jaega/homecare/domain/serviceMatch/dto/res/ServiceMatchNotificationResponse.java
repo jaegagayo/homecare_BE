@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record ServiceMatchNotificationResponse(
-        String ConsumerName,
+        String consumerName,
         String caregiverName,
         LocalDate serviceDate,
         LocalTime startTime,

@@ -8,6 +8,8 @@ import jaega.homecare.domain.center.dto.res.GetMatchingResultResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
+import jaega.homecare.domain.serviceMatch.dto.res.ServiceMatchNotificationResponse;
+import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class CenterControllerImpl implements CenterController{
     private final CenterQueryService centerQueryService;
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
+    private final ServiceMatchQueryService serviceMatchQueryService;
 
     @Override
     public ResponseEntity<Void> createCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId){
@@ -46,8 +49,8 @@ public class CenterControllerImpl implements CenterController{
     }
 
     @Override
-    public ResponseEntity<List<GetMatchingResultResponse>> getAllMatchingResult(){
-        List<GetMatchingResultResponse> matchingList = null;
-        return ResponseEntity.ok(matchingList);
+    public ResponseEntity<List<ServiceMatchNotificationResponse>> getAllMatchingResult(@PathVariable UUID centerId){
+        List<ServiceMatchNotificationResponse> notifications = serviceMatchQueryService.getMatchesByCenter(centerId);
+        return ResponseEntity.ok(notifications);
     }
 }
