@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.WorkLog.dto.res.GetWorkLogByDateResponse;
 import jaega.homecare.domain.WorkLog.dto.res.GetWorkLogByPaid;
 import jaega.homecare.domain.WorkLog.entity.QWorkLog;
+import jaega.homecare.domain.WorkLog.entity.WorkLog;
 import jaega.homecare.domain.WorkMatch.entity.QWorkMatch;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.users.entity.QUser;
@@ -29,6 +30,7 @@ public class WorkLogQueryRepository {
         return queryFactory
                 .select(Projections.constructor(
                         GetWorkLogByDateResponse.class,
+                        workLog.workLogId,
                         workMatch.workDate,
                         workLog.workTime_start,
                         workLog.workTime_end,
@@ -51,6 +53,7 @@ public class WorkLogQueryRepository {
         return queryFactory
                 .select(Projections.constructor(
                         GetWorkLogByPaid.class,
+                        workLog.workLogId,
                         workMatch.workDate,
                         caregiver.user.name
                 ))

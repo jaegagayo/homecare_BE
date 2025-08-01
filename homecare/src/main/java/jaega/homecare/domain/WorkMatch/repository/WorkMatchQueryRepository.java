@@ -29,6 +29,7 @@ public class WorkMatchQueryRepository {
         return queryFactory
                 .select(Projections.constructor(
                         GetCaregiverMatchesByMonth.class,
+                        workMatch.workMatchId,
                         user.name,
                         workMatch.workDate,
                         workMatch.status
