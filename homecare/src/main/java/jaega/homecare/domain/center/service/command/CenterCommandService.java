@@ -1,11 +1,17 @@
 package jaega.homecare.domain.center.service.command;
 
+import jaega.homecare.domain.center.dto.req.CenterLoginRequest;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
+import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
+import jaega.homecare.domain.center.entity.Center;
+import jaega.homecare.domain.center.mapper.CenterMapper;
+import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +24,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CenterCommandService {
 
+    private final CenterQueryService centerQueryService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CenterMapper centerMapper;
     private final CaregiverMapper caregiverMapper;
 
     // 유저 생성
@@ -36,6 +44,16 @@ public class CenterCommandService {
         user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
 
         return userRepository.save(user);
+    }
+
+    public CenterLoginResponse loginCenter(CenterLoginRequest request){
+        User user = userRepository.findByEmail(request.email());
+        if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new BadCredentialsException("로그인에 실패했습니다.");
+        }
+        Center center = centerQueryService.getCenterByUser(user);
+
+        return centerMapper.toLoginResponse(center);
     }
 
     // 랜덤 비밀번호 생성
