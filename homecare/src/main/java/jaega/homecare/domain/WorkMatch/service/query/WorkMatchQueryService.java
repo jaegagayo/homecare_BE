@@ -33,7 +33,7 @@ public class WorkMatchQueryService {
     public List<GetCaregiverMatchesResponse> getWorkMatchesByCaregiver(UUID caregiverId){
         Caregiver caregiver = caregiverQueryService.getCaregiver(caregiverId);
 
-        List<WorkMatch> workMatches = workMatchRepository.findByCaregiver(caregiver);
+        List<WorkMatch> workMatches = workMatchRepository.findByCaregiverOrderByIdDesc(caregiver);
         return workMatchMapper.toGetResponseByCaregiverList(workMatches);
     }
 

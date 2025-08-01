@@ -37,6 +37,7 @@ public class WorkMatchQueryRepository {
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
                 .where(workMatch.workDate.between(start, end))
+                .orderBy(workMatch.workDate.desc())
                 .fetch();
     }
 }

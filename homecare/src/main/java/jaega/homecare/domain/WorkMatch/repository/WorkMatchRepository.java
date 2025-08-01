@@ -11,5 +11,5 @@ import java.util.UUID;
 public interface WorkMatchRepository extends JpaRepository<WorkMatch, Long> {
     Optional<WorkMatch> findByWorkMatchId(UUID workMatchId);
 
-    List<WorkMatch> findByCaregiver(Caregiver caregiver);
+    List<WorkMatch> findByCaregiverOrderByIdDesc(Caregiver caregiver);
 }
