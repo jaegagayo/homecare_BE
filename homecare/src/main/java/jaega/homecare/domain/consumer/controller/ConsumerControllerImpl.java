@@ -4,6 +4,8 @@ import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
 import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
+import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConsumerControllerImpl implements ConsumerController {
 
     private final ConsumerCommandService consumerCommandService;
+    private final ServiceMatchCommandService serviceMatchCommandService;
     private final WorkMatchCommandService workMatchCommandService;
 
     @Override
@@ -28,6 +31,13 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     @Override
     public ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request){
+
+        CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(request.serviceRequestId(),
+                request.caregiverId(),
+                request.workTime_start(),
+                request.workTime_end(),
+                request.working_days());
+        serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
         CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(request.caregiverId(),
                 request.workTime_start(),

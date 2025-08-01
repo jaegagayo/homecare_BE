@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record ConfirmCaregiverRequest(
+        UUID serviceRequestId,
         UUID caregiverId,
 
         @Schema(description = "근무 시작 시간 (HH:mm)", example = "09:00")

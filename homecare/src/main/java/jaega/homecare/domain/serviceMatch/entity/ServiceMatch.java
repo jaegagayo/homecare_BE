@@ -40,19 +40,23 @@ public class ServiceMatch {
     private LocalDate serviceDate;
 
     @Column(name = "start_time")
-    private LocalTime stratTime;
+    private LocalTime startTime;
 
     @Column(name = "end_time")
     private LocalTime endTime;
 
     @Builder
-    public ServiceMatch(UUID serviceMatchId, ServiceRequest serviceRequest, Caregiver caregiver, MatchStatus status, LocalDate serviceDate, LocalTime stratTime, LocalTime endTime) {
+    public ServiceMatch(UUID serviceMatchId, ServiceRequest serviceRequest, Caregiver caregiver, MatchStatus status, LocalDate serviceDate, LocalTime startTime, LocalTime endTime) {
         this.serviceMatchId = serviceMatchId;
         this.serviceRequest = serviceRequest;
         this.caregiver = caregiver;
         this.status = MatchStatus.PENDING;
         this.serviceDate = serviceDate;
-        this.stratTime = stratTime;
+        this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public void setServiceMatch(UUID serviceMatchId){
+        this.serviceMatchId = serviceMatchId;
     }
 }
