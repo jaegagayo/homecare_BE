@@ -43,6 +43,7 @@ public class ConsumerControllerImpl implements ConsumerController {
                 request.workTime_start(),
                 request.workTime_end(),
                 request.working_days(),
+                request.location(),
                 request.distanceLog());
         workMatchCommandService.createWorkMatch(createWorkMatchRequest);
 

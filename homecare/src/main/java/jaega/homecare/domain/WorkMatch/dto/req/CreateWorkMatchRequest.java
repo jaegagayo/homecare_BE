@@ -11,6 +11,7 @@ public record CreateWorkMatchRequest(
         LocalTime workTime_start,
         LocalTime workTime_end,
         List<LocalDate> working_days,
+        String location,
         Double distanceLog
 ) {
 }

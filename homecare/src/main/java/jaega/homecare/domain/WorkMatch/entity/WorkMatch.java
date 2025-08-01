@@ -35,17 +35,20 @@ public class WorkMatch {
     @Column(name = "end_time")
     private LocalTime endTime;
 
+    private String location;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private WorkStatus status;
 
     @Builder
-    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime, WorkStatus status){
+    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime, String location, WorkStatus status){
         this.workMatchId = workMatchId;
         this.caregiver = caregiver;
         this.workDate = workDate;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.location = location;
         this.status = WorkStatus.PLANNED;
     }
 

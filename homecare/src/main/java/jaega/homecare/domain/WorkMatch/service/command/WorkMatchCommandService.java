@@ -36,7 +36,7 @@ public class WorkMatchCommandService {
 
         List<WorkMatch> workMatches = workingDays.stream()
                 .map(day -> {
-                    WorkMatch workMatch = workMatchMapper.toEntity(caregiver, day, request.workTime_start(), request.workTime_end());
+                    WorkMatch workMatch = workMatchMapper.toEntity(caregiver, day, request.workTime_start(), request.workTime_end(), request.location());
                     workMatch.setWorkMatch(UUID.randomUUID());
                     return workMatch;
                 })

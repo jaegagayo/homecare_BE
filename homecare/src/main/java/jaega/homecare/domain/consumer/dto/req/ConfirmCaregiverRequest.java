@@ -17,6 +17,7 @@ public record ConfirmCaregiverRequest(
         @Schema(description = "근무 종료 시간 (HH:mm)", example = "18:00")
         LocalTime workTime_end,
         List<LocalDate> working_days,
+        String location,
         Double distanceLog
 ) {
 }

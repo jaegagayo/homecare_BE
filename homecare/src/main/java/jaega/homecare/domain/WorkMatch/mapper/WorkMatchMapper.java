@@ -19,9 +19,10 @@ public interface WorkMatchMapper {
     @Mapping(target = "workDate", source = "workDate")
     @Mapping(target = "startTime", source = "startTime")
     @Mapping(target = "endTime", source = "endTime")
+    @Mapping(target = "location", source = "location")
     @Mapping(target = "workMatchId", ignore = true)
     @Mapping(target = "status", ignore = true)
-    WorkMatch toEntity(Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime);
+    WorkMatch toEntity(Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime, String location);
 
     @Mapping(target = "workMatch", source = "workMatch")
     @Mapping(target = "workTime_start", source = "request.workTime_start")
