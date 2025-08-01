@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
@@ -24,6 +25,11 @@ public interface CenterController {
     @ApiResponse(responseCode = "204", description = "요양 보호사 등록 성공")
     @PostMapping("/{centerId}/caregiver")
     ResponseEntity<Void> createCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId);
+
+    @Operation(summary = "보호사 상세 정보 등록 API", description = "입력받은 정보로 요양보호사의 프로필을 등록합니다.")
+    @ApiResponse(responseCode = "204", description = "요양 보호사 상세 정보 등록 성공")
+    @PostMapping("/caregiver")
+    ResponseEntity<Void> createCaregiverProfile(@RequestBody CreateCaregiverProfileRequest request);
 
     @Operation(summary = "보호사 목록 조회 API", description = "센터에 소속된 요양 보호사를 모두 조회합니다.")
     @ApiResponse(responseCode = "200", description = "요양 보호사 전체 조회 성공")

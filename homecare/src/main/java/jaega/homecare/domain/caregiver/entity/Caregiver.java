@@ -1,5 +1,6 @@
 package jaega.homecare.domain.caregiver.entity;
 
+import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.users.entity.User;
 import jakarta.persistence.*;
@@ -74,4 +75,11 @@ public class Caregiver {
         this.caregiverId = uuid;
     }
 
+    public void setCaregiverProfile(CreateCaregiverProfileRequest request){
+        this.availableStartTime = request.availableStartTIme();
+        this.availableEndTime = request.availableEndTime();
+        this.address = request.address();
+        this.serviceTypes = request.serviceTypes();
+        this.daysOff = request.daysOff();
+    }
 }
