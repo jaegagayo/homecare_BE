@@ -8,6 +8,7 @@ import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,4 +47,10 @@ public interface CenterController {
             @RequestParam int year,
             @RequestParam int month
     );
+
+    @Operation(summary = "센터의 특정 서비스 매칭 정보 조회 API", description = "센터에서 서비스 매칭 UUID를 기반으로 서비스 매칭 정보를 상세 조회합니다.<br>" +
+            "센터에서 1. 배정 내역 전체 조회를 하고 리턴된 UUID를 기반으로 이 API를 호출하는 느낌으로 구현했습니다.")
+    @ApiResponse(responseCode = "200", description = "특정 서비스 정보 조회 API")
+    @GetMapping("/schedule/detail/{serviceMatchId}")
+    ResponseEntity<GetServiceMatchByUUID> getMatchesByUUID(@PathVariable UUID serviceMatchId);
 }

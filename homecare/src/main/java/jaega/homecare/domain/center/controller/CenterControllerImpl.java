@@ -11,6 +11,7 @@ import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
@@ -66,6 +67,12 @@ public class CenterControllerImpl implements CenterController{
             @RequestParam int month
     ) {
         List<GetCaregiverMatchesByMonth> response = workMatchQueryService.getWorkMatchesByMonth(year, month);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GetServiceMatchByUUID> getMatchesByUUID(@PathVariable UUID serviceMatchId){
+        GetServiceMatchByUUID response = serviceMatchQueryService.getMatchesByUUID(serviceMatchId);
         return ResponseEntity.ok(response);
     }
 }
