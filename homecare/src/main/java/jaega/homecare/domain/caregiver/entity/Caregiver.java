@@ -2,6 +2,7 @@ package jaega.homecare.domain.caregiver.entity;
 
 import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.entity.Center;
+import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -45,6 +46,9 @@ public class Caregiver {
     @Column(name = "address")
     private String address;
 
+    @Embedded
+    private Location location;
+
     // 서비스 유형 (다중 선택 가능)
     @ElementCollection(targetClass = ServiceType.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "service_type", joinColumns = @JoinColumn(name = "caregiver_id"))
@@ -59,6 +63,11 @@ public class Caregiver {
     @Column(name = "day_of_week")
     private Set<DayOfWeek> daysOff = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
+    private CaregiverStatus status;
+
+    private String personalityType;
+
     @Builder
     public Caregiver(UUID caregiverId, User user, Center center, LocalTime availableStartTime, LocalTime availableEndTime, String address, Set<ServiceType> serviceTypes, Set<DayOfWeek> daysOff) {
         this.caregiverId = caregiverId;
@@ -69,6 +78,7 @@ public class Caregiver {
         this.address = address;
         this.serviceTypes = serviceTypes;
         this.daysOff = daysOff;
+        this.status = CaregiverStatus.ACTIVE;
     }
 
     public void initializeCaregiver(UUID uuid) {
@@ -79,6 +89,7 @@ public class Caregiver {
         this.availableStartTime = request.availableStartTIme();
         this.availableEndTime = request.availableEndTime();
         this.address = request.address();
+        this.location = request.location();
         this.serviceTypes = request.serviceTypes();
         this.daysOff = request.daysOff();
     }

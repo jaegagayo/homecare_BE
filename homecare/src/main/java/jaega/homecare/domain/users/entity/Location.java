@@ -1,4 +1,4 @@
-package jaega.homecare.domain.serviceRequest.entity;
+package jaega.homecare.domain.users.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
