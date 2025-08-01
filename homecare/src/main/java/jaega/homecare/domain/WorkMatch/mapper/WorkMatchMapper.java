@@ -28,4 +28,11 @@ public interface WorkMatchMapper {
     @Mapping(target = "workTime_end", source = "request.workTime_end")
     @Mapping(target = "distanceLog", source = "request.distanceLog")
     CreateWorkLogRequest toWorkLogCreateRequest(CreateWorkMatchRequest request, WorkMatch workMatch);
+
+
+    @Mapping(target = "workDate", source = "workDate")
+    @Mapping(target = "status", source = "status")
+    GetCaregiverMatchesResponse toGetResponseByCaregiver(WorkMatch workMatch);
+
+    List<GetCaregiverMatchesResponse> toGetResponseByCaregiverList(List<WorkMatch> workMatches);
 }
