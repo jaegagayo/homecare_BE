@@ -1,4 +1,4 @@
-package jaega.homecare.domain.users.dto.req;
+package jaega.homecare.domain.consumer.dto.req;
 
 import java.time.LocalDate;
 

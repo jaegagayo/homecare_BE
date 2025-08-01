@@ -1,11 +1,11 @@
-package jaega.homecare.domain.users.controller;
+package jaega.homecare.domain.consumer.controller;
 
 import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
 import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
-import jaega.homecare.domain.users.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
 import jaega.homecare.domain.users.entity.UserRole;
-import jaega.homecare.domain.users.service.command.ConsumerCommandService;
+import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;

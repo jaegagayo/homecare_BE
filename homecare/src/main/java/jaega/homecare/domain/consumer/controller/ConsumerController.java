@@ -1,10 +1,10 @@
-package jaega.homecare.domain.users.controller;
+package jaega.homecare.domain.consumer.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
-import jaega.homecare.domain.users.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
