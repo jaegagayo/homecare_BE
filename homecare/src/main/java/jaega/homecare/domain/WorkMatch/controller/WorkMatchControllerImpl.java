@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/schedule")
+@RequestMapping("/api/centerSchedule")
 public class WorkMatchControllerImpl implements WorkMatchController{
 
     private final WorkMatchQueryService workMatchQueryService;

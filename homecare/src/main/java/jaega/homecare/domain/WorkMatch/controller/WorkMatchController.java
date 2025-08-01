@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "workMatch", description = "근무 매칭 API")
-@RequestMapping("/api/schedule")
+@Tag(name = "workMatch", description = "센터(요양보호사) 매칭 API")
+@RequestMapping("/api/centerSchedule")
 public interface WorkMatchController {
 
     @Operation(summary = "특정 요양 보호사의 매칭 스케줄 조회", description = "특정 요양 보호사의 매칭 스케줄들을 조회합니다.")
