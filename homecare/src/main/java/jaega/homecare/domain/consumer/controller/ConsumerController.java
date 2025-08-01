@@ -5,12 +5,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User_Consumer", description = "유저(consumer) API")
+import java.util.List;
+import java.util.UUID;
+
+@Tag(name = "Consumer", description = "유저(consumer) API")
 @RequestMapping("/api/consumer")
 public interface ConsumerController {
 
@@ -24,4 +26,8 @@ public interface ConsumerController {
     @PostMapping("/confirm")
     ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request);
 
+    @Operation(summary = "특정 수요자의 매칭 스케줄 조회", description = "특정 수요자의 매칭된 결과를 토대로 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 수요자의 매칭 스케줄 조회 성공")
+    @GetMapping("/schedule/{consumerId}")
+    ResponseEntity<List<GetServiceMatchByConsumerResponse>> getMatchesByConsumer(@PathVariable UUID consumerId);
 }
