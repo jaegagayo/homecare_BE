@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -29,14 +30,14 @@ public class WorkMatchCommandService {
     public void createWorkMatch(CreateWorkMatchRequest request){
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
 
-        List<LocalDate> workingDays = request.working_days();
+        Set<LocalDate> workingDays = request.working_days();
         if (workingDays == null || workingDays.isEmpty()) {
             throw new IllegalArgumentException("working_day 리스트는 비어 있을 수 없습니다.");
         }
 
         List<WorkMatch> workMatches = workingDays.stream()
                 .map(day -> {
-                    WorkMatch workMatch = workMatchMapper.toEntity(caregiver, day, request.workTime_start(), request.workTime_end(), request.location());
+                    WorkMatch workMatch = workMatchMapper.toEntity(caregiver, day, request.workTime_start(), request.workTime_end(), request.address());
                     workMatch.setWorkMatch(UUID.randomUUID());
                     return workMatch;
                 })

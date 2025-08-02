@@ -8,6 +8,8 @@ import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
+import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
+import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class ConsumerControllerImpl implements ConsumerController {
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final WorkMatchCommandService workMatchCommandService;
     private final ServiceMatchQueryService serviceMatchQueryService;
+    private final ServiceRequestQueryService serviceRequestQueryService;
 
     @Override
     public ResponseEntity<Void> createConsumer(@RequestBody ConsumerCreateRequest request) {
@@ -39,18 +42,20 @@ public class ConsumerControllerImpl implements ConsumerController {
     @Override
     public ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request){
 
+        ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(request.serviceRequestId());
+
         CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(request.serviceRequestId(),
                 request.caregiverId(),
-                request.workTime_start(),
-                request.workTime_end(),
-                request.working_days());
+                serviceRequest.getPreferred_time_start(),
+                serviceRequest.getPreferred_time_end(),
+                serviceRequest.getRequestedDays());
         serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
         CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(request.caregiverId(),
-                request.workTime_start(),
-                request.workTime_end(),
-                request.working_days(),
-                request.location(),
+                serviceRequest.getPreferred_time_start(),
+                serviceRequest.getPreferred_time_end(),
+                serviceRequest.getRequestedDays(),
+                serviceRequest.getAddress(),
                 request.distanceLog());
         workMatchCommandService.createWorkMatch(createWorkMatchRequest);
 
