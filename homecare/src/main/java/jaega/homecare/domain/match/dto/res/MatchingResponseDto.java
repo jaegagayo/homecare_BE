@@ -4,6 +4,7 @@ import java.util.List;
 
 public record MatchingResponseDto(
         String caregiverId,
+        String caregiverName,
         String availableStartTime,
         String availableEndTime,
         String address,

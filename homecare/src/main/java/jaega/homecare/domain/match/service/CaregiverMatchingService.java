@@ -2,6 +2,7 @@ package jaega.homecare.domain.match.service;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
+import jaega.homecare.domain.match.dto.res.MatchingResponseDto;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.match.dto.req.CaregiverDTO;
@@ -48,8 +49,8 @@ public class CaregiverMatchingService {
 
         ServiceRequestDTO dto = convertToDTO(request);
 
-        // DTO 리스트를 넘기기
-        return aiClient.sendRecommendRequest(dto, finalCandidateDTOs);
+        MatchResponse response = aiClient.sendRecommendRequest(dto, finalCandidateDTOs);
+        return enrichWithCaregiverNames(response);
     }
 
     private ServiceRequestDTO convertToDTO(ServiceRequest entity) {
@@ -105,5 +106,28 @@ public class CaregiverMatchingService {
         return caregivers.stream()
                 .map(this::convertCaregiverToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public MatchResponse enrichWithCaregiverNames(MatchResponse response) {
+        Map<UUID, String> idToNameMap = caregiverRepository.findAll().stream()
+                .collect(Collectors.toMap(
+                        Caregiver::getCaregiverId,
+                        caregiver -> caregiver.getUser().getName()
+                ));
+
+        List<MatchingResponseDto> enrichedList = response.matchedCaregivers().stream()
+                .map(dto -> new MatchingResponseDto(
+                        dto.caregiverId(),
+                        idToNameMap.getOrDefault(UUID.fromString(dto.caregiverId()), "이름없음"), 
+                        dto.availableStartTime(),
+                        dto.availableEndTime(),
+                        dto.address(),
+                        dto.location(),
+                        dto.matchScore(),
+                        dto.matchReason()
+                ))
+                .toList();
+
+        return new MatchResponse(enrichedList, response.totalMatches());
     }
 }
