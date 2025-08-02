@@ -9,6 +9,8 @@ import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
+import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
+import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +24,7 @@ public class WorkMatchQueryService {
 
     private final WorkMatchRepository workMatchRepository;
     private final WorkMatchQueryRepository workMatchQueryRepository;
-    private final CaregiverQueryService caregiverQueryService;
-    private final WorkMatchMapper workMatchMapper;
+    private final ServiceMatchQueryRepository serviceMatchQueryRepository;
 
     public WorkMatch getWorkMatch(UUID workMatchId){
         return workMatchRepository.findByWorkMatchId(workMatchId)
@@ -31,10 +32,7 @@ public class WorkMatchQueryService {
     }
 
     public List<GetCaregiverMatchesResponse> getWorkMatchesByCaregiver(UUID caregiverId){
-        Caregiver caregiver = caregiverQueryService.getCaregiver(caregiverId);
-
-        List<WorkMatch> workMatches = workMatchRepository.findByCaregiverOrderByIdDesc(caregiver);
-        return workMatchMapper.toGetResponseByCaregiverList(workMatches);
+        return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
     }
 
     public List<GetCaregiverMatchesByMonth> getWorkMatchesByMonth(UUID centerId, int year, int month) {

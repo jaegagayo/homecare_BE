@@ -14,14 +14,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
 public class WorkMatchQueryRepository {
     private final JPAQueryFactory queryFactory;
-
 
     public List<GetCaregiverMatchesByMonth> findWorkMatchesByMonth(UUID centerId, int year, int month) {
         QWorkMatch workMatch = QWorkMatch.workMatch;

@@ -31,9 +31,4 @@ public interface WorkMatchMapper {
     CreateWorkLogRequest toWorkLogCreateRequest(CreateWorkMatchRequest request, WorkMatch workMatch);
 
 
-    @Mapping(target = "workDate", source = "workDate")
-    @Mapping(target = "status", source = "status")
-    GetCaregiverMatchesResponse toGetResponseByCaregiver(WorkMatch workMatch);
-
-    List<GetCaregiverMatchesResponse> toGetResponseByCaregiverList(List<WorkMatch> workMatches);
 }
