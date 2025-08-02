@@ -1,7 +1,9 @@
 package jaega.homecare.global.dummy.service;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiver.repository.CertificationRepository;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.repository.CenterRepository;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
@@ -27,6 +29,7 @@ public class DummyDataService {
     private final CenterRepository centerRepository;
     private final CaregiverRepository caregiverRepository;
     private final ServiceRequestRepository serviceRequestRepository;
+    private final CertificationRepository certificationRepository;
     private final Random random = new Random();
 
     public void generateAllDummyData() {
@@ -109,6 +112,15 @@ public class DummyDataService {
                 .daysOff(daysOff)
                 .build();
         caregiverRepository.save(caregiver);
+
+        Certification certification = Certification.builder()
+                .certificationId(UUID.randomUUID())
+                .caregiver(caregiver)
+                .certificationNumber("CERT-2025-" + String.format("%04d", index))
+                .certificationDate(LocalDate.of(2020 + random.nextInt(5), random.nextInt(12) + 1, random.nextInt(28) + 1))
+                .trainStatus(random.nextBoolean())
+                .build();
+        certificationRepository.save(certification);
     }
 
     private void createDummyServiceRequest(int index) {
@@ -128,9 +140,9 @@ public class DummyDataService {
         }
 
         Set<LocalDate> requestedDays = new HashSet<>();
-        int daysToRequest = random.nextInt(3) + 1; // 1~3일 요청
+        int daysToRequest = 1;
         for (int i = 0; i < daysToRequest; i++) {
-            requestedDays.add(LocalDate.now().plusDays(random.nextInt(30) + 1));
+            requestedDays.add(LocalDate.now().plusDays(random.nextInt(2) + 1));
         }
 
         ServiceRequest serviceRequest = ServiceRequest.builder()

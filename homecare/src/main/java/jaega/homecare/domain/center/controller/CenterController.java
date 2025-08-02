@@ -89,7 +89,7 @@ public interface CenterController {
     @Operation(summary = "요양보호사의 자격증 조회 API", description = "센터 요양보호사의 자격증을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "센터 요양보호사의 자격증 정보 조회 성공")
     @GetMapping("/{caregiverId}/certification")
-    ResponseEntity<GetCertificationResponse> getCertificationByCaregiver(@RequestParam UUID caregiverId);
+    ResponseEntity<GetCertificationResponse> getCertificationByCaregiver(@PathVariable UUID caregiverId);
 
     @Operation(summary = "요양보호사 자격증 교육 상태 전환 API", description = "요양보호사 자격증의 교육 완료 상태를 전환합니다.")
     @ApiResponse(responseCode = "204", description = "요양보호사 자격증의 교육 상태 전환 성공")

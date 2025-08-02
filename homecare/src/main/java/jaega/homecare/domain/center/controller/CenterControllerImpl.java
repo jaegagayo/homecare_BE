@@ -120,7 +120,7 @@ public class CenterControllerImpl implements CenterController{
     }
 
     @Override
-    public ResponseEntity<GetCertificationResponse> getCertificationByCaregiver(@RequestParam UUID caregiverId){
+    public ResponseEntity<GetCertificationResponse> getCertificationByCaregiver(@PathVariable UUID caregiverId){
         GetCertificationResponse response = certificationQueryService.getCertificationByCaregiver(caregiverId);
         return ResponseEntity.ok(response);
     }
