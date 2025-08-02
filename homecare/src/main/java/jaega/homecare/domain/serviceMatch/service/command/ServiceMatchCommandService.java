@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -30,7 +31,7 @@ public class ServiceMatchCommandService {
         ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(request.serviceRequestId());
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
 
-        List<LocalDate> serviceDays = request.service_days();
+        Set<LocalDate> serviceDays = request.service_days();
         if(serviceDays == null || serviceDays.isEmpty()){
             throw new IllegalArgumentException("service_days 리스트는 비어 있을 수 없습니다.");
         }

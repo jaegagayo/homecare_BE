@@ -21,7 +21,7 @@ public class CaregiverFilterProcessor {
 
     public List<Caregiver> filter(ServiceRequest request, List<Caregiver> candidates, LocalDate applyDate) {
         return candidates.stream()
-           //     .filter(c -> !isDayOff(c, applyDate.getDayOfWeek()))
+                .filter(c -> !isDayOff(c, applyDate.getDayOfWeek()))
                 .filter(c -> isAvailableAtTime(c, request.getPreferred_time_start(), request.getPreferred_time_end()))
                 .filter(c -> supportsServiceType(c, request.getServiceType()))
                 .filter(c -> !hasOverlappingWork(c, applyDate, request.getPreferred_time_start(), request.getPreferred_time_end()))
