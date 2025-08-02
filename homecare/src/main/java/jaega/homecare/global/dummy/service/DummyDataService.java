@@ -1,16 +1,21 @@
 package jaega.homecare.global.dummy.service;
 
+import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
+import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.repository.CertificationRepository;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.repository.CenterRepository;
+import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
+import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
 import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,16 +35,20 @@ public class DummyDataService {
     private final CaregiverRepository caregiverRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
+
+    private final ServiceMatchCommandService serviceMatchCommandService;
+    private final WorkMatchCommandService workMatchCommandService;
     private final Random random = new Random();
 
+    @Transactional
     public void generateAllDummyData() {
         // 1. 모든 사용자 데이터 먼저 생성
-        IntStream.range(0, 50).forEach(this::createDummyUser);
+        IntStream.range(0, 60).forEach(this::createDummyUser);
 
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
         // 더미 센터 5개 생성
-        IntStream.range(0, 5).forEach(this::createDummyCenter);
+        IntStream.range(0, 3).forEach(this::createDummyCenter);
 
         // 더미 요양보호사 생성
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
@@ -74,7 +83,7 @@ public class DummyDataService {
         // 파라미터로 넘어온 caregivers 리스트를 사용
         User user = caregivers.get(index);
 
-        Center center = centerRepository.findAll().get(random.nextInt(5));
+        Center center = centerRepository.findAll().get(random.nextInt(3));
 
         LocalTime startTime, endTime;
         int timeSlot = random.nextInt(3);
@@ -155,7 +164,38 @@ public class DummyDataService {
                 .additionalInformation("추가 정보" + index)
                 .build();
 
-        serviceRequest.setServiceRequest(UUID.randomUUID(), user, ServiceRequestStatus.PENDING, requestedDays);
+        UUID serviceRequestId = UUID.randomUUID();
+        serviceRequest.setServiceRequest(serviceRequestId, user, ServiceRequestStatus.PENDING, requestedDays);
         serviceRequestRepository.save(serviceRequest);
+
+        List<Caregiver> caregivers = caregiverRepository.findAll();
+        if (!caregivers.isEmpty()) {
+            Caregiver matchedCaregiver = caregivers.get(random.nextInt(caregivers.size()));
+            UUID caregiverId = matchedCaregiver.getCaregiverId();
+
+            // 거리 대충 87~125 사이 랜덤값
+            double distanceLog = 87.0 + (random.nextDouble() * 38.0);
+
+            // 서비스 매칭 생성
+            CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(
+                    serviceRequestId,
+                    caregiverId,
+                    startTime,
+                    endTime,
+                    requestedDays
+            );
+            serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
+
+            // 근무 매칭 생성
+            CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(
+                    caregiverId,
+                    startTime,
+                    endTime,
+                    requestedDays,
+                    serviceRequest.getAddress(),
+                    distanceLog
+            );
+            workMatchCommandService.createWorkMatch(createWorkMatchRequest);
+        }
     }
 }

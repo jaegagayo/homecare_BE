@@ -65,6 +65,8 @@ public class ServiceMatchQueryRepository {
                         GetServiceMatchByConsumerResponse.class,
                         requesterUser.name,
                         caregiverUser.name,
+                        caregiver.address,
+                        caregiver.user.phone,
                         serviceMatch.serviceDate,
                         serviceMatch.startTime,
                         serviceMatch.endTime,
