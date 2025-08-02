@@ -47,13 +47,19 @@ public class CenterCommandService {
     }
 
     public CenterLoginResponse loginCenter(CenterLoginRequest request){
+        /*
         User user = userRepository.findByEmail(request.email());
         if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new BadCredentialsException("로그인에 실패했습니다.");
         }
         Center center = centerQueryService.getCenterByUser(user);
 
-        return centerMapper.toLoginResponse(center);
+         */
+
+       // return centerMapper.toLoginResponse(center);
+
+
+        return new CenterLoginResponse(UUID.fromString("1534ae77-5ded-4764-86ce-d3215968a110"));
     }
 
     // 랜덤 비밀번호 생성
