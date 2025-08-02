@@ -29,4 +29,11 @@ public class Center {
 
     private String contact_number;
 
+    public void setCenter(UUID centerId, User user, String name, String center_address, String contact_number){
+        this.centerId = centerId;
+        this.user = user;
+        this.name = name;
+        this.center_address = center_address;
+        this.contact_number = contact_number;
+    }
 }
