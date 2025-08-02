@@ -5,12 +5,16 @@ import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
+import jaega.homecare.domain.center.dto.req.CenterLoginRequest;
+import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
+import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
@@ -43,6 +47,18 @@ public class CenterControllerImpl implements CenterController{
     }
 
     @Override
+    public ResponseEntity<CenterLoginResponse> loginCenter(@RequestBody CenterLoginRequest request){
+        CenterLoginResponse response = centerCommandService.loginCenter(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> createCaregiverProfile(@RequestBody CreateCaregiverProfileRequest request){
+        caregiverCommandService.createCaregiverProfile(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<List<GetCaregiverResponse>> getAllCaregivers(@PathVariable UUID centerId){
         List<GetCaregiverResponse> caregivers = caregiverQueryService.getAllCaregiversByCenter(centerId);
         return ResponseEntity.ok(caregivers);
@@ -66,6 +82,12 @@ public class CenterControllerImpl implements CenterController{
             @RequestParam int month
     ) {
         List<GetCaregiverMatchesByMonth> response = workMatchQueryService.getWorkMatchesByMonth(year, month);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GetServiceMatchByUUID> getMatchesByUUID(@PathVariable UUID serviceMatchId){
+        GetServiceMatchByUUID response = serviceMatchQueryService.getMatchesByUUID(serviceMatchId);
         return ResponseEntity.ok(response);
     }
 }

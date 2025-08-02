@@ -4,12 +4,16 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.entity.QWorkMatch;
+import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
+import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
+import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.users.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -29,6 +33,7 @@ public class WorkMatchQueryRepository {
         return queryFactory
                 .select(Projections.constructor(
                         GetCaregiverMatchesByMonth.class,
+                        workMatch.workMatchId,
                         user.name,
                         workMatch.workDate,
                         workMatch.status
@@ -38,6 +43,26 @@ public class WorkMatchQueryRepository {
                 .join(caregiver.user, user)
                 .where(workMatch.workDate.between(start, end))
                 .orderBy(workMatch.workDate.desc())
+                .fetch();
+    }
+
+    public List<WorkMatch> findOverlappingWorkMatches(
+            Caregiver caregiver,
+            LocalDate date,
+            LocalTime startTime,
+            LocalTime endTime
+    ) {
+        QWorkMatch wm = QWorkMatch.workMatch;
+
+        return queryFactory
+                .selectFrom(wm)
+                .where(
+                        wm.caregiver.eq(caregiver),
+                        wm.workDate.eq(date),
+                        wm.status.eq(WorkStatus.PLANNED),
+                        wm.startTime.lt(endTime),
+                        wm.endTime.gt(startTime)
+                )
                 .fetch();
     }
 }

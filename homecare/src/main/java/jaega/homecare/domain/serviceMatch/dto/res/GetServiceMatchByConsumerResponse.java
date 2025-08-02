@@ -1,5 +1,7 @@
 package jaega.homecare.domain.serviceMatch.dto.res;
 
+import jaega.homecare.domain.caregiver.entity.ServiceType;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -9,6 +11,6 @@ public record GetServiceMatchByConsumerResponse(
         LocalDate serviceDate,
         LocalTime startTime,
         LocalTime endTime,
-        String serviceType
+        ServiceType serviceType
 ) {
 }

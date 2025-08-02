@@ -11,11 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,19 +26,8 @@ public class ServiceRequestCommandService {
         User user = userQueryService.getUser(request.userId());
 
         ServiceRequest serviceRequest = serviceRequestMapper.toEntity(request);
-        Set<Integer> requestedDaysSet = parseRequestedDays(request.requestedDays());
 
-        serviceRequest.setServiceRequest(UUID.randomUUID(), user, ServiceRequestStatus.PENDING, requestedDaysSet);
+        serviceRequest.setServiceRequest(UUID.randomUUID(), user, ServiceRequestStatus.PENDING, request.requestedDays());
         serviceRequestRepository.save(serviceRequest);
-    }
-
-    private Set<Integer> parseRequestedDays(String requestedDaysStr) {
-        if (requestedDaysStr == null || requestedDaysStr.isEmpty()) {
-            return Collections.emptySet();
-        }
-        return Arrays.stream(requestedDaysStr.split(","))
-                .map(String::trim)
-                .map(Integer::parseInt)
-                .collect(Collectors.toSet());
     }
 }
