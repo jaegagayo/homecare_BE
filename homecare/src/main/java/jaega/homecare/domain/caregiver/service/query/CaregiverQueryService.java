@@ -2,10 +2,12 @@ package jaega.homecare.domain.caregiver.service.query;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
+import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
 import jaega.homecare.domain.caregiver.repository.CaregiverQueryRepository;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
 import jaega.homecare.domain.users.entity.ServiceType;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class CaregiverQueryService {
 
     private final CaregiverQueryRepository caregiverQueryRepository;
     private final CaregiverRepository caregiverRepository;
+    private final CaregiverMapper caregiverMapper;
 
     public List<GetCaregiverResponse> getAllCaregiversByCenter(UUID centerId) {
         return caregiverQueryRepository.findAllByCenterId(centerId);
@@ -38,5 +41,10 @@ public class CaregiverQueryService {
 
     public List<GetCaregiverByServiceTypeResponse> getCaregiverByServiceType(UUID centerId, Set<ServiceType> serviceTypes){
         return caregiverQueryRepository.findCaregiverByServiceTypes(centerId, serviceTypes);
+    }
+
+    public GetCaregiverProfileResponse getCaregiverProfile(UUID caregiverId){
+        Caregiver caregiver = getCaregiver(caregiverId);
+        return caregiverMapper.toGetCaregiverProfile(caregiver);
     }
 }

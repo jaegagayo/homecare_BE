@@ -11,10 +11,7 @@ import jaega.homecare.domain.caregiver.service.command.CertificationCommandServi
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiver.service.query.CertificationQueryService;
 import jaega.homecare.domain.center.dto.req.*;
-import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
+import jaega.homecare.domain.center.dto.res.*;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
@@ -132,5 +129,11 @@ public class CenterControllerImpl implements CenterController{
     public ResponseEntity<Void> changeTrainStatus(@RequestBody UUID certificationId){
         certificationCommandService.changeTrainStatus(certificationId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<GetCaregiverProfileResponse >getCaregiverProfile(@RequestParam UUID caregiverId){
+        GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfile(caregiverId);
+        return ResponseEntity.ok(response);
     }
 }

@@ -18,7 +18,7 @@ public class Certification {
     private Long id;
 
     @Column(name = "certification_id", unique = true)
-    private UUID certificationID;
+    private UUID certificationId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caregiver_id")
@@ -32,7 +32,7 @@ public class Certification {
 
     @Builder
     public Certification(UUID certificationId, Caregiver caregiver, String certificationNumber, LocalDate certificationDate, boolean trainStatus){
-        this.certificationID = certificationId;
+        this.certificationId = certificationId;
         this.caregiver = caregiver;
         this.CertificationNumber = certificationNumber;
         this.CertificationDate = certificationDate;
@@ -40,7 +40,7 @@ public class Certification {
     }
 
     public void setCertification(UUID certificationID){
-        this.certificationID = certificationID;
+        this.certificationId = certificationID;
     }
 
     public void changeStatus(boolean trainStatus){

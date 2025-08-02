@@ -9,10 +9,7 @@ import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
 import jaega.homecare.domain.center.dto.req.*;
-import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
+import jaega.homecare.domain.center.dto.res.*;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.users.entity.ServiceType;
@@ -98,4 +95,9 @@ public interface CenterController {
     @ApiResponse(responseCode = "204", description = "요양보호사 자격증의 교육 상태 전환 성공")
     @PostMapping("/certification/change")
     ResponseEntity<Void> changeTrainStatus(@RequestBody UUID certificationId);
+
+    @Operation(summary = "요양보호사 인사카드 조회", description = "요양보호사의 ID로 인사카드를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사 인사카드 조회 성공")
+    @GetMapping("/profile")
+    ResponseEntity<GetCaregiverProfileResponse>getCaregiverProfile(@RequestParam UUID caregiverId);
 }

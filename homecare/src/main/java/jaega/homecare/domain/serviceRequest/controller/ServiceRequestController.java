@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
+import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
@@ -21,7 +22,7 @@ public interface ServiceRequestController {
     @Operation(summary = "수요자 서비스 요청 API", description = "입력받은 정보로 수요자가 서비스를 요청합니다.")
     @ApiResponse(responseCode = "204", description = "수요자가 서비스 요청 성공")
     @PostMapping
-    ResponseEntity<Void> createServiceRequest(@RequestBody ConsumerServiceRequest request);
+    ResponseEntity<GetCreateServiceResponse> createServiceRequest(@RequestBody ConsumerServiceRequest request);
 
     @Operation(summary  = "수요자가 신청한 서비스 내역 조회 API", description = "수요자가 신청한 서비스를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 조회 성공")

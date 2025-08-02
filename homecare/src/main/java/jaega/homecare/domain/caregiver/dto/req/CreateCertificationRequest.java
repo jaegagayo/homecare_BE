@@ -6,7 +6,6 @@ import java.util.UUID;
 public record CreateCertificationRequest(
         UUID caregiverId,
         String certificationNumber,
-        LocalDate certificationDate,
-        boolean trainStatus
+        LocalDate certificationDate
 ) {
 }
