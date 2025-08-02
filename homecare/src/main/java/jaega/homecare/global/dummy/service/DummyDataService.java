@@ -59,14 +59,30 @@ public class DummyDataService {
     }
 
     private void createDummyUser(int index) {
-        UserRole role = index % 5 == 0 ? UserRole.ROLE_CENTER : (index % 3 == 0 ? UserRole.ROLE_CAREGIVER : UserRole.ROLE_CONSUMER);
+        List<String> koreanNames = List.of(
+                "김기현", "박지성", "이재민", "최유진", "장서연",
+                "정하늘", "김소희", "이수환", "박민재", "윤지영",
+                "한동훈", "강채영", "오세훈", "조민아", "서지수",
+                "신재혁", "배유림", "노지민", "황서현", "문지호"
+        );
+
+        String name = koreanNames.get(index % koreanNames.size());
+
+        // 이메일 생성: 이름을 영어로 단순 변환 + 인덱스 붙이기
+        String emailPrefix = "user" + index;
+        String email = emailPrefix + "@dummy.com";
+
+        UserRole role = index % 5 == 0 ? UserRole.ROLE_CENTER :
+                (index % 3 == 0 ? UserRole.ROLE_CAREGIVER : UserRole.ROLE_CONSUMER);
+
         User user = User.builder()
-                .name("더미유저" + index)
-                .email("user" + index + "@dummy.com")
+                .name(name)
+                .email(email)
                 .password("$2a$10$vvUzhakZH7BQ0fpo8RfS/u3Ip54VLNHAQSoBCnCIYKSxVBmAhxaVG")
                 .phone("010-1234-" + String.format("%04d", index))
                 .birthDate(LocalDate.of(1970 + random.nextInt(30), random.nextInt(12) + 1, random.nextInt(28) + 1))
                 .build();
+
         user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
         userRepository.save(user);
     }
