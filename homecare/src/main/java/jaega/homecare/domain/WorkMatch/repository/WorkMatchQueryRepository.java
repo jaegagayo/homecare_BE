@@ -21,13 +21,23 @@ import java.util.*;
 public class WorkMatchQueryRepository {
     private final JPAQueryFactory queryFactory;
 
-    public List<GetCaregiverMatchesByMonth> findWorkMatchesByMonth(UUID centerId, int year, int month) {
+    public List<GetCaregiverMatchesByMonth> findWorkMatchesByMonth(UUID centerId, int year, int month, Integer day) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
 
-        LocalDate start = LocalDate.of(year, month, 1);
-        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+        LocalDate startDate;
+        LocalDate endDate;
+
+        if (day != null) {
+            // ✅ 특정 일만 조회
+            startDate = LocalDate.of(year, month, day);
+            endDate = startDate;
+        } else {
+            // ✅ 월 전체 조회
+            startDate = LocalDate.of(year, month, 1);
+            endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        }
 
         return queryFactory
                 .select(Projections.constructor(
@@ -40,8 +50,10 @@ public class WorkMatchQueryRepository {
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
-                .where(workMatch.workDate.between(start, end),
-                        caregiver.center.centerId.eq(centerId))
+                .where(
+                        workMatch.workDate.between(startDate, endDate),
+                        caregiver.center.centerId.eq(centerId)
+                )
                 .orderBy(workMatch.workDate.desc())
                 .fetch();
     }

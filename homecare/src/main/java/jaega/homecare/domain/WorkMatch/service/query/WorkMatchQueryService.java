@@ -35,8 +35,8 @@ public class WorkMatchQueryService {
         return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
     }
 
-    public List<GetCaregiverMatchesByMonth> getWorkMatchesByMonth(UUID centerId, int year, int month) {
-        return workMatchQueryRepository.findWorkMatchesByMonth(centerId, year, month);
+    public List<GetCaregiverMatchesByMonth> getWorkMatchesByMonth(UUID centerId, int year, int month, Integer day) {
+        return workMatchQueryRepository.findWorkMatchesByMonth(centerId, year, month, day);
     }
 
 }

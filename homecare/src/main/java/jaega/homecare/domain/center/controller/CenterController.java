@@ -62,7 +62,8 @@ public interface CenterController {
     ResponseEntity<List<GetCaregiverMatchesByMonth>> getMatchesByMonth(
             @RequestParam UUID centerId,
             @RequestParam int year,
-            @RequestParam int month
+            @RequestParam int month,
+            @RequestParam(required = false) Integer day
     );
 
     @Operation(summary = "센터의 특정 서비스 매칭 정보 조회 API", description = "센터에서 서비스 매칭 UUID를 기반으로 서비스 매칭 정보를 상세 조회합니다.<br>" +
