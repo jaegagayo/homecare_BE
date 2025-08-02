@@ -1,6 +1,6 @@
 package jaega.homecare.domain.center.dto.res;
 
-import jaega.homecare.domain.caregiver.entity.ServiceType;
+import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.util.Set;
 import java.util.UUID;

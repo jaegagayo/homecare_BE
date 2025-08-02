@@ -2,7 +2,7 @@ package jaega.homecare.domain.serviceRequest.dto.req;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jaega.homecare.domain.caregiver.entity.ServiceType;
+import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

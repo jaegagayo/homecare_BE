@@ -1,6 +1,6 @@
 package jaega.homecare.domain.serviceRequest.entity;
 
-import jaega.homecare.domain.caregiver.entity.ServiceType;
+import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.User;
 import jakarta.persistence.*;
@@ -37,6 +37,7 @@ public class ServiceRequest {
 
     private LocalTime preferred_time_end;
 
+    @Enumerated(EnumType.STRING)
     private ServiceType serviceType;
 
     @Enumerated(EnumType.STRING)

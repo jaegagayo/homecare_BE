@@ -2,7 +2,7 @@ package jaega.homecare.domain.match.service;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
-import jaega.homecare.domain.caregiver.entity.ServiceType;
+import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.match.dto.req.CaregiverDTO;
 import jaega.homecare.domain.match.dto.req.ServiceRequestDTO;
