@@ -116,7 +116,7 @@ public class ServiceMatchQueryRepository {
                 .collect(Collectors.toSet());
 
         // 3. JPQL로 serviceTypes 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
+        List<Object[]> rows = caregiverRepository.findServiceTypesByIds(caregiverIds);
 
         // 4. Map<Long, Set<ServiceType>> 변환
         Map<Long, Set<ServiceType>> serviceTypeMap = new HashMap<>();

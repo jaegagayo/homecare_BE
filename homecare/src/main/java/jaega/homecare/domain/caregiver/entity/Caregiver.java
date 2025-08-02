@@ -70,13 +70,14 @@ public class Caregiver {
     private String personalityType;
 
     @Builder
-    public Caregiver(UUID caregiverId, User user, Center center, LocalTime availableStartTime, LocalTime availableEndTime, String address, Set<ServiceType> serviceTypes, Set<DayOfWeek> daysOff) {
+    public Caregiver(UUID caregiverId, User user, Center center, LocalTime availableStartTime, LocalTime availableEndTime, String address, Location location, Set<ServiceType> serviceTypes, Set<DayOfWeek> daysOff) {
         this.caregiverId = caregiverId;
         this.user = user;
         this.center = center;
         this.availableStartTime = availableStartTime;
         this.availableEndTime = availableEndTime;
         this.address = address;
+        this.location = location;
         this.serviceTypes = serviceTypes;
         this.daysOff = daysOff;
         this.status = CaregiverStatus.ACTIVE;

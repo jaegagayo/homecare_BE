@@ -38,7 +38,8 @@ public class CaregiverQueryRepository {
                         c.getCaregiverId(),
                         c.getUser().getName(),
                         c.getUser().getPhone(),
-                        c.getServiceTypes()
+                        c.getServiceTypes(),
+                        c.getStatus()
                 ))
                 .toList();
     }
