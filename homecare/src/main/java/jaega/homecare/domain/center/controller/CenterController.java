@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
+import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
 import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
@@ -81,4 +83,14 @@ public interface CenterController {
     @ApiResponse(responseCode = "200", description = "센터 요양보호사의 서비스 유형 기반 조회 성공")
     @GetMapping("/{centerId}/serviceType")
     ResponseEntity<List<GetCaregiverByServiceTypeResponse>> getCaregiverByServiceType(@PathVariable UUID centerId, @RequestParam Set<ServiceType> serviceTypes);
+
+    @Operation(summary = "요양보호사의 자격증 생성 API", description = "센터 요양보호사의 자격증 정보를 생성합니다.")
+    @ApiResponse(responseCode = "200", description = "센터 요양보호사의 자격증 정보 생성 성공")
+    @PostMapping("/certification")
+    ResponseEntity<Void> createCertification(@RequestBody CreateCertificationRequest request);
+
+    @Operation(summary = "요양보호사의 자격증 조회 API", description = "센터 요양보호사의 자격증을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터 요양보호사의 자격증 정보 조회 성공")
+    @GetMapping("/{caregiverId}/certification")
+    ResponseEntity<GetCertificationResponse> getCertificationByCaregiver(@RequestParam UUID caregiverId);
 }
