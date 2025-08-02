@@ -1,5 +1,6 @@
 package jaega.homecare.domain.serviceRequest.service.query;
 
+import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
@@ -61,6 +62,11 @@ public class ServiceRequestQueryService {
         return serviceRequests.stream()
                 .map(serviceRequestMapper::toFindResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    public GetServiceRequestById findServiceRequestById(UUID serviceRequestId){
+        ServiceRequest serviceRequest = getServiceRequest(serviceRequestId);
+        return serviceRequestMapper.toGetResponseById(serviceRequest);
     }
 
 }

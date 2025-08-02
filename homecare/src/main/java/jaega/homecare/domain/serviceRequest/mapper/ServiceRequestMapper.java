@@ -2,6 +2,7 @@ package jaega.homecare.domain.serviceRequest.mapper;
 
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.req.LocationDto;
+import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
@@ -25,6 +26,8 @@ public interface ServiceRequestMapper {
     ServiceRequest toEntity(ConsumerServiceRequest request);
 
     GetServiceRequestResponse toFindResponseDto(ServiceRequest request);
+
+    GetServiceRequestById toGetResponseById(ServiceRequest serviceRequest);
 
     default Location map(LocationDto dto) {
         if (dto == null) return null;

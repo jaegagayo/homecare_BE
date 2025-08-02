@@ -1,9 +1,11 @@
 package jaega.homecare.domain.serviceRequest.controller;
 
+import com.amazonaws.transform.JsonUnmarshallerContextImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
+import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,4 +32,9 @@ public interface ServiceRequestController {
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 신청 상태를 조건으로 조회 성공")
     @GetMapping("/status")
     ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID userId, ServiceRequestStatus status);
+
+    @Operation(summary = "수요자가 신청한 서비스 내역 상세 조회", description = "수요자가 신청한 서비스 내역을 서비스 내역의 아이디로 상세 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 상세 조회 성공")
+    @GetMapping("/{serviceRequestId}")
+    ResponseEntity<GetServiceRequestById> getServiceRequestById(@PathVariable UUID serviceRequestId);
 }
