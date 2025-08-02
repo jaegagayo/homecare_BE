@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class WorkMatchQueryRepository {
     private final JPAQueryFactory queryFactory;
 
 
-    public List<GetCaregiverMatchesByMonth> findWorkMatchesByMonth(int year, int month) {
+    public List<GetCaregiverMatchesByMonth> findWorkMatchesByMonth(UUID centerId, int year, int month) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
@@ -41,11 +42,13 @@ public class WorkMatchQueryRepository {
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
-                .where(workMatch.workDate.between(start, end))
+                .where(workMatch.workDate.between(start, end),
+                        caregiver.center.centerId.eq(centerId))
                 .orderBy(workMatch.workDate.desc())
                 .fetch();
     }
 
+    // 매칭 알고리즘 사전 필터링
     public List<WorkMatch> findOverlappingWorkMatches(
             Caregiver caregiver,
             LocalDate date,

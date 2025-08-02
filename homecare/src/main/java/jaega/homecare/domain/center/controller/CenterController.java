@@ -58,6 +58,7 @@ public interface CenterController {
     @ApiResponse(responseCode = "200", description = "특정 년도, 월의 요양보호사 매칭 스케줄 조회")
     @GetMapping("/schedule/date")
     ResponseEntity<List<GetCaregiverMatchesByMonth>> getMatchesByMonth(
+            @RequestParam UUID centerId,
             @RequestParam int year,
             @RequestParam int month
     );

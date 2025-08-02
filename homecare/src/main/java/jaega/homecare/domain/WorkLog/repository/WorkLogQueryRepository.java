@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class WorkLogQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<GetWorkLogByDateResponse> findWorkLogsByDate(LocalDate date) {
+    public List<GetWorkLogByDateResponse> findWorkLogsByDate(UUID centerId, LocalDate date) {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -40,11 +41,12 @@ public class WorkLogQueryRepository {
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
-                .where(workMatch.workDate.eq(date))
+                .where(workMatch.workDate.eq(date)
+                        .and(caregiver.center.centerId.eq(centerId)))
                 .fetch();
     }
 
-    public List<GetWorkLogByPaid> findWorkLogsByPaid(Boolean isPaid) {
+    public List<GetWorkLogByPaid> findWorkLogsByPaid(UUID centerId, Boolean isPaid) {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -61,7 +63,8 @@ public class WorkLogQueryRepository {
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
-                .where(workLog.isPaid.eq(isPaid))
+                .where(workLog.isPaid.eq(isPaid)
+                        .and(caregiver.center.centerId.eq(centerId)))
                 .fetch();
     }
 }

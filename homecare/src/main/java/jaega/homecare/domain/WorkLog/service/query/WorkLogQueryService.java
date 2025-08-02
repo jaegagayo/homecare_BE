@@ -36,11 +36,11 @@ public class WorkLogQueryService {
 
     }
 
-    public List<GetWorkLogByDateResponse> getWorkLogsByDate(LocalDate date) {
-        return workLogQueryRepository.findWorkLogsByDate(date);
+    public List<GetWorkLogByDateResponse> getWorkLogsByDate(UUID centerId, LocalDate date) {
+        return workLogQueryRepository.findWorkLogsByDate(centerId, date);
     }
 
-    public List<GetWorkLogByPaid> getWorkLogByPaid(Boolean isPaid){
-        return workLogQueryRepository.findWorkLogsByPaid(isPaid);
+    public List<GetWorkLogByPaid> getWorkLogByPaid(UUID centerId, Boolean isPaid){
+        return workLogQueryRepository.findWorkLogsByPaid(centerId, isPaid);
     }
 }

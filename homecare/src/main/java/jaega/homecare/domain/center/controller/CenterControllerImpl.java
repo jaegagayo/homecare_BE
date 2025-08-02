@@ -78,10 +78,11 @@ public class CenterControllerImpl implements CenterController{
 
     @Override
     public ResponseEntity<List<GetCaregiverMatchesByMonth>> getMatchesByMonth(
+            @RequestParam UUID centerId,
             @RequestParam int year,
             @RequestParam int month
     ) {
-        List<GetCaregiverMatchesByMonth> response = workMatchQueryService.getWorkMatchesByMonth(year, month);
+        List<GetCaregiverMatchesByMonth> response = workMatchQueryService.getWorkMatchesByMonth(centerId, year, month);
         return ResponseEntity.ok(response);
     }
 
