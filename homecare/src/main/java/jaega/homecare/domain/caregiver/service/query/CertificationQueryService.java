@@ -19,7 +19,7 @@ public class CertificationQueryService {
     private final CertificationMapper certificationMapper;
 
     public Certification getCertification(UUID certificationId){
-        return certificationRepository.findByCertificationID(certificationId)
+        return certificationRepository.findByCertificationId(certificationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 certificationId로 자격증을 찾을 수 없습니다."));
     }
 

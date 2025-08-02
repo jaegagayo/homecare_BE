@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CertificationRepository extends JpaRepository<Certification, Long> {
-    Optional<Certification> findByCertificationID(UUID certificationId);
+    Optional<Certification> findByCertificationId(UUID certificationId);
 
     Optional<Certification> findByCaregiver(Caregiver caregiver);
 }
