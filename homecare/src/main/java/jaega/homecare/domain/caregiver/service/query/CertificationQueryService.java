@@ -18,14 +18,19 @@ public class CertificationQueryService {
     private final CaregiverQueryService caregiverQueryService;
     private final CertificationMapper certificationMapper;
 
-    public Certification getCertification(Caregiver caregiver){
+    public Certification getCertification(UUID certificationId){
+        return certificationRepository.findByCertificationID(certificationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 certificationId로 자격증을 찾을 수 없습니다."));
+    }
+
+    public Certification findCertificationByCaregiver(Caregiver caregiver){
         return certificationRepository.findByCaregiver(caregiver)
                 .orElseThrow(() -> new EntityNotFoundException("해당 Caregiver로 자격증을 찾을 수 없습니다."));
     }
 
     public GetCertificationResponse getCertificationByCaregiver(UUID caregiverId){
         Caregiver caregiver = caregiverQueryService.getCaregiver(caregiverId);
-        Certification certification = getCertification(caregiver);
+        Certification certification = findCertificationByCaregiver(caregiver);
         return certificationMapper.toGetResponse(certification);
     }
 }

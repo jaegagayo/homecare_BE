@@ -127,4 +127,10 @@ public class CenterControllerImpl implements CenterController{
         GetCertificationResponse response = certificationQueryService.getCertificationByCaregiver(caregiverId);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<Void> changeTrainStatus(@RequestBody UUID certificationId){
+        certificationCommandService.changeTrainStatus(certificationId);
+        return ResponseEntity.noContent().build();
+    }
 }
