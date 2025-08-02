@@ -3,6 +3,7 @@ package jaega.homecare.domain.caregiver.entity;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.users.entity.Location;
+import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
