@@ -3,12 +3,13 @@ package jaega.homecare.domain.center.controller;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
+import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
-import jaega.homecare.domain.center.dto.req.CenterLoginRequest;
-import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
-import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
+import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
@@ -16,6 +17,7 @@ import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
+import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -90,5 +93,19 @@ public class CenterControllerImpl implements CenterController{
     public ResponseEntity<GetServiceMatchByUUID> getMatchesByUUID(@PathVariable UUID serviceMatchId){
         GetServiceMatchByUUID response = serviceMatchQueryService.getMatchesByUUID(serviceMatchId);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<List<GetCaregiverByCaregiverStatusResponse>> getCaregiversByWorkStatus(@PathVariable UUID centerId,
+                                                                                                 @RequestParam CaregiverStatus caregiverStatus) {
+        List<GetCaregiverByCaregiverStatusResponse> response = caregiverQueryService.getCaregiverByWorkStatus(centerId, caregiverStatus);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<List<GetCaregiverByServiceTypeResponse>> getCaregiverByServiceType(@PathVariable UUID centerId,
+                                                                                             @RequestParam Set<ServiceType> serviceTypes){
+        List<GetCaregiverByServiceTypeResponse> responses = caregiverQueryService.getCaregiverByServiceType(centerId, serviceTypes);
+        return ResponseEntity.ok(responses);
     }
 }
