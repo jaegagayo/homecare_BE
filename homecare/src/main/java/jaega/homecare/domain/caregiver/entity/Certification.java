@@ -46,4 +46,9 @@ public class Certification {
     public void changeStatus(boolean trainStatus){
         this.trainStatus = !trainStatus;
     }
+
+    public void update(String certificationNumber, LocalDate certificationDate) {
+        this.CertificationNumber = certificationNumber;
+        this.CertificationDate = certificationDate;
+    }
 }

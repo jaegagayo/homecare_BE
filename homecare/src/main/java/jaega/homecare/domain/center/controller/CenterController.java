@@ -83,7 +83,7 @@ public interface CenterController {
 
     @Operation(summary = "요양보호사의 자격증 생성 API", description = "센터 요양보호사의 자격증 정보를 생성합니다.")
     @ApiResponse(responseCode = "200", description = "센터 요양보호사의 자격증 정보 생성 성공")
-    @PostMapping("/certification")
+    @PutMapping("/certification")
     ResponseEntity<Void> createCertification(@RequestBody CreateCertificationRequest request);
 
     @Operation(summary = "요양보호사의 자격증 조회 API", description = "센터 요양보호사의 자격증을 조회합니다.")
