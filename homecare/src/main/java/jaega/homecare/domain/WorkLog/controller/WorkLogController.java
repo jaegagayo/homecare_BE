@@ -28,16 +28,17 @@ public interface WorkLogController {
     @Operation(summary = "특정 날짜의 근무 기록 조회 API", description = "특정 근무 날짜의 근무 기록들을 모두 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 날짜의 근무 기록 조회 성공")
     @GetMapping("/workDay")
-    ResponseEntity<List<GetWorkLogByDateResponse>> getWorkLogByWorkDay(@RequestParam LocalDate workDate);
+    ResponseEntity<List<GetWorkLogByDateResponse>> getWorkLogByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate);
 
     @Operation(summary = "정산 상태 기반 근무 기록 조회 API", description = "정산 상태를 기반으로 특정 근무 기록들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 정산 상태 기반 근무 기록 조회 성공")
     @GetMapping("/paid")
     ResponseEntity<List<GetWorkLogByPaid>> getWorkLogByPaid(
+            @RequestParam UUID centerId,
             @Parameter(
-            description = "정산 여부 (true: 정산 완료, false: 미정산)",
-            example = "true",
-            required = true
-    )
+                    description = "정산 여부 (true: 정산 완료, false: 미정산)",
+                    example = "true",
+                    required = true
+            )
             @RequestParam Boolean isPaid);
 }

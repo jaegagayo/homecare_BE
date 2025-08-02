@@ -1,6 +1,6 @@
 package jaega.homecare.domain.serviceMatch.dto.res;
 
-import jaega.homecare.domain.caregiver.entity.ServiceType;
+import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

@@ -1,4 +1,4 @@
-package jaega.homecare.domain.caregiver.entity;
+package jaega.homecare.domain.users.entity;
 
 public enum ServiceType {
     VISITING_CARE,      // 방문 요양

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
@@ -28,14 +29,14 @@ public class WorkLogControllerImpl implements WorkLogController{
     }
 
     @Override
-    public ResponseEntity<List<GetWorkLogByDateResponse>> getWorkLogByWorkDay(LocalDate workDate) {
-        List<GetWorkLogByDateResponse> response = workLogQueryService.getWorkLogsByDate(workDate);
+    public ResponseEntity<List<GetWorkLogByDateResponse>> getWorkLogByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate) {
+        List<GetWorkLogByDateResponse> response = workLogQueryService.getWorkLogsByDate(centerId, workDate);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<List<GetWorkLogByPaid>> getWorkLogByPaid(Boolean isPaid) {
-        List<GetWorkLogByPaid> response = workLogQueryService.getWorkLogByPaid(isPaid);
+    public ResponseEntity<List<GetWorkLogByPaid>> getWorkLogByPaid(@RequestParam UUID centerId, Boolean isPaid) {
+        List<GetWorkLogByPaid> response = workLogQueryService.getWorkLogByPaid(centerId, isPaid);
         return ResponseEntity.ok(response);
     }
 }

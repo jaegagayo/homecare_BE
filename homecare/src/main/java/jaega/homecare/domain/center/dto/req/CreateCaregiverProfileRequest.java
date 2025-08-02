@@ -1,7 +1,7 @@
 package jaega.homecare.domain.center.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jaega.homecare.domain.caregiver.entity.ServiceType;
+import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.Location;
 
 import java.time.DayOfWeek;

@@ -2,7 +2,7 @@ package jaega.homecare.domain.match.processor;
 
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchQueryRepository;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiver.entity.ServiceType;
+import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

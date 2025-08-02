@@ -6,12 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
+import jaega.homecare.domain.users.dto.res.GetConsumerResponse;
 import jaega.homecare.domain.users.dto.res.UserLoginResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Tag(name = "User", description = "유저(공통) API")
 @RequestMapping("/api/user")
@@ -29,4 +30,8 @@ public interface UserController {
     @PostMapping("/logout")
     ResponseEntity<Void> logout();
 
+    @Operation(summary = "유저 정보 조회 API", description = "유저 ID를 토대로 유저의 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "유저 정보 조회 성공")
+    @PostMapping("/{userId}")
+    ResponseEntity<GetConsumerResponse> getConsumer(@PathVariable UUID userId);
 }
