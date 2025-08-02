@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public record GetCaregiverMatchesByMonth(
         UUID workMatchId,
-        Long caregiverId,
+        UUID caregiverId,
         String caregiverName,
         LocalDate workDate,
         LocalTime startTime,

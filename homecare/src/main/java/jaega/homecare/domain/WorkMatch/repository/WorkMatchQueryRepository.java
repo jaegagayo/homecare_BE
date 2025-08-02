@@ -47,7 +47,7 @@ public class WorkMatchQueryRepository {
                 .select(Projections.constructor(
                         GetCaregiverMatchesByMonth.class,
                         workMatch.workMatchId,
-                        caregiver.id,
+                        caregiver.caregiverId,
                         user.name,
                         workMatch.workDate,
                         workMatch.startTime,
@@ -67,12 +67,12 @@ public class WorkMatchQueryRepository {
                 .fetch();
 
         // 2. 필요한 caregiverId(Long)를 추출
-        Set<Long> caregiverIds = baseList.stream()
+        Set<UUID> caregiverIds = baseList.stream()
                 .map(GetCaregiverMatchesByMonth::caregiverId)
                 .collect(Collectors.toSet());
 
         // 3. JPQL 또는 NativeQuery를 통해 serviceTypes를 별도로 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByIds(caregiverIds);
+        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
 
         // 4. Map<Long, Set<ServiceType>> 으로 정리
         Map<Long, Set<ServiceType>> serviceTypeMap = new HashMap<>();
