@@ -48,7 +48,7 @@ public class DummyDataService {
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
         // 더미 센터 5개 생성
-        IntStream.range(0, 3).forEach(this::createDummyCenter);
+        createDummyCenter(0);
 
         // 더미 요양보호사 생성
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
@@ -99,7 +99,7 @@ public class DummyDataService {
         // 파라미터로 넘어온 caregivers 리스트를 사용
         User user = caregivers.get(index);
 
-        Center center = centerRepository.findAll().get(random.nextInt(3));
+        Center center = centerRepository.findAll().get(0);
 
         LocalTime startTime, endTime;
         int timeSlot = random.nextInt(3);
