@@ -1,7 +1,8 @@
 package jaega.homecare.domain.match.service;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
+import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterQueryRepository;
 import jaega.homecare.domain.match.dto.res.MatchingResponseDto;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
@@ -25,13 +26,13 @@ public class CaregiverMatchingService {
 
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final CaregiverRepository caregiverRepository;
+    private final CaregiverCenterQueryRepository caregiverCenterQueryRepository;
     private final CaregiverFilterProcessor filterProcessor;
     private final AiRecommendation aiClient;
 
     public MatchResponse recommendCaregivers(UUID serviceRequestId) {
         ServiceRequest request = serviceRequestQueryService.getServiceRequest(serviceRequestId);
-        List<Caregiver> all = caregiverRepository.findAllByStatus(CaregiverStatus.ACTIVE);
-
+        List<Caregiver> all = caregiverCenterQueryRepository.findAllByStatus(CaregiverStatus.ACTIVE);
         Set<LocalDate> applyDates = request.getRequestedDays();
 
         // 날짜별 필터링 후 결과 합치기 (중복 제거)

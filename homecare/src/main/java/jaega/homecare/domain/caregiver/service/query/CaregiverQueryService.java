@@ -1,7 +1,7 @@
 package jaega.homecare.domain.caregiver.service.query;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
 import jaega.homecare.domain.caregiver.repository.CaregiverQueryRepository;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;

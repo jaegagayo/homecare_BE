@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
@@ -29,6 +30,7 @@ public class ServiceMatchQueryRepository {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
         QUser requesterUser = QUser.user;
         QUser caregiverUser = new QUser("caregiverUser");
 
@@ -48,7 +50,7 @@ public class ServiceMatchQueryRepository {
                 .join(serviceRequest.user, requesterUser)
                 .join(serviceMatch.caregiver, caregiver)
                 .join(caregiver.user, caregiverUser)
-                .where(caregiver.center.centerId.eq(centerId))
+                .where(caregiverCenter.center.centerId.eq(centerId))
                 .orderBy(serviceMatch.serviceDate.desc())
                 .fetch();
     }

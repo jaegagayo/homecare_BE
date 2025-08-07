@@ -10,6 +10,7 @@ import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.QUser;
 import jaega.homecare.domain.users.entity.ServiceType;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class WorkMatchQueryRepository {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate startDate;
         LocalDate endDate;
@@ -61,7 +63,7 @@ public class WorkMatchQueryRepository {
                 .join(caregiver.user, user)
                 .where(
                         workMatch.workDate.between(startDate, endDate),
-                        caregiver.center.centerId.eq(centerId)
+                        caregiverCenter.center.centerId.eq(centerId)
                 )
                 .orderBy(workMatch.workDate.desc())
                 .fetch();

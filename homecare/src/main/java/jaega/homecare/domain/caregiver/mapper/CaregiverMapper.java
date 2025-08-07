@@ -23,13 +23,13 @@ public interface CaregiverMapper {
 
     @Mapping(target = "address", source = "address")
     @Mapping(target = "user", source = "user")
-    @Mapping(target = "center", source = "center")
     @Mapping(target = "caregiverId", ignore = true)
     @Mapping(target = "availableStartTime", ignore = true)
     @Mapping(target = "availableEndTime", ignore = true)
     @Mapping(target = "serviceTypes", ignore = true)
     @Mapping(target = "daysOff", ignore = true)
-    Caregiver toEntity(String address, User user, Center center);
+    @Mapping(target = "location", ignore = true)
+    Caregiver toEntity(String address, User user);
 
     @Mapping(target = "caregiverName", source = "caregiver.user.name")
     @Mapping(target = "email", source = "caregiver.user.email")

@@ -7,7 +7,7 @@ import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
-import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.*;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;

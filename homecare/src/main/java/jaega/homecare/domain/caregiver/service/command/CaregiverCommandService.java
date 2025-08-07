@@ -7,7 +7,6 @@ import jaega.homecare.domain.caregiver.repository.CertificationRepository;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
-import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
 import jaega.homecare.domain.users.entity.User;
 import jakarta.transaction.Transactional;
@@ -26,9 +25,9 @@ public class CaregiverCommandService {
     private final CaregiverQueryService caregiverQueryService;
     private final CertificationRepository certificationRepository;
 
-    public void createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user, Center center) {
+    public void createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user) {
         String address = createCaregiverRequest.address();
-        Caregiver caregiver = caregiverMapper.toEntity(address, user, center);
+        Caregiver caregiver = caregiverMapper.toEntity(address, user);
         caregiver.initializeCaregiver(UUID.randomUUID());
 
         // 자격증 기본 정보 없이 생성

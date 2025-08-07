@@ -128,7 +128,6 @@ public class DummyDataService {
         Caregiver caregiver = Caregiver.builder()
                 .caregiverId(UUID.randomUUID())
                 .user(user)
-                .center(center)
                 .availableStartTime(startTime)
                 .availableEndTime(endTime)
                 .address("서울시 송파구 올림픽로 " + index)
