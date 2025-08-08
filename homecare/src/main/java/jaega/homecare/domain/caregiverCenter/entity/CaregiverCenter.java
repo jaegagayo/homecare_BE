@@ -3,10 +3,12 @@ package jaega.homecare.domain.caregiverCenter.entity;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.center.entity.Center;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -33,6 +35,20 @@ public class CaregiverCenter {
     @Enumerated(EnumType.STRING)
     private CaregiverStatus status;
 
-    private LocalDate joinedAt;
+    private LocalDateTime joinedAt;
 
+    @Builder
+    public CaregiverCenter(UUID caregiverCenterId, Caregiver caregiver, Center center, CaregiverStatus status, LocalDateTime joinedAt){
+        this.caregiverCenterId = caregiverCenterId;
+        this.caregiver = caregiver;
+        this.center = center;
+        this.status = status;
+        this.joinedAt = joinedAt;
+    }
+
+    public void setCaregiverCenter(UUID caregiverCenterId, CaregiverStatus status, LocalDateTime joinedAt){
+        this.caregiverCenterId = caregiverCenterId;
+        this.status = status;
+        this.joinedAt = joinedAt;
+    }
 }

@@ -10,6 +10,7 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.command.CertificationCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiver.service.query.CertificationQueryService;
+import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
 import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.*;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
@@ -34,7 +35,6 @@ import java.util.UUID;
 public class CenterControllerImpl implements CenterController{
 
     private final CenterCommandService centerCommandService;
-    private final CenterQueryService centerQueryService;
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
@@ -45,7 +45,7 @@ public class CenterControllerImpl implements CenterController{
     @Override
     public ResponseEntity<Void> createCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId){
         User user = centerCommandService.createUser(createCaregiverRequest, UserRole.ROLE_CAREGIVER);
-        caregiverCommandService.createCaregiver(createCaregiverRequest, user);
+        caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
 
         return ResponseEntity.noContent().build();
     }
