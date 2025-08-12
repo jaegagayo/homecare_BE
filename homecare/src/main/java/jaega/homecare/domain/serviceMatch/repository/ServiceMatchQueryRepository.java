@@ -50,6 +50,7 @@ public class ServiceMatchQueryRepository {
                 .join(serviceRequest.user, requesterUser)
                 .join(serviceMatch.caregiver, caregiver)
                 .join(caregiver.user, caregiverUser)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(caregiverCenter.center.centerId.eq(centerId))
                 .orderBy(serviceMatch.serviceDate.desc())
                 .fetch();
@@ -68,7 +69,7 @@ public class ServiceMatchQueryRepository {
                         requesterUser.name,
                         caregiverUser.name,
                         caregiver.address,
-                        caregiver.user.phone,
+                        caregiverUser.phone,
                         serviceMatch.serviceDate,
                         serviceMatch.startTime,
                         serviceMatch.endTime,
@@ -88,28 +89,31 @@ public class ServiceMatchQueryRepository {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
-        QUser user = QUser.user;
+        QUser caregiverUser = new QUser("caregiverUser");
+        QUser consumerUser = new QUser("consumerUser");
 
-        // 1. 기본 정보만 조회, serviceTypes는 null로 둠
+        // 1. 기본 정보 조회 (serviceTypes는 비워둠)
         List<GetCaregiverMatchesResponse> baseList = queryFactory
                 .select(Projections.constructor(
                         GetCaregiverMatchesResponse.class,
                         serviceMatch.serviceMatchId,
                         caregiver.id,
-                        caregiver.user.name,
-                        serviceMatch.serviceRequest.user.name,
+                        caregiverUser.name,
+                        consumerUser.name,
                         serviceMatch.serviceDate,
                         serviceMatch.startTime,
                         serviceMatch.endTime,
-                        Expressions.constant(Collections.emptySet()),
+                        Expressions.constant(Collections.emptySet()), // ServiceType, 이후 별도 로딩
                         serviceRequest.address,
-                        Expressions.constant(12000),
+                        Expressions.constant(12000), // TODO: 하드코딩, 시급(추후 제거 필요)
                         serviceMatch.status,
-                        Expressions.nullExpression(String.class)
+                        Expressions.nullExpression(String.class) // notes, 추가 내용
                 ))
                 .from(serviceMatch)
                 .join(serviceMatch.caregiver, caregiver)
-                .join(caregiver.user, user)
+                .join(caregiver.user, caregiverUser)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.user, consumerUser)
                 .where(caregiver.caregiverId.eq(caregiverId))
                 .orderBy(serviceMatch.id.desc())
                 .fetch();
@@ -119,19 +123,22 @@ public class ServiceMatchQueryRepository {
                 .map(GetCaregiverMatchesResponse::caregiverId)
                 .collect(Collectors.toSet());
 
-        // 3. JPQL로 serviceTypes 조회
+        if (caregiverIds.isEmpty()) {
+            return baseList; // 결과 없으면 바로 반환
+        }
+
+        // 3. serviceTypes 조회
         List<Object[]> rows = caregiverRepository.findServiceTypesByIds(caregiverIds);
 
         // 4. Map<Long, Set<ServiceType>> 변환
-        Map<Long, Set<ServiceType>> serviceTypeMap = new HashMap<>();
-        for (Object[] row : rows) {
-            Long cId = (Long) row[0];
-            ServiceType st = (ServiceType) row[1];
-            serviceTypeMap.computeIfAbsent(cId, k -> new HashSet<>()).add(st);
-        }
+        Map<Long, Set<ServiceType>> serviceTypeMap = rows.stream()
+                .collect(Collectors.groupingBy(
+                        row -> (Long) row[0],
+                        Collectors.mapping(row -> (ServiceType) row[1], Collectors.toSet())
+                ));
 
-        // 5. DTO 객체 재생성 (record면 새 객체 생성 필요)
-        List<GetCaregiverMatchesResponse> resultList = baseList.stream()
+        // 5. serviceTypes 채워서 새 DTO 생성
+        return baseList.stream()
                 .map(base -> new GetCaregiverMatchesResponse(
                         base.serviceMatchId(),
                         base.caregiverId(),
@@ -146,8 +153,6 @@ public class ServiceMatchQueryRepository {
                         base.status(),
                         base.notes()
                 ))
-                .collect(Collectors.toList());
-
-        return resultList;
+                .toList();
     }
 }

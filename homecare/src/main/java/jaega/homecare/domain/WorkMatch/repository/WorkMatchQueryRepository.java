@@ -44,7 +44,7 @@ public class WorkMatchQueryRepository {
             endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
         }
 
-        // 1. 기본 정보만 조회 (serviceTypes 제외)
+        // 1. 기본 정보 조회 (serviceTypes 제외)
         List<GetCaregiverMatchesByMonth> baseList = queryFactory
                 .select(Projections.constructor(
                         GetCaregiverMatchesByMonth.class,
@@ -61,6 +61,7 @@ public class WorkMatchQueryRepository {
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))  // 필터용 join 추가
                 .where(
                         workMatch.workDate.between(startDate, endDate),
                         caregiverCenter.center.centerId.eq(centerId)
@@ -68,23 +69,26 @@ public class WorkMatchQueryRepository {
                 .orderBy(workMatch.workDate.desc())
                 .fetch();
 
-        // 2. 필요한 caregiverId(Long)를 추출
+        // 2. caregiverId 추출
         Set<UUID> caregiverIds = baseList.stream()
                 .map(GetCaregiverMatchesByMonth::caregiverId)
                 .collect(Collectors.toSet());
 
-        // 3. JPQL 또는 NativeQuery를 통해 serviceTypes를 별도로 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
-
-        // 4. Map<Long, Set<ServiceType>> 으로 정리
-        Map<Long, Set<ServiceType>> serviceTypeMap = new HashMap<>();
-        for (Object[] row : rows) {
-            Long cId = (Long) row[0];
-            ServiceType type = (ServiceType) row[1];
-            serviceTypeMap.computeIfAbsent(cId, k -> new HashSet<>()).add(type);
+        if (caregiverIds.isEmpty()) {
+            return baseList;
         }
 
-        // 5. DTO 재생성 (record 타입이므로 새 객체 생성 필요)
+        // 3. serviceTypes 별도 조회
+        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
+
+        // 4. Map<Long, Set<ServiceType>> 변환
+        Map<UUID, Set<ServiceType>> serviceTypeMap = rows.stream()
+                .collect(Collectors.groupingBy(
+                        row -> (UUID) row[0],
+                        Collectors.mapping(row -> (ServiceType) row[1], Collectors.toSet())
+                ));
+
+        // 5. DTO 재생성
         return baseList.stream()
                 .map(base -> new GetCaregiverMatchesByMonth(
                         base.workMatchId(),
@@ -97,7 +101,7 @@ public class WorkMatchQueryRepository {
                         base.address(),
                         base.status()
                 ))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 매칭 알고리즘 사전 필터링

@@ -17,6 +17,6 @@ public interface CaregiverRepository extends JpaRepository<Caregiver, Long>{
     @Query("select c.id, st from Caregiver c join c.serviceTypes st where c.id in :caregiverIds")
     List<Object[]> findServiceTypesByIds(@Param("caregiverIds") Set<Long> caregiverIds);
 
-    @Query("select c.id, st from Caregiver c join c.serviceTypes st where c.caregiverId in :caregiverIds")
+    @Query("select c.caregiverId, st from Caregiver c join c.serviceTypes st where c.caregiverId in :caregiverIds")
     List<Object[]> findServiceTypesByCaregiverIds(@Param("caregiverIds") Set<UUID> caregiverIds);
 }
