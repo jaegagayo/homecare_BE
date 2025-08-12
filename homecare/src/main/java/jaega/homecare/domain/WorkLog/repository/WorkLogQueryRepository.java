@@ -42,7 +42,7 @@ public class WorkLogQueryRepository {
                 .from(workLog)
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
-                .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workMatch.workDate.eq(date)
                         .and(caregiverCenter.center.centerId.eq(centerId)))
                 .fetch();
@@ -66,6 +66,7 @@ public class WorkLogQueryRepository {
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workLog.isPaid.eq(isPaid)
                         .and(caregiverCenter.center.centerId.eq(centerId)))
                 .fetch();
