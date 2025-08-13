@@ -11,9 +11,9 @@ import jaega.homecare.domain.WorkMatch.entity.QWorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.QUser;
 import jaega.homecare.domain.users.entity.ServiceType;
@@ -67,7 +67,7 @@ public class WorkMatchQueryRepository {
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))  // 필터용 join 추가
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(
                         workMatch.workDate.between(startDate, endDate),
                         caregiverCenter.center.centerId.eq(centerId)
@@ -139,6 +139,7 @@ public class WorkMatchQueryRepository {
     public Long countCaregiversWorkingToday(UUID centerId) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate today = LocalDate.now();
 
@@ -146,9 +147,10 @@ public class WorkMatchQueryRepository {
                 .select(workMatch.caregiver.countDistinct())
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(
-                        workMatch.workDate.eq(today.plusDays(1))
-                                .and(caregiver.center.centerId.eq(centerId))
+                        caregiverCenter.center.centerId.eq(centerId)
+                                .and(workMatch.workDate.eq(today))
                                 .and(workMatch.status.in(WorkStatus.PLANNED, WorkStatus.COMPLETED))
                 )
                 .fetchOne();
@@ -158,13 +160,16 @@ public class WorkMatchQueryRepository {
     public Long countUnassignedCaregiversToday(UUID centerId) {
         QCaregiver caregiver = QCaregiver.caregiver;
         QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate today = LocalDate.now();
 
-        // 서브쿼리: 오늘 배정된 caregiverId
+        // 오늘 배정된 caregiverId 서브쿼리
         List<UUID> assignedCaregiverIds = queryFactory
                 .select(workMatch.caregiver.caregiverId)
                 .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workMatch.workDate.eq(today))
                 .fetch();
 
@@ -172,8 +177,9 @@ public class WorkMatchQueryRepository {
         return queryFactory
                 .select(caregiver.count())
                 .from(caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(
-                        caregiver.center.centerId.eq(centerId)
+                        caregiverCenter.center.centerId.eq(centerId)
                                 .and(caregiver.caregiverId.notIn(assignedCaregiverIds))
                 )
                 .fetchOne();
@@ -183,16 +189,22 @@ public class WorkMatchQueryRepository {
     public Long countWaitingApplicants(UUID centerId) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        LocalDate today = LocalDate.now();
 
         return queryFactory
                 .select(workMatch.count())
                 .from(workMatch)
                 .leftJoin(workMatch.caregiver, caregiver)
+                .leftJoin(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(
                         workMatch.status.eq(WorkStatus.PLANNED)
-                                .and(workMatch.caregiver.isNull())
-                                .and(workMatch.workDate.eq(LocalDate.now()))
-                                .and(workMatch.caregiver.center.centerId.eq(centerId).or(workMatch.caregiver.isNull())) // caregiver 없으면 center 조건 제외 가능
+                                .and(workMatch.workDate.eq(today))
+                                .and(
+                                        workMatch.caregiver.isNull()
+                                                .or(caregiverCenter.center.centerId.eq(centerId))
+                                )
                 )
                 .fetchOne();
     }
@@ -200,36 +212,38 @@ public class WorkMatchQueryRepository {
     // 요양 보호사 대시보드의 근무지 별 분포 통계 조회
     public List<WorkPlaceDistribution> getWorkPlaceDistributionByServiceType(UUID centerId) {
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
-        // 1. centerId에 속한 보호사 ID 리스트 가져오기
-        List<Long> caregiverIds = queryFactory
-                .select(caregiver.id)
+        // center 소속 활성 보호사 + serviceTypes 조회
+        List<Tuple> rows = queryFactory
+                .select(caregiver, caregiver.serviceTypes)
                 .from(caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(
-                        caregiver.center.centerId.eq(centerId),
-                        caregiver.status.eq(CaregiverStatus.ACTIVE)
+                        caregiverCenter.center.centerId.eq(centerId),
+                        caregiverCenter.status.eq(CaregiverStatus.ACTIVE)
                 )
                 .fetch();
 
-        if (caregiverIds.isEmpty()) {
+        if (rows.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 2. JPQL로 serviceTypes 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByIds(new HashSet<>(caregiverIds));
-        // rows = [ [caregiverId, ServiceType], [caregiverId, ServiceType], ... ]
-
-        // 3. ServiceType별 카운트 계산
+        // ServiceType별 카운트 계산
         Map<ServiceType, Long> serviceTypeCount = new HashMap<>();
-        for (Object[] row : rows) {
-            ServiceType st = (ServiceType) row[1];
-            serviceTypeCount.put(st, serviceTypeCount.getOrDefault(st, 0L) + 1);
+        for (Tuple row : rows) {
+            Set<ServiceType> serviceTypes = row.get(caregiver.serviceTypes);
+            if (serviceTypes != null) {
+                for (ServiceType st : serviceTypes) {
+                    serviceTypeCount.put(st, serviceTypeCount.getOrDefault(st, 0L) + 1);
+                }
+            }
         }
 
-        // 4. 총합 계산
+        // 총합 계산
         long total = serviceTypeCount.values().stream().mapToLong(Long::longValue).sum();
 
-        // 5. DTO 변환
+        // DTO 변환
         return serviceTypeCount.entrySet().stream()
                 .map(entry -> new WorkPlaceDistribution(
                         entry.getKey(),
@@ -246,6 +260,7 @@ public class WorkMatchQueryRepository {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         List<Tuple> results = queryFactory
                 .select(
@@ -255,8 +270,9 @@ public class WorkMatchQueryRepository {
                 )
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
-                .where(caregiver.center.centerId.eq(centerId))
+                .where(caregiverCenter.center.centerId.eq(centerId))
                 .groupBy(workMatch.status)
                 .fetch();
 
@@ -359,10 +375,11 @@ public class WorkMatchQueryRepository {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QWorkLog workLog = QWorkLog.workLog;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
         QUser user = QUser.user;
 
         BooleanBuilder where = new BooleanBuilder();
-        where.and(caregiver.center.centerId.eq(centerId));
+        where.and(caregiverCenter.center.centerId.eq(centerId));
 
         // 상태 필터
         if (status != null) {
@@ -390,6 +407,7 @@ public class WorkMatchQueryRepository {
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
                 .where(where)
                 .orderBy(
@@ -412,6 +430,7 @@ public class WorkMatchQueryRepository {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QWorkLog workLog = QWorkLog.workLog;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
         QUser user = QUser.user;
 
         BooleanBuilder where = new BooleanBuilder();
@@ -441,6 +460,7 @@ public class WorkMatchQueryRepository {
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
                 .where(where)
                 .orderBy(
@@ -458,6 +478,7 @@ public class WorkMatchQueryRepository {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate now = LocalDate.now();
         LocalDate startMonth = now.minusMonths(monthsBack - 1).withDayOfMonth(1);
@@ -472,9 +493,10 @@ public class WorkMatchQueryRepository {
                 .from(workLog)
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workLog.isPaid.eq(true)
                         .and(workMatch.status.eq(WorkStatus.COMPLETED))
-                        .and(caregiver.center.centerId.eq(centerId))
+                        .and(caregiverCenter.center.centerId.eq(centerId))
                         .and(workMatch.workDate.goe(startMonth)))
                 .groupBy(workMatch.workDate.year(), workMatch.workDate.month())
                 .orderBy(workMatch.workDate.year().desc(), workMatch.workDate.month().desc())
@@ -506,6 +528,7 @@ public class WorkMatchQueryRepository {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate startDate = LocalDate.now().minusDays(6); // 오늘 포함 최근 7일
 
@@ -519,9 +542,10 @@ public class WorkMatchQueryRepository {
                 .from(workLog)
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workLog.isPaid.eq(false)
                         .and(workMatch.status.ne(WorkStatus.COMPLETED))
-                        .and(caregiver.center.centerId.eq(centerId))
+                        .and(caregiverCenter.center.centerId.eq(centerId))
                         .and(workMatch.workDate.goe(startDate)))
                 .groupBy(workMatch.workDate)
                 .orderBy(workMatch.workDate.desc())

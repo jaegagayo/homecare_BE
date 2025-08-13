@@ -21,8 +21,9 @@ public interface CaregiverRepository extends JpaRepository<Caregiver, Long>{
     @Query("select c.caregiverId, st from Caregiver c join c.serviceTypes st where c.caregiverId in :caregiverIds")
     List<Object[]> findServiceTypesByCaregiverIds(@Param("caregiverIds") Set<UUID> caregiverIds);
 
+    @Query("SELECT COUNT(cc) FROM CaregiverCenter cc WHERE cc.center.centerId = :centerId")
+    Long countByCenterId(@Param("centerId") UUID centerId);
 
-    Long countByCenter(Center center);
-
-    Long countByCenterAndStatus(Center center, CaregiverStatus status);
+    @Query("SELECT COUNT(cc) FROM CaregiverCenter cc WHERE cc.center.centerId = :centerId AND cc.status = :status")
+    Long countByCenterAndStatus(@Param("centerId") UUID centerId, @Param("status") CaregiverStatus status);
 }

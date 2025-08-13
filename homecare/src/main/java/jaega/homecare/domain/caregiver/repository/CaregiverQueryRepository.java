@@ -1,12 +1,12 @@
 package jaega.homecare.domain.caregiver.repository;
 
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
@@ -108,12 +108,14 @@ public class CaregiverQueryRepository {
 
     public Long countNewCaregiversThisMonth(Center center) {
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         return queryFactory
-                .select(caregiver.count())
-                .from(caregiver)
+                .select(caregiver.countDistinct())
+                .from(caregiverCenter)
+                .join(caregiverCenter.caregiver, caregiver)
                 .where(
-                        caregiver.center.centerId.eq(center.getCenterId())
+                        caregiverCenter.center.centerId.eq(center.getCenterId())
                                 .and(Expressions.booleanTemplate(
                                         "function('date_trunc', 'month', {0}) = function('date_trunc', 'month', current_date)",
                                         caregiver.createdAt
@@ -121,5 +123,4 @@ public class CaregiverQueryRepository {
                 )
                 .fetchOne();
     }
-
 }

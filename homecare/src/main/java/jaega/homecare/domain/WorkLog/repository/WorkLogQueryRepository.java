@@ -79,6 +79,7 @@ public class WorkLogQueryRepository {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate now = LocalDate.now();
         LocalDate firstDay = now.withDayOfMonth(1);
@@ -88,9 +89,10 @@ public class WorkLogQueryRepository {
                 .from(workLog)
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workLog.isPaid.eq(true)
                         .and(workMatch.workDate.goe(firstDay))
-                        .and(caregiver.center.centerId.eq(centerId)))
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
                 .fetchOne();
     }
 
@@ -99,14 +101,16 @@ public class WorkLogQueryRepository {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         return queryFactory
                 .select(workLog.count())
                 .from(workLog)
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workLog.isPaid.eq(false)
-                        .and(caregiver.center.centerId.eq(centerId)))
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
                 .fetchOne();
     }
 }
