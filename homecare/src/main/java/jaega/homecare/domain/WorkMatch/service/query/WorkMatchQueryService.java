@@ -49,6 +49,13 @@ public class WorkMatchQueryService {
     }
 
     // 정산 페이지
+
+    // 정산 금액, 정산 건수 통계 조회
+    public GetSettlementSummaryResponse getSettlementSummary(UUID centerId){
+        return workMatchQueryRepository.getSettlementSummary(centerId);
+    }
+
+    // 요양보호사 정산 내역 목록 조회
     public List<GetCaregiverWorkResponse> getCaregiverWorkList(
             UUID centerId,
             WorkStatus status,
@@ -56,6 +63,20 @@ public class WorkMatchQueryService {
             int month
     ) {
         return workMatchQueryRepository.getCaregiverWorkList(centerId, status, year, month);
+    }
+
+    /**
+     * 최근 6개월 총 정산 금액
+     */
+    public List<GetMonthlyPaymentResponse> getMonthlyPaidSettlements(UUID centerId) {
+        return workMatchQueryRepository.getMonthlyPaidSettlements(centerId, 6); // 이번 달 포함 6개월
+    }
+
+    /**
+     * 최근 7일 미정산 건수
+     */
+    public List<GetDailyUnsettledResponse> getDailyUnsettledCount(UUID centerId) {
+        return workMatchQueryRepository.getDailyUnsettledCount(centerId);
     }
 }
 

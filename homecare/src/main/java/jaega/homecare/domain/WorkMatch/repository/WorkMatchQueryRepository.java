@@ -6,9 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.WorkLog.entity.QWorkLog;
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverWorkResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.WorkPlaceDistribution;
+import jaega.homecare.domain.WorkMatch.dto.res.*;
 import jaega.homecare.domain.WorkMatch.entity.QWorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
@@ -21,6 +19,7 @@ import jaega.homecare.domain.users.entity.ServiceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -228,6 +227,52 @@ public class WorkMatchQueryRepository {
 
     // 정산 페이지
 
+    public GetSettlementSummaryResponse getSettlementSummary(UUID centerId) {
+        QWorkLog workLog = QWorkLog.workLog;
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        List<Tuple> results = queryFactory
+                .select(
+                        workMatch.status,
+                        workLog.settlementAmount.sum(),
+                        workMatch.count()
+                )
+                .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
+                .where(caregiver.center.centerId.eq(centerId))
+                .groupBy(workMatch.status)
+                .fetch();
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        long completedCount = 0L;
+        long plannedCount = 0L;
+        long cancelledCount = 0L;
+
+        for (Tuple tuple : results) {
+            WorkStatus status = tuple.get(workMatch.status);
+            BigDecimal sumAmount = tuple.get(workLog.settlementAmount.sum());
+            Long count = tuple.get(workMatch.count());
+
+            if (status == WorkStatus.COMPLETED) {
+                completedCount = count;
+                totalAmount = totalAmount.add(sumAmount != null ? sumAmount : BigDecimal.ZERO);
+            } else if (status == WorkStatus.PLANNED) {
+                plannedCount = count;
+            } else if (status == WorkStatus.CANCELLED) {
+                cancelledCount = count;
+            }
+        }
+
+        return new GetSettlementSummaryResponse(
+                totalAmount,
+                completedCount,
+                plannedCount,
+                cancelledCount
+        );
+    }
+
     public List<GetCaregiverWorkResponse> getCaregiverWorkList(
             UUID centerId,
             WorkStatus status,   // nullable
@@ -245,6 +290,8 @@ public class WorkMatchQueryRepository {
         // 상태 필터
         if (status != null) {
             where.and(workMatch.status.eq(status));
+        } else {
+            where.and(workMatch.status.eq(WorkStatus.COMPLETED));
         }
 
         // 연/월 필터
@@ -275,6 +322,80 @@ public class WorkMatchQueryRepository {
                                 .coalesce(workMatch.createdAt)
                                 .desc()
                 )
+                .fetch();
+    }
+
+    // 이번 달 총 정산내역 조회
+    public List<GetMonthlyPaymentResponse> getMonthlyPaidSettlements(UUID centerId, int monthsBack) {
+        QWorkLog workLog = QWorkLog.workLog;
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        LocalDate now = LocalDate.now();
+        LocalDate startMonth = now.minusMonths(monthsBack - 1).withDayOfMonth(1);
+
+        List<GetMonthlyPaymentResponse> rawResults = queryFactory
+                .select(Projections.constructor(
+                        GetMonthlyPaymentResponse.class,
+                        workMatch.workDate.year(),
+                        workMatch.workDate.month(),
+                        workLog.settlementAmount.sum()
+                ))
+                .from(workLog)
+                .join(workLog.workMatch, workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .where(workLog.isPaid.eq(true)
+                        .and(workMatch.status.eq(WorkStatus.COMPLETED))
+                        .and(caregiver.center.centerId.eq(centerId))
+                        .and(workMatch.workDate.goe(startMonth)))
+                .groupBy(workMatch.workDate.year(), workMatch.workDate.month())
+                .orderBy(workMatch.workDate.year().desc(), workMatch.workDate.month().desc())
+                .fetch();
+
+        // 누락된 월 채우기
+        Map<String, BigDecimal> map = rawResults.stream()
+                .collect(Collectors.toMap(
+                        r -> r.year() + "-" + r.month(),
+                        GetMonthlyPaymentResponse::totalAmount
+                ));
+
+        List<GetMonthlyPaymentResponse> filled = new ArrayList<>();
+        for (int i = 0; i < monthsBack; i++) {
+            LocalDate target = now.minusMonths(i);
+            String key = target.getYear() + "-" + target.getMonthValue();
+            filled.add(new GetMonthlyPaymentResponse(
+                    target.getYear(),
+                    target.getMonthValue(),
+                    map.getOrDefault(key, BigDecimal.ZERO)
+            ));
+        }
+
+        return filled;
+    }
+
+    // 일주일 간 미정산 내역 조회
+    public List<GetDailyUnsettledResponse> getDailyUnsettledCount(UUID centerId) {
+        QWorkLog workLog = QWorkLog.workLog;
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        LocalDate startDate = LocalDate.now().minusDays(6); // 오늘 포함 최근 7일
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetDailyUnsettledResponse.class,
+                        workMatch.workDate,
+                        workLog.count()
+                ))
+                .from(workLog)
+                .join(workLog.workMatch, workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .where(workLog.isPaid.eq(false)
+                        .and(workMatch.status.ne(WorkStatus.COMPLETED))
+                        .and(caregiver.center.centerId.eq(centerId))
+                        .and(workMatch.workDate.goe(startDate)))
+                .groupBy(workMatch.workDate)
+                .orderBy(workMatch.workDate.desc())
                 .fetch();
     }
 }
