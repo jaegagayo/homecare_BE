@@ -1,7 +1,6 @@
 package jaega.homecare.domain.caregiver.entity;
 
 import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
-import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.User;
@@ -32,10 +31,6 @@ public class Caregiver {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "center_id")
-    private Center center;
-
     // 근무 시작 시간
     @Column(name = "available_start_time")
     private LocalTime availableStartTime;
@@ -64,23 +59,18 @@ public class Caregiver {
     @Column(name = "day_of_week")
     private Set<DayOfWeek> daysOff = new HashSet<>();
 
-    @Enumerated(EnumType.STRING)
-    private CaregiverStatus status;
-
     private String personalityType;
 
     @Builder
-    public Caregiver(UUID caregiverId, User user, Center center, LocalTime availableStartTime, LocalTime availableEndTime, String address, Location location, Set<ServiceType> serviceTypes, Set<DayOfWeek> daysOff) {
+    public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime, String address, Location location, Set<ServiceType> serviceTypes, Set<DayOfWeek> daysOff) {
         this.caregiverId = caregiverId;
         this.user = user;
-        this.center = center;
         this.availableStartTime = availableStartTime;
         this.availableEndTime = availableEndTime;
         this.address = address;
         this.location = location;
         this.serviceTypes = serviceTypes;
         this.daysOff = daysOff;
-        this.status = CaregiverStatus.ACTIVE;
     }
 
     public void initializeCaregiver(UUID uuid) {

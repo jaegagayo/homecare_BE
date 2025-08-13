@@ -8,6 +8,7 @@ import jaega.homecare.domain.WorkLog.entity.QWorkLog;
 import jaega.homecare.domain.WorkLog.entity.WorkLog;
 import jaega.homecare.domain.WorkMatch.entity.QWorkMatch;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -27,6 +28,7 @@ public class WorkLogQueryRepository {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         return queryFactory
                 .select(Projections.constructor(
@@ -40,9 +42,9 @@ public class WorkLogQueryRepository {
                 .from(workLog)
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
-                .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workMatch.workDate.eq(date)
-                        .and(caregiver.center.centerId.eq(centerId)))
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
                 .fetch();
     }
 
@@ -51,6 +53,7 @@ public class WorkLogQueryRepository {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         return queryFactory
                 .select(Projections.constructor(
@@ -63,8 +66,9 @@ public class WorkLogQueryRepository {
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workLog.isPaid.eq(isPaid)
-                        .and(caregiver.center.centerId.eq(centerId)))
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
                 .fetch();
     }
 }

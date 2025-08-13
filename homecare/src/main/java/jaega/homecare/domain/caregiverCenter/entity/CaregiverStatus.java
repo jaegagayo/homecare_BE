@@ -1,4 +1,4 @@
-package jaega.homecare.domain.caregiver.entity;
+package jaega.homecare.domain.caregiverCenter.entity;
 
 public enum CaregiverStatus {
     ACTIVE,     // 활동중

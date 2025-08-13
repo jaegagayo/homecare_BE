@@ -5,10 +5,14 @@ import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.repository.CertificationRepository;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
+import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
+import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
+import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
-import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
+import jaega.homecare.domain.center.entity.Center;
+import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.users.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +29,13 @@ public class CaregiverCommandService {
     private final CaregiverRepository caregiverRepository;
     private final CaregiverQueryService caregiverQueryService;
     private final CertificationRepository certificationRepository;
+    private final CenterQueryService centerQueryService;
+    private final CaregiverCenterCommandService caregiverCenterCommandService;
 
-    public void createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user, Center center) {
+    public void createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user, UUID centerId) {
         String address = createCaregiverRequest.address();
-        Caregiver caregiver = caregiverMapper.toEntity(address, user, center);
+        Center center = centerQueryService.getCenterByUUID(centerId);
+        Caregiver caregiver = caregiverMapper.toEntity(address, user);
         caregiver.initializeCaregiver(UUID.randomUUID());
 
         // 자격증 기본 정보 없이 생성
@@ -41,6 +48,7 @@ public class CaregiverCommandService {
                 .build();
 
         certificationRepository.save(certification);
+        caregiverCenterCommandService.createCaregiverCenter(center, caregiver);
 
         caregiverRepository.save(caregiver);
     }

@@ -12,6 +12,7 @@ public interface CertificationMapper {
 
     @Mapping(target = "caregiver", source = "caregiver")
     @Mapping(target = "certificationId", ignore = true)
+    @Mapping(target = "trainStatus", ignore = true)
     Certification toEntity(CreateCertificationRequest request, Caregiver caregiver);
 
     GetCertificationResponse toGetResponse(Certification certification);

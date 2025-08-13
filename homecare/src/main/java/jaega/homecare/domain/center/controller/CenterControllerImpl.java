@@ -5,14 +5,14 @@ import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
-import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.command.CertificationCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiver.service.query.CertificationQueryService;
+import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
 import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.*;
-import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
@@ -35,7 +35,6 @@ import java.util.UUID;
 public class CenterControllerImpl implements CenterController{
 
     private final CenterCommandService centerCommandService;
-    private final CenterQueryService centerQueryService;
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
@@ -46,8 +45,7 @@ public class CenterControllerImpl implements CenterController{
     @Override
     public ResponseEntity<Void> createCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId){
         User user = centerCommandService.createUser(createCaregiverRequest, UserRole.ROLE_CAREGIVER);
-        Center center = centerQueryService.getCenterByUUID(centerId);
-        caregiverCommandService.createCaregiver(createCaregiverRequest, user, center);
+        caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
 
         return ResponseEntity.noContent().build();
     }
