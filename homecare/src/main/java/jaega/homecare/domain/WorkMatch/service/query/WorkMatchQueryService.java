@@ -35,9 +35,9 @@ public class WorkMatchQueryService {
     }
 
     public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
-        long workingToday = workMatchQueryRepository.countCaregiversWorkingToday(centerId);
-        long unassigned = workMatchQueryRepository.countUnassignedCaregiversToday(centerId);
-        long waiting = workMatchQueryRepository.countWaitingApplicants(centerId);
+        Long workingToday = workMatchQueryRepository.countCaregiversWorkingToday(centerId);
+        Long unassigned = workMatchQueryRepository.countUnassignedCaregiversToday(centerId);
+        Long waiting = workMatchQueryRepository.countWaitingApplicants(centerId);
         List<WorkPlaceDistribution> distribution = workMatchQueryRepository.getWorkPlaceDistributionByServiceType(centerId);
 
         return new GetDashboardWorkStatusResponse(
@@ -52,36 +52,40 @@ public class WorkMatchQueryService {
 
     // 정산 금액, 정산 건수 통계 조회
     public GetSettlementCenterSummaryResponse getSettlementSummary(UUID centerId){
-        return workMatchQueryRepository.getSettlementSummary(centerId);
+        return workMatchQueryRepository.getSettlementCenterSummary(centerId);
     }
 
-    // 요양보호사 정산 내역 목록 조회
+    // 센터의 요양보호사 정산 내역 목록 조회
     public List<GetCaregiverWorkResponse> getCaregiverWorkList(
             UUID centerId,
             WorkStatus status,
-            int year,
-            int month
+            Integer year,
+            Integer month
     ) {
-        return workMatchQueryRepository.getCaregiverWorkList(centerId, status, year, month);
+        return workMatchQueryRepository.getCaregiverWorkListByCenter(centerId, status, year, month);
     }
 
-    /**
-     * 최근 6개월 총 정산 금액
-     */
+    // 요양보호사 개별 정산 내역 목록 조회
+    public List<GetCaregiverWorkResponse> getCaregiverWorkListByCaregiver(
+            UUID caregiverId,
+            WorkStatus status,
+            Integer year,
+            Integer month
+    ) {
+        return workMatchQueryRepository.getCaregiverWorkListByCaregiver(caregiverId, status, year, month);
+    }
+
+    // 최근 6개월 간 정산 내역 조회
     public List<GetMonthlyPaymentResponse> getMonthlyPaidSettlements(UUID centerId) {
         return workMatchQueryRepository.getMonthlyPaidSettlements(centerId, 6); // 이번 달 포함 6개월
     }
 
-    /**
-     * 최근 7일 미정산 건수
-     */
+    // 최근 7일간 미정산 된 건수 조회
     public List<GetDailyUnsettledResponse> getDailyUnsettledCount(UUID centerId) {
         return workMatchQueryRepository.getDailyUnsettledCount(centerId);
     }
 
-    /**
-     * 요양보호사의 정산 내역 요약 조회
-     */
+    // 요양 보호사의 정산 내역 조회
     public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId){
         return workMatchQueryRepository.getCaregiverSettlementSummary(caregiverId);
     }

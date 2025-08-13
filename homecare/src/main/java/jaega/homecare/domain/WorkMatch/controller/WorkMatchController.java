@@ -15,18 +15,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "WorkMatch", description = "근무 일자 관련 조회 API")
+@Tag(name = "WorkMatch", description = "정산 내역 일자 관련 조회 API")
 @RequestMapping("/api/workMatch")
 public interface WorkMatchController {
 
-    @Operation(summary = "정산 페이지 요양 보호사 내역 조회 ", description = "정산 페이지의 요양 보호사 내역들을 조회합니다.")
-    @ApiResponse(responseCode = "204", description = "수요자가 서비스 요청 성공")
+    @Operation(summary = "센터의 요양 보호사 정산 내역 조회", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회합니다.")
+    @ApiResponse(responseCode = "204", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회 성공")
     @GetMapping(("/{centerId}/caregivers/work"))
     ResponseEntity<List<GetCaregiverWorkResponse>> getCaregiverWorkList(
             @PathVariable UUID centerId,
             @RequestParam(required = false) WorkStatus status,
-            @RequestParam(required = false) int year,
-            @RequestParam(required = false) int month
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month
+    );
+
+    @Operation(summary = "센터의 요양 보호사 개별 정산 내역 조회", description = "센터의 요양 보호사 개별 정산 내역 조회합니다.")
+    @ApiResponse(responseCode = "204", description = "센터의 요양 보호사 개별 정산 내역 조회 성공")
+    @GetMapping(("/{caregiverId}/work"))
+    ResponseEntity<List<GetCaregiverWorkResponse>> getCaregiverWorkListByCaregiver(
+            @PathVariable UUID caregiverId,
+            @RequestParam(required = false) WorkStatus status,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month
     );
 
     @Operation(summary = "센터별 최근 6개월 총 정산 금액 조회", description = "센터의 최근 6개월 간 총 정산 금액을 조회합니다.")

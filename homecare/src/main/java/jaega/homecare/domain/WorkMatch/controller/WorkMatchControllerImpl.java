@@ -29,10 +29,21 @@ public class WorkMatchControllerImpl implements WorkMatchController{
     public ResponseEntity<List<GetCaregiverWorkResponse>> getCaregiverWorkList(
             @PathVariable UUID centerId,
             @RequestParam(required = false) WorkStatus status,
-            @RequestParam(required = false) int year,
-            @RequestParam(required = false) int month
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month
     ) {
         List<GetCaregiverWorkResponse> result = workMatchQueryService.getCaregiverWorkList(centerId, status, year, month);
+        return ResponseEntity.ok(result);
+    }
+
+    @Override
+    public ResponseEntity<List<GetCaregiverWorkResponse>> getCaregiverWorkListByCaregiver(
+            @PathVariable UUID caregiverId,
+            @RequestParam(required = false) WorkStatus status,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month
+    ) {
+        List<GetCaregiverWorkResponse> result = workMatchQueryService.getCaregiverWorkListByCaregiver(caregiverId, status, year, month);
         return ResponseEntity.ok(result);
     }
 

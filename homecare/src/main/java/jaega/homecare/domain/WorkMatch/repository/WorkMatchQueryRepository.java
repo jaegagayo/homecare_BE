@@ -31,6 +31,7 @@ public class WorkMatchQueryRepository {
     private final JPAQueryFactory queryFactory;
     private final CaregiverRepository caregiverRepository;
 
+    // 센터에 등록된 요양보호사 정산 내역 조회
     public List<GetCaregiverMatchesByMonth> findWorkMatchesByMonth(UUID centerId, int year, int month, Integer day) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -124,8 +125,11 @@ public class WorkMatchQueryRepository {
                 .fetch();
     }
 
-    // 대시보드를 위한 api
+    /**
+     * 대시보드의 통계를 위한 api
+     */
 
+    // 오늘 근무하는 요양보호사 수 조회
     public Long countCaregiversWorkingToday(UUID centerId) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -144,6 +148,7 @@ public class WorkMatchQueryRepository {
                 .fetchOne();
     }
 
+    // 오늚 미배정된 요양보호사 수 조회
     public Long countUnassignedCaregiversToday(UUID centerId) {
         QCaregiver caregiver = QCaregiver.caregiver;
         QWorkMatch workMatch = QWorkMatch.workMatch;
@@ -168,6 +173,7 @@ public class WorkMatchQueryRepository {
                 .fetchOne();
     }
 
+    // 배정 대기인 요양보호사 수 조회
     public Long countWaitingApplicants(UUID centerId) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -184,6 +190,8 @@ public class WorkMatchQueryRepository {
                 )
                 .fetchOne();
     }
+
+    // 요양 보호사 대시보드의 근무지 별 분포 통계 조회
     public List<WorkPlaceDistribution> getWorkPlaceDistributionByServiceType(UUID centerId) {
         QCaregiver caregiver = QCaregiver.caregiver;
 
@@ -227,7 +235,8 @@ public class WorkMatchQueryRepository {
 
     // 정산 페이지
 
-    public GetSettlementCenterSummaryResponse getSettlementSummary(UUID centerId) {
+    // 센터에 등록된 요양보호사 정산 금액, 건수 조회
+    public GetSettlementCenterSummaryResponse getSettlementCenterSummary(UUID centerId) {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -273,7 +282,69 @@ public class WorkMatchQueryRepository {
         );
     }
 
-    public List<GetCaregiverWorkResponse> getCaregiverWorkList(
+    // 요양보호사 개별 정산 금액, 건수 조회
+    public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QWorkLog workLog = QWorkLog.workLog;
+
+        // 총 정산 금액 (isPaid = true만)
+        BigDecimal totalAmount = Optional.ofNullable(
+                queryFactory
+                        .select(workLog.settlementAmount.sum())
+                        .from(workLog)
+                        .join(workLog.workMatch, workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.COMPLETED),
+                                workLog.isPaid.eq(true)
+                        )
+                        .fetchOne()
+        ).orElse(BigDecimal.ZERO);
+
+        // 상태별 카운트
+        long completedCount = Optional.ofNullable(
+                queryFactory
+                        .select(workMatch.count())
+                        .from(workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.COMPLETED)
+                        )
+                        .fetchOne()
+        ).orElse(0L);
+
+        long plannedCount = Optional.ofNullable(
+                queryFactory
+                        .select(workMatch.count())
+                        .from(workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.PLANNED)
+                        )
+                        .fetchOne()
+        ).orElse(0L);
+
+        long cancelledCount = Optional.ofNullable(
+                queryFactory
+                        .select(workMatch.count())
+                        .from(workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.CANCELLED)
+                        )
+                        .fetchOne()
+        ).orElse(0L);
+
+        return new GetCaregiverSettlementSummaryResponse(
+                totalAmount,
+                completedCount,
+                plannedCount,
+                cancelledCount
+        );
+    }
+
+    // 센터에 등록된 요양보호사의 근무 상태, 월-연도별 내역 조회
+    public List<GetCaregiverWorkResponse> getCaregiverWorkListByCenter(
             UUID centerId,
             WorkStatus status,   // nullable
             Integer year,        // nullable
@@ -292,6 +363,57 @@ public class WorkMatchQueryRepository {
             where.and(workMatch.status.eq(status));
         } else {
             where.and(workMatch.status.eq(WorkStatus.COMPLETED));
+        }
+
+        // 연/월 필터
+        if (year != null && month != null) {
+            where.and(workMatch.workDate.year().eq(year)
+                    .and(workMatch.workDate.month().eq(month)));
+        }
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetCaregiverWorkResponse.class,
+                        user.name,
+                        workMatch.workDate,
+                        workLog.workTime_start,
+                        workLog.workTime_end,
+                        workLog.settlementAmount,
+                        workMatch.status
+                ))
+                .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiver.user, user)
+                .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
+                .where(where)
+                .orderBy(
+                        workLog.modifiedAt
+                                .coalesce(workLog.createdAt)
+                                .coalesce(workMatch.modifiedAt)
+                                .coalesce(workMatch.createdAt)
+                                .desc()
+                )
+                .fetch();
+    }
+
+    // 개별 요양보호사의 근무 상태, 월-연도별 내역 조회
+    public List<GetCaregiverWorkResponse> getCaregiverWorkListByCaregiver(
+            UUID caregiverId,
+            WorkStatus status,   // nullable
+            Integer year,        // nullable
+            Integer month        // nullable
+    ) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QWorkLog workLog = QWorkLog.workLog;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser user = QUser.user;
+
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(caregiver.caregiverId.eq(caregiverId));
+
+        // 상태 필터
+        if (status != null) {
+            where.and(workMatch.status.eq(status));
         }
 
         // 연/월 필터
@@ -397,66 +519,5 @@ public class WorkMatchQueryRepository {
                 .groupBy(workMatch.workDate)
                 .orderBy(workMatch.workDate.desc())
                 .fetch();
-    }
-
-    // 요양보호사 정산 내역 요약 조회
-    public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId) {
-        QWorkMatch workMatch = QWorkMatch.workMatch;
-        QWorkLog workLog = QWorkLog.workLog;
-
-        // 총 정산 금액 (isPaid = true만)
-        BigDecimal totalAmount = Optional.ofNullable(
-                queryFactory
-                        .select(workLog.settlementAmount.sum())
-                        .from(workLog)
-                        .join(workLog.workMatch, workMatch)
-                        .where(
-                                workMatch.caregiver.caregiverId.eq(caregiverId),
-                                workMatch.status.eq(WorkStatus.COMPLETED),
-                                workLog.isPaid.eq(true)
-                        )
-                        .fetchOne()
-        ).orElse(BigDecimal.ZERO);
-
-        // 상태별 카운트
-        long completedCount = Optional.ofNullable(
-                queryFactory
-                        .select(workMatch.count())
-                        .from(workMatch)
-                        .where(
-                                workMatch.caregiver.caregiverId.eq(caregiverId),
-                                workMatch.status.eq(WorkStatus.COMPLETED)
-                        )
-                        .fetchOne()
-        ).orElse(0L);
-
-        long plannedCount = Optional.ofNullable(
-                queryFactory
-                        .select(workMatch.count())
-                        .from(workMatch)
-                        .where(
-                                workMatch.caregiver.caregiverId.eq(caregiverId),
-                                workMatch.status.eq(WorkStatus.PLANNED)
-                        )
-                        .fetchOne()
-        ).orElse(0L);
-
-        long cancelledCount = Optional.ofNullable(
-                queryFactory
-                        .select(workMatch.count())
-                        .from(workMatch)
-                        .where(
-                                workMatch.caregiver.caregiverId.eq(caregiverId),
-                                workMatch.status.eq(WorkStatus.CANCELLED)
-                        )
-                        .fetchOne()
-        ).orElse(0L);
-
-        return new GetCaregiverSettlementSummaryResponse(
-                totalAmount,
-                completedCount,
-                plannedCount,
-                cancelledCount
-        );
     }
 }
