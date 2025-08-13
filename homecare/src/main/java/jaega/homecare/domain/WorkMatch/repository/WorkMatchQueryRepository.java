@@ -507,7 +507,8 @@ public class WorkMatchQueryRepository {
                 .select(Projections.constructor(
                         GetDailyUnsettledResponse.class,
                         workMatch.workDate,
-                        workLog.count()
+                        workLog.count(),
+                        workLog.settlementAmount.sum()
                 ))
                 .from(workLog)
                 .join(workLog.workMatch, workMatch)
