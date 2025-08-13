@@ -1,10 +1,8 @@
 package jaega.homecare.domain.WorkMatch.service.query;
 
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardWorkStatusResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.WorkPlaceDistribution;
+import jaega.homecare.domain.WorkMatch.dto.res.*;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
+import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchQueryRepository;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
@@ -50,4 +48,15 @@ public class WorkMatchQueryService {
         );
     }
 
+    // 정산 페이지
+    public List<GetCaregiverWorkResponse> getCaregiverWorkList(
+            UUID centerId,
+            WorkStatus status,
+            int year,
+            int month
+    ) {
+        return workMatchQueryRepository.getCaregiverWorkList(centerId, status, year, month);
+    }
 }
+
+

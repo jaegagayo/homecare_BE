@@ -1,6 +1,7 @@
 package jaega.homecare.domain.WorkMatch.entity;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Table(name = "workMatch")
 @NoArgsConstructor
-public class WorkMatch {
+public class WorkMatch extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,10 +1,13 @@
 package jaega.homecare.domain.WorkMatch.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jaega.homecare.domain.WorkLog.entity.QWorkLog;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
+import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverWorkResponse;
 import jaega.homecare.domain.WorkMatch.dto.res.WorkPlaceDistribution;
 import jaega.homecare.domain.WorkMatch.entity.QWorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
@@ -223,4 +226,55 @@ public class WorkMatchQueryRepository {
                 .toList();
     }
 
+    // 정산 페이지
+
+    public List<GetCaregiverWorkResponse> getCaregiverWorkList(
+            UUID centerId,
+            WorkStatus status,   // nullable
+            Integer year,        // nullable
+            Integer month        // nullable
+    ) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QWorkLog workLog = QWorkLog.workLog;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser user = QUser.user;
+
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(caregiver.center.centerId.eq(centerId));
+
+        // 상태 필터
+        if (status != null) {
+            where.and(workMatch.status.eq(status));
+        }
+
+        // 연/월 필터
+        if (year != null && month != null) {
+            where.and(workMatch.workDate.year().eq(year)
+                    .and(workMatch.workDate.month().eq(month)));
+        }
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetCaregiverWorkResponse.class,
+                        user.name,
+                        workMatch.workDate,
+                        workLog.workTime_start,
+                        workLog.workTime_end,
+                        workLog.settlementAmount,
+                        workMatch.status
+                ))
+                .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiver.user, user)
+                .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
+                .where(where)
+                .orderBy(
+                        workLog.modifiedAt
+                                .coalesce(workLog.createdAt)
+                                .coalesce(workMatch.modifiedAt)
+                                .coalesce(workMatch.createdAt)
+                                .desc()
+                )
+                .fetch();
+    }
 }
