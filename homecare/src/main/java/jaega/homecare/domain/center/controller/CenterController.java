@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.WorkLog.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
@@ -112,4 +113,9 @@ public interface CenterController {
     @ApiResponse(responseCode = "200", description = "센터 대시보드에 정산 현황 조회 성공")
     @GetMapping("/dashboard/settlement")
     ResponseEntity<GetDashboardSettlementResponse> getDashboardSettlement(@RequestParam UUID centerId);
+
+    @Operation(summary = "센터 대시보드의 근무 현황 조회", description = "센터 대시보드에서 근무 현황을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터 대시보드에 근무 현황 조회 성공")
+    @GetMapping("/dashboard/workStatus")
+    ResponseEntity<GetDashboardWorkStatusResponse> getDashboardWorkStatus(@RequestParam UUID centerId);
 }

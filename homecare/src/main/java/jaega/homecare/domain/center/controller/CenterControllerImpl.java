@@ -4,6 +4,7 @@ import jaega.homecare.domain.WorkLog.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.WorkLog.service.query.WorkLogQueryService;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
@@ -152,6 +153,12 @@ public class CenterControllerImpl implements CenterController{
     @Override
     public ResponseEntity<GetDashboardSettlementResponse> getDashboardSettlement(@RequestParam UUID centerId) {
         GetDashboardSettlementResponse response = workLogQueryService.getSettlementStatus(centerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GetDashboardWorkStatusResponse> getDashboardWorkStatus(@RequestParam UUID centerId){
+        GetDashboardWorkStatusResponse response = workMatchQueryService.getDashboardWorkStatus(centerId);
         return ResponseEntity.ok(response);
     }
 }

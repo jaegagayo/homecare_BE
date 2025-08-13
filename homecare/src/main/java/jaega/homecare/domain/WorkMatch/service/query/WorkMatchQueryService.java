@@ -2,15 +2,12 @@ package jaega.homecare.domain.WorkMatch.service.query;
 
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardWorkStatusResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.WorkPlaceDistribution;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
-import jaega.homecare.domain.WorkMatch.mapper.WorkMatchMapper;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchQueryRepository;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
-import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
-import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
-import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +34,20 @@ public class WorkMatchQueryService {
 
     public List<GetCaregiverMatchesByMonth> getWorkMatchesByMonth(UUID centerId, int year, int month, Integer day) {
         return workMatchQueryRepository.findWorkMatchesByMonth(centerId, year, month, day);
+    }
+
+    public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
+        long workingToday = workMatchQueryRepository.countCaregiversWorkingToday(centerId);
+        long unassigned = workMatchQueryRepository.countUnassignedCaregiversToday(centerId);
+        long waiting = workMatchQueryRepository.countWaitingApplicants(centerId);
+        List<WorkPlaceDistribution> distribution = workMatchQueryRepository.getWorkPlaceDistributionByServiceType(centerId);
+
+        return new GetDashboardWorkStatusResponse(
+                workingToday,
+                unassigned,
+                waiting,
+                distribution
+        );
     }
 
 }
