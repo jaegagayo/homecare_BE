@@ -12,6 +12,7 @@ import jaega.homecare.domain.users.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -66,5 +67,42 @@ public class WorkLogQueryRepository {
                 .where(workLog.isPaid.eq(isPaid)
                         .and(caregiver.center.centerId.eq(centerId)))
                 .fetch();
+    }
+
+
+    // 이번 달 누적 정산 금액 조회
+    public BigDecimal getTotalSettledAmountThisMonth(UUID centerId) {
+        QWorkLog workLog = QWorkLog.workLog;
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        LocalDate now = LocalDate.now();
+        LocalDate firstDay = now.withDayOfMonth(1);
+
+        return queryFactory
+                .select(workLog.settlementAmount.sum())
+                .from(workLog)
+                .join(workLog.workMatch, workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .where(workLog.isPaid.eq(true)
+                        .and(workMatch.workDate.goe(firstDay))
+                        .and(caregiver.center.centerId.eq(centerId)))
+                .fetchOne();
+    }
+
+    // 미정산 건수 조회
+    public Long countUnsettled(UUID centerId) {
+        QWorkLog workLog = QWorkLog.workLog;
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        return queryFactory
+                .select(workLog.count())
+                .from(workLog)
+                .join(workLog.workMatch, workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .where(workLog.isPaid.eq(false)
+                        .and(caregiver.center.centerId.eq(centerId)))
+                .fetchOne();
     }
 }
