@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -37,6 +38,9 @@ public class WorkLog {
     @Column(name = "is_paid")
     private boolean isPaid = false;
 
+    @Column(name = "settlement_account")
+    private BigDecimal settlementAmount;
+
     @Builder
     public WorkLog(UUID workLogId, WorkMatch workMatch, LocalTime workTime_start,
                    LocalTime workTime_end, Double distanceLog, boolean isPaid){
@@ -48,7 +52,8 @@ public class WorkLog {
         this.isPaid = isPaid;
     }
 
-    public void setWorkLog(UUID workLogId){
+    public void setWorkLog(UUID workLogId, BigDecimal settlementAmount){
         this.workLogId = workLogId;
+        this.settlementAmount = settlementAmount;
     }
 }
