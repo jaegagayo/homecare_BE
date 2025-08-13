@@ -1,9 +1,11 @@
 package jaega.homecare.domain.caregiver.repository;
 
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
@@ -84,4 +86,21 @@ public class CaregiverQueryRepository {
                 ))
                 .toList();
     }
+
+    public Long countNewCaregiversThisMonth(Center center) {
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        return queryFactory
+                .select(caregiver.count())
+                .from(caregiver)
+                .where(
+                        caregiver.center.centerId.eq(center.getCenterId())
+                                .and(Expressions.booleanTemplate(
+                                        "function('date_trunc', 'month', {0}) = function('date_trunc', 'month', current_date)",
+                                        caregiver.createdAt
+                                ))
+                )
+                .fetchOne();
+    }
+
 }

@@ -1,5 +1,6 @@
 package jaega.homecare.domain.caregiver.service.query;
 
+import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
@@ -9,6 +10,8 @@ import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusRespons
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
+import jaega.homecare.domain.center.entity.Center;
+import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.users.entity.ServiceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CaregiverQueryService {
 
+    private final CenterQueryService centerQueryService;
     private final CaregiverQueryRepository caregiverQueryRepository;
     private final CaregiverRepository caregiverRepository;
     private final CaregiverMapper caregiverMapper;
@@ -47,4 +51,18 @@ public class CaregiverQueryService {
         Caregiver caregiver = getCaregiver(caregiverId);
         return caregiverMapper.toGetCaregiverProfile(caregiver);
     }
+
+
+    public GetDashboardPopularResponse getCaregiverStats(UUID centerId) {
+        Center center = centerQueryService.getCenterByUUID(centerId);
+
+        Long total = caregiverRepository.countByCenter(center);
+        Long active = caregiverRepository.countByCenterAndStatus(center, CaregiverStatus.ACTIVE);
+        Long inactive = caregiverRepository.countByCenterAndStatus(center, CaregiverStatus.INACTIVE);
+        Long resigned = caregiverRepository.countByCenterAndStatus(center, CaregiverStatus.RESIGNED);
+        Long newThisMonth = caregiverQueryRepository.countNewCaregiversThisMonth(center);
+
+        return new GetDashboardPopularResponse(total, active, inactive, resigned, newThisMonth);
+    }
+
 }

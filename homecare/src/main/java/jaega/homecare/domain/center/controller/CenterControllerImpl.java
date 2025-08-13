@@ -5,6 +5,7 @@ import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
+import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.command.CertificationCommandService;
@@ -134,6 +135,14 @@ public class CenterControllerImpl implements CenterController{
     @Override
     public ResponseEntity<GetCaregiverProfileResponse >getCaregiverProfile(@RequestParam UUID caregiverId){
         GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfile(caregiverId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 대시보드 조회 Api
+
+    @Override
+    public ResponseEntity<GetDashboardPopularResponse> getDashboardPopular(@RequestParam UUID centerId){
+        GetDashboardPopularResponse response = caregiverQueryService.getCaregiverStats(centerId);
         return ResponseEntity.ok(response);
     }
 }

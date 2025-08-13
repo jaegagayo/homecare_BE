@@ -2,6 +2,7 @@ package jaega.homecare.domain.caregiver.repository;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.CaregiverStatus;
+import jaega.homecare.domain.center.entity.Center;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +23,9 @@ public interface CaregiverRepository extends JpaRepository<Caregiver, Long>{
 
     @Query("select c.id, st from Caregiver c join c.serviceTypes st where c.caregiverId in :caregiverIds")
     List<Object[]> findServiceTypesByCaregiverIds(@Param("caregiverIds") Set<UUID> caregiverIds);
+
+
+    Long countByCenter(Center center);
+
+    Long countByCenterAndStatus(Center center, CaregiverStatus status);
 }
