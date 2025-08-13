@@ -51,7 +51,7 @@ public class WorkMatchQueryService {
     // 정산 페이지
 
     // 정산 금액, 정산 건수 통계 조회
-    public GetSettlementSummaryResponse getSettlementSummary(UUID centerId){
+    public GetSettlementCenterSummaryResponse getSettlementSummary(UUID centerId){
         return workMatchQueryRepository.getSettlementSummary(centerId);
     }
 
@@ -77,6 +77,13 @@ public class WorkMatchQueryService {
      */
     public List<GetDailyUnsettledResponse> getDailyUnsettledCount(UUID centerId) {
         return workMatchQueryRepository.getDailyUnsettledCount(centerId);
+    }
+
+    /**
+     * 요양보호사의 정산 내역 요약 조회
+     */
+    public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId){
+        return workMatchQueryRepository.getCaregiverSettlementSummary(caregiverId);
     }
 }
 

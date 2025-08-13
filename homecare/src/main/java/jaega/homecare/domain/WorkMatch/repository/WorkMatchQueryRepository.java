@@ -227,7 +227,7 @@ public class WorkMatchQueryRepository {
 
     // 정산 페이지
 
-    public GetSettlementSummaryResponse getSettlementSummary(UUID centerId) {
+    public GetSettlementCenterSummaryResponse getSettlementSummary(UUID centerId) {
         QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -265,7 +265,7 @@ public class WorkMatchQueryRepository {
             }
         }
 
-        return new GetSettlementSummaryResponse(
+        return new GetSettlementCenterSummaryResponse(
                 totalAmount,
                 completedCount,
                 plannedCount,
@@ -397,5 +397,66 @@ public class WorkMatchQueryRepository {
                 .groupBy(workMatch.workDate)
                 .orderBy(workMatch.workDate.desc())
                 .fetch();
+    }
+
+    // 요양보호사 정산 내역 요약 조회
+    public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QWorkLog workLog = QWorkLog.workLog;
+
+        // 총 정산 금액 (isPaid = true만)
+        BigDecimal totalAmount = Optional.ofNullable(
+                queryFactory
+                        .select(workLog.settlementAmount.sum())
+                        .from(workLog)
+                        .join(workLog.workMatch, workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.COMPLETED),
+                                workLog.isPaid.eq(true)
+                        )
+                        .fetchOne()
+        ).orElse(BigDecimal.ZERO);
+
+        // 상태별 카운트
+        long completedCount = Optional.ofNullable(
+                queryFactory
+                        .select(workMatch.count())
+                        .from(workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.COMPLETED)
+                        )
+                        .fetchOne()
+        ).orElse(0L);
+
+        long plannedCount = Optional.ofNullable(
+                queryFactory
+                        .select(workMatch.count())
+                        .from(workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.PLANNED)
+                        )
+                        .fetchOne()
+        ).orElse(0L);
+
+        long cancelledCount = Optional.ofNullable(
+                queryFactory
+                        .select(workMatch.count())
+                        .from(workMatch)
+                        .where(
+                                workMatch.caregiver.caregiverId.eq(caregiverId),
+                                workMatch.status.eq(WorkStatus.CANCELLED)
+                        )
+                        .fetchOne()
+        ).orElse(0L);
+
+        return new GetCaregiverSettlementSummaryResponse(
+                totalAmount,
+                completedCount,
+                plannedCount,
+                cancelledCount
+        );
     }
 }

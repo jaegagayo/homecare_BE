@@ -2,9 +2,10 @@ package jaega.homecare.domain.WorkMatch.dto.res;
 
 import java.math.BigDecimal;
 
-public record GetSettlementSummaryResponse(
+public record GetCaregiverSettlementSummaryResponse(
         BigDecimal totalAmount,
         Long completedCount,
-        Long pendingCount,
-        Long rejectedCount
-) {}
+        Long plannedCount,
+        Long cancelledCount
+) {
+}

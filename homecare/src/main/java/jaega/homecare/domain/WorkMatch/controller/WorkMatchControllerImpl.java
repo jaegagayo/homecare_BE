@@ -1,9 +1,6 @@
 package jaega.homecare.domain.WorkMatch.controller;
 
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverWorkResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.GetDailyUnsettledResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.GetMonthlyPaymentResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.GetSettlementSummaryResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.*;
 import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +47,14 @@ public class WorkMatchControllerImpl implements WorkMatchController{
     }
 
     @Override
-    public GetSettlementSummaryResponse getSettlementSummary(@RequestParam UUID centerId) {
+    public GetSettlementCenterSummaryResponse getSettlementSummary(@RequestParam UUID centerId) {
         return workMatchQueryService.getSettlementSummary(centerId);
+    }
+
+    @Override
+    public ResponseEntity<GetCaregiverSettlementSummaryResponse> getCaregiverSettlementSummary(
+            @PathVariable UUID caregiverId
+    ) {
+        return ResponseEntity.ok(workMatchQueryService.getCaregiverSettlementSummary(caregiverId));
     }
 }

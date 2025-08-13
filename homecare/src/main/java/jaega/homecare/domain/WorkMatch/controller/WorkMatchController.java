@@ -4,10 +4,7 @@ package jaega.homecare.domain.WorkMatch.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverWorkResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.GetDailyUnsettledResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.GetMonthlyPaymentResponse;
-import jaega.homecare.domain.WorkMatch.dto.res.GetSettlementSummaryResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.*;
 import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,5 +42,12 @@ public interface WorkMatchController {
     @Operation(summary = "센터의 정산 금액 및 정산 상태 통계 조회", description = "센터의 정산 금액 및 정산 상태 통계를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "센터의 정산 금액, 상태 통계 조회 성공")
     @GetMapping("/settlementSummary")
-    GetSettlementSummaryResponse getSettlementSummary(@RequestParam UUID centerId);
+    GetSettlementCenterSummaryResponse getSettlementSummary(@RequestParam UUID centerId);
+
+    @Operation(summary = "센터의 요양보호사 정산 금액 및 정산 상태 통계 조회", description = "센터의 요양보호사 정산 금액 및 정산 상태 통계 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터의 요양보호사 정산 금액 및 정산 상태 통계 조회 성공")
+    @GetMapping("/caregiver/{caregiverId}/settlementSummary")
+    ResponseEntity<GetCaregiverSettlementSummaryResponse> getCaregiverSettlementSummary(
+            @PathVariable UUID caregiverId
+    );
 }
