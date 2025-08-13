@@ -6,6 +6,8 @@ import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.repository.CertificationRepository;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
+import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.repository.CenterRepository;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
@@ -33,6 +35,7 @@ public class DummyDataService {
     private final UserRepository userRepository;
     private final CenterRepository centerRepository;
     private final CaregiverRepository caregiverRepository;
+    private final CaregiverCenterRepository caregiverCenterRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
 
@@ -136,6 +139,13 @@ public class DummyDataService {
                 .daysOff(daysOff)
                 .build();
         caregiverRepository.save(caregiver);
+
+        CaregiverCenter caregiverCenter = CaregiverCenter.builder()
+                .caregiverCenterId(UUID.randomUUID())
+                .caregiver(caregiver)
+                .center(center)
+                .build();
+        caregiverCenterRepository.save(caregiverCenter);
 
         Certification certification = Certification.builder()
                 .certificationId(UUID.randomUUID())
