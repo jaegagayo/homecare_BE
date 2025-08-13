@@ -530,6 +530,7 @@ public class WorkMatchQueryRepository {
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
+        LocalDate today = LocalDate.now();
         LocalDate startDate = LocalDate.now().minusDays(6); // 오늘 포함 최근 7일
 
         return queryFactory
@@ -543,10 +544,11 @@ public class WorkMatchQueryRepository {
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(workLog.isPaid.eq(false)
+                .where(workLog.isPaid.eq(  false)
                         .and(workMatch.status.ne(WorkStatus.COMPLETED))
                         .and(caregiverCenter.center.centerId.eq(centerId))
-                        .and(workMatch.workDate.goe(startDate)))
+                        .and(workMatch.workDate.between(startDate, today))
+                )
                 .groupBy(workMatch.workDate)
                 .orderBy(workMatch.workDate.desc())
                 .fetch();
