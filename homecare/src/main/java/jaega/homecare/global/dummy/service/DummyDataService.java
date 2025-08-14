@@ -1,6 +1,12 @@
 package jaega.homecare.global.dummy.service;
 
+import jaega.homecare.domain.WorkLog.entity.WorkLog;
+import jaega.homecare.domain.WorkLog.repository.WorkLogRepository;
+import jaega.homecare.domain.WorkLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
+import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
+import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
+import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
 import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
@@ -41,12 +47,15 @@ public class DummyDataService {
 
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final WorkMatchCommandService workMatchCommandService;
+    private final WorkMatchRepository workMatchRepository;
+    private final WorkLogRepository workLogRepository;
+    private final WorkLogCommandService workLogCommandService;
     private final Random random = new Random();
 
     @Transactional
     public void generateAllDummyData() {
         // 1. 모든 사용자 데이터 먼저 생성
-        IntStream.range(0, 60).forEach(this::createDummyUser);
+        IntStream.range(0, 100).forEach(this::createDummyUser);
 
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
@@ -174,9 +183,18 @@ public class DummyDataService {
         }
 
         Set<LocalDate> requestedDays = new HashSet<>();
-        int daysToRequest = 1;
-        for (int i = 0; i < daysToRequest; i++) {
-            requestedDays.add(LocalDate.now().plusDays(random.nextInt(2) + 1));
+        int pastDaysCount = random.nextInt(3) + 1; // 1~3일 과거
+        int futureDaysCount = 1; // 기존 1일 이후
+        LocalDate now = LocalDate.now();
+
+        // 과거 날짜 추가 (오늘 기준 6개월 내)
+        for (int i = 0; i < pastDaysCount; i++) {
+            requestedDays.add(now.minusDays(random.nextInt(30 * 6))); // 6개월 내 과거
+        }
+
+        // 미래 날짜 추가
+        for (int i = 0; i < futureDaysCount; i++) {
+            requestedDays.add(now.plusDays(random.nextInt(2) + 1));
         }
 
         ServiceRequest serviceRequest = ServiceRequest.builder()
@@ -221,6 +239,33 @@ public class DummyDataService {
                     distanceLog
             );
             workMatchCommandService.createWorkMatch(createWorkMatchRequest);
+
+            // WorkMatch 일부를 COMPLETED 상태로 변경
+            List<WorkMatch> createdMatches = workMatchRepository.findByCaregiverAndWorkDateIn(
+                    matchedCaregiver, requestedDays
+            );
+
+            // WorkMatch 상태 랜덤 설정
+            for (WorkMatch match : createdMatches) {
+                LocalDate workDate = match.getWorkDate();
+                if (workDate.isBefore(now)) {
+                    // 과거 날짜
+                    int statusChoice = random.nextBoolean() ? 1 : 2; // 1: COMPLETED, 2: CANCELLED
+                    if (statusChoice == 1) {
+                        workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.COMPLETED);
+                        // COMPLETED이면 WorkLog 정산 완료
+                        List<WorkLog> logs = workLogRepository.findByWorkMatch(match);
+                        for (WorkLog log : logs) {
+                            log.togglePaidStatus();
+                        }
+                    } else {
+                        workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.CANCELLED);
+                    }
+                } else {
+                    // 오늘 이후 날짜
+                    workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.PLANNED);
+                }
+            }
         }
     }
 }
