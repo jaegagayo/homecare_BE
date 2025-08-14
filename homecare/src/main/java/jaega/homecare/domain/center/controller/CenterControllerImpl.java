@@ -1,10 +1,14 @@
 package jaega.homecare.domain.center.controller;
 
+import jaega.homecare.domain.WorkLog.dto.res.GetDashboardSettlementResponse;
+import jaega.homecare.domain.WorkLog.service.query.WorkLogQueryService;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
+import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.command.CertificationCommandService;
@@ -39,6 +43,7 @@ public class CenterControllerImpl implements CenterController{
     private final CaregiverQueryService caregiverQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final WorkMatchQueryService workMatchQueryService;
+    private final WorkLogQueryService workLogQueryService;
     private final CertificationCommandService certificationCommandService;
     private final CertificationQueryService certificationQueryService;
 
@@ -132,6 +137,26 @@ public class CenterControllerImpl implements CenterController{
     @Override
     public ResponseEntity<GetCaregiverProfileResponse >getCaregiverProfile(@RequestParam UUID caregiverId){
         GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfile(caregiverId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 대시보드 조회 Api
+
+    @Override
+    public ResponseEntity<GetDashboardPopularResponse> getDashboardPopular(@RequestParam UUID centerId){
+        GetDashboardPopularResponse response = caregiverQueryService.getCaregiverStats(centerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GetDashboardSettlementResponse> getDashboardSettlement(@RequestParam UUID centerId) {
+        GetDashboardSettlementResponse response = workLogQueryService.getSettlementStatus(centerId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GetDashboardWorkStatusResponse> getDashboardWorkStatus(@RequestParam UUID centerId){
+        GetDashboardWorkStatusResponse response = workMatchQueryService.getDashboardWorkStatus(centerId);
         return ResponseEntity.ok(response);
     }
 }

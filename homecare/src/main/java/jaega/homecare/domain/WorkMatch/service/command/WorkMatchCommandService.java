@@ -4,6 +4,7 @@ import jaega.homecare.domain.WorkLog.dto.req.CreateWorkLogRequest;
 import jaega.homecare.domain.WorkLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
+import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
 import jaega.homecare.domain.WorkMatch.mapper.WorkMatchMapper;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
@@ -26,6 +27,16 @@ public class WorkMatchCommandService {
     private final CaregiverQueryService caregiverQueryService;
     private final WorkLogCommandService workLogCommandService;
     private final WorkMatchMapper workMatchMapper;
+
+    /**
+     * 특정 WorkMatch의 근무 상태 변경
+     */
+    public void changeWorkMatchStatus(UUID workMatchId, WorkStatus newStatus) {
+        WorkMatch workMatch = workMatchRepository.findByWorkMatchId(workMatchId)
+                .orElseThrow(() -> new IllegalArgumentException("WorkMatch not found: " + workMatchId));
+
+        workMatch.changeWorkStatus(newStatus);
+    }
 
     public void createWorkMatch(CreateWorkMatchRequest request){
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());

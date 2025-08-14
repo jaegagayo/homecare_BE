@@ -4,6 +4,7 @@ import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.User;
+import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Getter
 @Table(name = "caregiver")
 @NoArgsConstructor
-public class Caregiver {
+public class Caregiver extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
