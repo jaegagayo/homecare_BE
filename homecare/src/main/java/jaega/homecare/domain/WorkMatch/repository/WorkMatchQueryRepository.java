@@ -72,7 +72,7 @@ public class WorkMatchQueryRepository {
                         workMatch.workDate.between(startDate, endDate),
                         caregiverCenter.center.centerId.eq(centerId)
                 )
-                .orderBy(workMatch.workDate.desc())
+                .orderBy(workMatch.workDate.desc(), workMatch.createdAt.desc())
                 .fetch();
 
         // 2. caregiverId 추출
@@ -274,6 +274,7 @@ public class WorkMatchQueryRepository {
                 .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
                 .where(caregiverCenter.center.centerId.eq(centerId))
                 .groupBy(workMatch.status)
+                .orderBy(workMatch.createdAt.desc())
                 .fetch();
 
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -550,7 +551,7 @@ public class WorkMatchQueryRepository {
                         .and(workMatch.workDate.between(startDate, today))
                 )
                 .groupBy(workMatch.workDate)
-                .orderBy(workMatch.workDate.desc())
+                .orderBy(workMatch.workDate.year().desc(), workMatch.workDate.month().desc())
                 .fetch();
     }
 }
