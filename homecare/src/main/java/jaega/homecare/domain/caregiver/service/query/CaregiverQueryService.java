@@ -56,10 +56,10 @@ public class CaregiverQueryService {
     public GetDashboardPopularResponse getCaregiverStats(UUID centerId) {
         Center center = centerQueryService.getCenterByUUID(centerId);
 
-        Long total = caregiverRepository.countByCenterId(center.getCenterId());
-        Long active = caregiverRepository.countByCenterAndStatus(center.getCenterId(), CaregiverStatus.ACTIVE);
-        Long inactive = caregiverRepository.countByCenterAndStatus(center.getCenterId(), CaregiverStatus.INACTIVE);
-        Long resigned = caregiverRepository.countByCenterAndStatus(center.getCenterId(), CaregiverStatus.RESIGNED);
+        Long total = caregiverQueryRepository.countByCenterId(center.getCenterId());
+        Long active = caregiverQueryRepository.countByCenterAndStatus(center.getCenterId(), CaregiverStatus.ACTIVE);
+        Long inactive = caregiverQueryRepository.countByCenterAndStatus(center.getCenterId(), CaregiverStatus.INACTIVE);
+        Long resigned = caregiverQueryRepository.countByCenterAndStatus(center.getCenterId(), CaregiverStatus.RESIGNED);
         Long newThisMonth = caregiverQueryRepository.countNewCaregiversThisMonth(center);
 
         return new GetDashboardPopularResponse(total, active, inactive, resigned, newThisMonth);

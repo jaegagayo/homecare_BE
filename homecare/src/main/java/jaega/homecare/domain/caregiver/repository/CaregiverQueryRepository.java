@@ -123,4 +123,27 @@ public class CaregiverQueryRepository {
                 )
                 .fetchOne();
     }
+
+    public Long countByCenterId(UUID centerId) {
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(caregiverCenter.count())
+                .from(caregiverCenter)
+                .where(caregiverCenter.center.centerId.eq(centerId))
+                .fetchOne();
+    }
+
+    public Long countByCenterAndStatus(UUID centerId, CaregiverStatus status) {
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(caregiverCenter.count())
+                .from(caregiverCenter)
+                .where(
+                        caregiverCenter.center.centerId.eq(centerId)
+                                .and(caregiverCenter.status.eq(status))
+                )
+                .fetchOne();
+    }
 }
