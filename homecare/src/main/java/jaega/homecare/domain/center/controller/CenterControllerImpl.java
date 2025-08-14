@@ -56,6 +56,13 @@ public class CenterControllerImpl implements CenterController{
     }
 
     @Override
+    public ResponseEntity<Void> deregisterCaregiver(UUID centerId, UUID caregiverId) {
+        centerCommandService.deregisterCaregiver(centerId, caregiverId);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @Override
     public ResponseEntity<Void> createCaregiverProfile(@RequestBody CreateCaregiverProfileRequest request){
         caregiverCommandService.createCaregiverProfile(request);
         return ResponseEntity.noContent().build();
@@ -129,7 +136,7 @@ public class CenterControllerImpl implements CenterController{
     }
 
     @Override
-    public ResponseEntity<GetCaregiverProfileResponse>getCaregiverProfile(@RequestParam UUID caregiverId){
+    public ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId){
         GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfile(caregiverId);
         return ResponseEntity.ok(response);
     }

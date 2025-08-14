@@ -35,6 +35,11 @@ public interface CenterController {
     @PostMapping("/{centerId}/caregiver")
     ResponseEntity<Void> registerCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId);
 
+    @Operation(summary = "요양 보호사 말소 API", description = "입력받은 센터 ID와 보호사 ID를 이용하여 해당 요양 보호사를 말소(삭제)합니다.")
+    @ApiResponse(responseCode = "204", description = "요양 보호사 말소 성공")
+    @DeleteMapping("/{centerId}/caregiver/{caregiverId}")
+    ResponseEntity<Void> deregisterCaregiver(@PathVariable UUID centerId, @PathVariable UUID caregiverId);
+
     @Operation(summary = "보호사 상세 정보 등록 API", description = "입력받은 정보로 요양보호사의 프로필을 등록합니다.")
     @ApiResponse(responseCode = "204", description = "요양 보호사 상세 정보 등록 성공")
     @PostMapping("/caregiver")
@@ -99,5 +104,5 @@ public interface CenterController {
     @Operation(summary = "요양보호사 인사카드 조회", description = "요양보호사의 ID로 인사카드를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "요양보호사 인사카드 조회 성공")
     @GetMapping("/profile")
-    ResponseEntity<GetCaregiverProfileResponse>getCaregiverProfile(@RequestParam UUID caregiverId);
+    ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId);
 }
