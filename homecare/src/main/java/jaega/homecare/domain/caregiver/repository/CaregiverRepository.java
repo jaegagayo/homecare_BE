@@ -1,6 +1,7 @@
 package jaega.homecare.domain.caregiver.repository;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

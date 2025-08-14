@@ -3,10 +3,13 @@ package jaega.homecare.domain.center.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jaega.homecare.domain.WorkLog.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
+import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.*;
@@ -105,4 +108,19 @@ public interface CenterController {
     @ApiResponse(responseCode = "200", description = "요양보호사 인사카드 조회 성공")
     @GetMapping("/profile")
     ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "센터 대시보드의 요양보호사 인구 현황 조회", description = "센터 대시보드에서 요양보호사 인구 현황을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터 대시보드에 요양보호사 인구 현황 조회 성공")
+    @GetMapping("/dashboard/popular")
+    ResponseEntity<GetDashboardPopularResponse> getDashboardPopular(@RequestParam UUID centerId);
+
+    @Operation(summary = "센터 대시보드의 정산 현황 조회", description = "센터 대시보드에서 정산 현황을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터 대시보드에 정산 현황 조회 성공")
+    @GetMapping("/dashboard/settlement")
+    ResponseEntity<GetDashboardSettlementResponse> getDashboardSettlement(@RequestParam UUID centerId);
+
+    @Operation(summary = "센터 대시보드의 근무 현황 조회", description = "센터 대시보드에서 근무 현황을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터 대시보드에 근무 현황 조회 성공")
+    @GetMapping("/dashboard/workStatus")
+    ResponseEntity<GetDashboardWorkStatusResponse> getDashboardWorkStatus(@RequestParam UUID centerId);
 }

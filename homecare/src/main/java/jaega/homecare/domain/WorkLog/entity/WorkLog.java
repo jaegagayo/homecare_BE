@@ -1,11 +1,13 @@
 package jaega.homecare.domain.WorkLog.entity;
 
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
+import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -13,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Table(name = "workLog")
 @NoArgsConstructor
-public class WorkLog {
+public class WorkLog extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,6 +39,9 @@ public class WorkLog {
     @Column(name = "is_paid")
     private boolean isPaid = false;
 
+    @Column(name = "settlement_account")
+    private BigDecimal settlementAmount;
+
     @Builder
     public WorkLog(UUID workLogId, WorkMatch workMatch, LocalTime workTime_start,
                    LocalTime workTime_end, Double distanceLog, boolean isPaid){
@@ -48,7 +53,12 @@ public class WorkLog {
         this.isPaid = isPaid;
     }
 
-    public void setWorkLog(UUID workLogId){
+    public void togglePaidStatus(){
+        this.isPaid = !isPaid;
+    }
+
+    public void setWorkLog(UUID workLogId, BigDecimal settlementAmount){
         this.workLogId = workLogId;
+        this.settlementAmount = settlementAmount;
     }
 }

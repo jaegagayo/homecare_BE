@@ -1,11 +1,12 @@
 package jaega.homecare.domain.caregiver.repository;
 
-import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
@@ -103,5 +104,46 @@ public class CaregiverQueryRepository {
                         cc.getCaregiver().getServiceTypes()
                 ))
                 .toList();
+    }
+
+    public Long countNewCaregiversThisMonth(Center center) {
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(caregiver.countDistinct())
+                .from(caregiverCenter)
+                .join(caregiverCenter.caregiver, caregiver)
+                .where(
+                        caregiverCenter.center.centerId.eq(center.getCenterId())
+                                .and(Expressions.booleanTemplate(
+                                        "function('date_trunc', 'month', {0}) = function('date_trunc', 'month', current_date)",
+                                        caregiver.createdAt
+                                ))
+                )
+                .fetchOne();
+    }
+
+    public Long countByCenterId(UUID centerId) {
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(caregiverCenter.count())
+                .from(caregiverCenter)
+                .where(caregiverCenter.center.centerId.eq(centerId))
+                .fetchOne();
+    }
+
+    public Long countByCenterAndStatus(UUID centerId, CaregiverStatus status) {
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(caregiverCenter.count())
+                .from(caregiverCenter)
+                .where(
+                        caregiverCenter.center.centerId.eq(centerId)
+                                .and(caregiverCenter.status.eq(status))
+                )
+                .fetchOne();
     }
 }
