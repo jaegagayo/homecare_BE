@@ -13,6 +13,7 @@ import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.repository.CertificationRepository;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.repository.CenterRepository;
@@ -149,10 +150,22 @@ public class DummyDataService {
                 .build();
         caregiverRepository.save(caregiver);
 
+        // 상태 랜덤 생성
+        CaregiverStatus status;
+        int statusRandom = random.nextInt(3);
+        if (statusRandom == 0) {
+            status = CaregiverStatus.ACTIVE;
+        } else if (statusRandom == 1) {
+            status = CaregiverStatus.INACTIVE;
+        } else {
+            status = CaregiverStatus.RESIGNED;
+        }
+
         CaregiverCenter caregiverCenter = CaregiverCenter.builder()
                 .caregiverCenterId(UUID.randomUUID())
                 .caregiver(caregiver)
                 .center(center)
+                .status(status)
                 .build();
         caregiverCenterRepository.save(caregiverCenter);
 
@@ -211,9 +224,14 @@ public class DummyDataService {
         serviceRequest.setServiceRequest(serviceRequestId, user, ServiceRequestStatus.PENDING, requestedDays);
         serviceRequestRepository.save(serviceRequest);
 
-        List<Caregiver> caregivers = caregiverRepository.findAll();
-        if (!caregivers.isEmpty()) {
-            Caregiver matchedCaregiver = caregivers.get(random.nextInt(caregivers.size()));
+        // CaregiverCenter가 ACTIVE인 요양보호사만 DB에서 조회
+        List<Caregiver> activeCaregivers = caregiverCenterRepository.findByStatus(CaregiverStatus.ACTIVE)
+                .stream()
+                .map(CaregiverCenter::getCaregiver)
+                .toList();
+
+        if (!activeCaregivers.isEmpty()) {
+            Caregiver matchedCaregiver = activeCaregivers.get(random.nextInt(activeCaregivers.size()));
             UUID caregiverId = matchedCaregiver.getCaregiverId();
 
             // 거리 대충 87~125 사이 랜덤값
@@ -240,20 +258,17 @@ public class DummyDataService {
             );
             workMatchCommandService.createWorkMatch(createWorkMatchRequest);
 
-            // WorkMatch 일부를 COMPLETED 상태로 변경
+            // WorkMatch 상태 설정 (오늘 이후는 ACTIVE만 PLANNED)
             List<WorkMatch> createdMatches = workMatchRepository.findByCaregiverAndWorkDateIn(
                     matchedCaregiver, requestedDays
             );
 
-            // WorkMatch 상태 랜덤 설정
             for (WorkMatch match : createdMatches) {
                 LocalDate workDate = match.getWorkDate();
                 if (workDate.isBefore(now)) {
-                    // 과거 날짜
-                    int statusChoice = random.nextBoolean() ? 1 : 2; // 1: COMPLETED, 2: CANCELLED
+                    int statusChoice = random.nextBoolean() ? 1 : 2;
                     if (statusChoice == 1) {
                         workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.COMPLETED);
-                        // COMPLETED이면 WorkLog 정산 완료
                         List<WorkLog> logs = workLogRepository.findByWorkMatch(match);
                         for (WorkLog log : logs) {
                             log.togglePaidStatus();
@@ -262,7 +277,6 @@ public class DummyDataService {
                         workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.CANCELLED);
                     }
                 } else {
-                    // 오늘 이후 날짜
                     workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.PLANNED);
                 }
             }
