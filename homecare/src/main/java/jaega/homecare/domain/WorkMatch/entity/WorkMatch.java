@@ -53,6 +53,10 @@ public class WorkMatch extends BaseTimeEntity {
         this.status = WorkStatus.PLANNED;
     }
 
+    public void changeWorkStatus(WorkStatus workStatus){
+        this.status = workStatus;
+    }
+
     public void setWorkMatch(UUID workMatchId){
         this.workMatchId = workMatchId;
     }

@@ -22,6 +22,16 @@ public class WorkLogCommandService {
     private final WorkLogRepository workLogRepository;
     private final WorkLogMapper workLogMapper;
 
+    /**
+     * 특정 WorkLog의 정산 상태 변경
+     */
+    public void togglePaidStatus(UUID workLogId) {
+        WorkLog workLog = workLogRepository.findByWorkLogId(workLogId)
+                .orElseThrow(() -> new IllegalArgumentException("WorkLog not found: " + workLogId));
+
+        workLog.togglePaidStatus();
+    }
+
     public void createWorkLog(CreateWorkLogRequest request){
 
         BigDecimal settlementAccount = calculateSettlementAmount(request.workTime_start(), request.workTime_end(), request.distanceLog());

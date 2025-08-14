@@ -53,6 +53,10 @@ public class WorkLog extends BaseTimeEntity {
         this.isPaid = isPaid;
     }
 
+    public void togglePaidStatus(){
+        this.isPaid = !isPaid;
+    }
+
     public void setWorkLog(UUID workLogId, BigDecimal settlementAmount){
         this.workLogId = workLogId;
         this.settlementAmount = settlementAmount;
