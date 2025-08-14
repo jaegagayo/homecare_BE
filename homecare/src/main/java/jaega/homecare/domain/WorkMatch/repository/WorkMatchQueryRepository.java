@@ -545,7 +545,7 @@ public class WorkMatchQueryRepository {
                 .join(workLog.workMatch, workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(workLog.isPaid.eq(  false)
+                .where(workLog.isPaid.eq(false)
                         .and(workMatch.status.ne(WorkStatus.COMPLETED))
                         .and(caregiverCenter.center.centerId.eq(centerId))
                         .and(workMatch.workDate.between(startDate, today))
