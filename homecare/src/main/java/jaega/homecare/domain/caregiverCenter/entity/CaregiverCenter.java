@@ -51,4 +51,9 @@ public class CaregiverCenter {
         this.status = status;
         this.joinedAt = joinedAt;
     }
+
+    public void deregister() {
+        this.status = CaregiverStatus.INACTIVE;
+    }
+
 }
