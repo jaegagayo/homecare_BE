@@ -42,18 +42,17 @@ public class CenterControllerImpl implements CenterController{
     private final CertificationCommandService certificationCommandService;
     private final CertificationQueryService certificationQueryService;
 
-    @Override
-    public ResponseEntity<Void> createCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId){
-        User user = centerCommandService.createUser(createCaregiverRequest, UserRole.ROLE_CAREGIVER);
-        caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
-
-        return ResponseEntity.noContent().build();
-    }
 
     @Override
     public ResponseEntity<CenterLoginResponse> loginCenter(@RequestBody CenterLoginRequest request){
-        CenterLoginResponse response = centerCommandService.loginCenter(request);
+        CenterLoginResponse response = centerCommandService.loginCenterWithoutAuth();
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> registerCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId){
+        centerCommandService.registerCaregiver(createCaregiverRequest, UserRole.ROLE_CAREGIVER, centerId);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -130,7 +129,7 @@ public class CenterControllerImpl implements CenterController{
     }
 
     @Override
-    public ResponseEntity<GetCaregiverProfileResponse >getCaregiverProfile(@RequestParam UUID caregiverId){
+    public ResponseEntity<GetCaregiverProfileResponse>getCaregiverProfile(@RequestParam UUID caregiverId){
         GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfile(caregiverId);
         return ResponseEntity.ok(response);
     }

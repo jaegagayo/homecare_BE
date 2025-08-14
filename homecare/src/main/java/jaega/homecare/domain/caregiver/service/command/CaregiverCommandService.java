@@ -5,9 +5,7 @@ import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.repository.CertificationRepository;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
-import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
 import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
-import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
@@ -32,9 +30,9 @@ public class CaregiverCommandService {
     private final CenterQueryService centerQueryService;
     private final CaregiverCenterCommandService caregiverCenterCommandService;
 
-    public void createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user, UUID centerId) {
+    public Caregiver createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user, UUID centerId) {
         String address = createCaregiverRequest.address();
-        Center center = centerQueryService.getCenterByUUID(centerId);
+        Center center = centerQueryService.findCenterByUUID(centerId);
         Caregiver caregiver = caregiverMapper.toEntity(address, user);
         caregiver.initializeCaregiver(UUID.randomUUID());
 
@@ -50,7 +48,7 @@ public class CaregiverCommandService {
         certificationRepository.save(certification);
         caregiverCenterCommandService.createCaregiverCenter(center, caregiver);
 
-        caregiverRepository.save(caregiver);
+        return caregiverRepository.save(caregiver);
     }
 
     public void createCaregiverProfile(CreateCaregiverProfileRequest request){
@@ -59,4 +57,5 @@ public class CaregiverCommandService {
 
         caregiverRepository.save(caregiver);
     }
+
 }
