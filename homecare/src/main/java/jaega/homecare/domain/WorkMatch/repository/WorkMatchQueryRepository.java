@@ -274,7 +274,6 @@ public class WorkMatchQueryRepository {
                 .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
                 .where(caregiverCenter.center.centerId.eq(centerId))
                 .groupBy(workMatch.status)
-                .orderBy(workMatch.createdAt.desc())
                 .fetch();
 
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -532,9 +531,10 @@ public class WorkMatchQueryRepository {
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate today = LocalDate.now();
-        LocalDate startDate = LocalDate.now().minusDays(6); // 오늘 포함 최근 7일
+        LocalDate startDate = today.minusDays(6); // 최근 7일
 
-        return queryFactory
+        // 실제 DB에서 미정산 내역 조회
+        List<GetDailyUnsettledResponse> rawResults = queryFactory
                 .select(Projections.constructor(
                         GetDailyUnsettledResponse.class,
                         workMatch.workDate,
@@ -551,7 +551,19 @@ public class WorkMatchQueryRepository {
                         .and(workMatch.workDate.between(startDate, today))
                 )
                 .groupBy(workMatch.workDate)
-                .orderBy(workMatch.workDate.year().desc(), workMatch.workDate.month().desc())
+                .orderBy(workMatch.workDate.asc())
                 .fetch();
+
+        // 누락된 날짜 채우기
+        Map<LocalDate, GetDailyUnsettledResponse> map = rawResults.stream()
+                .collect(Collectors.toMap(GetDailyUnsettledResponse::date, r -> r));
+
+        List<GetDailyUnsettledResponse> filled = new ArrayList<>();
+        for (int i = 0; i <= 6; i++) {
+            LocalDate date = startDate.plusDays(i);
+            filled.add(map.getOrDefault(date, new GetDailyUnsettledResponse(date, 0L, BigDecimal.ZERO)));
+        }
+
+        return filled;
     }
 }
