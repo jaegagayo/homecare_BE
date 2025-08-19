@@ -1,8 +1,10 @@
 package jaega.homecare.domain.WorkMatch.service.query;
 
 import jaega.homecare.domain.WorkMatch.dto.res.*;
+import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
+import jaega.homecare.domain.WorkMatch.mapper.WorkMatchMapper;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchQueryRepository;
 import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
@@ -10,6 +12,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,17 +21,29 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WorkMatchQueryService {
 
-    private final WorkMatchRepository workMatchRepository;
     private final WorkMatchQueryRepository workMatchQueryRepository;
     private final ServiceMatchQueryRepository serviceMatchQueryRepository;
+    private final WorkMatchRepository workMatchRepository;
+    private final WorkMatchMapper workMatchMapper;
 
+    // 프론트엔드 GET 조회
+    public GetWorkMatchResponse findWorkMatch(UUID workMatchId){
+        WorkMatch workMatch = getWorkMatch(workMatchId);
+        return workMatchMapper.toGetResponse(workMatch);
+    }
+
+    // 엔티티 조회용
     public WorkMatch getWorkMatch(UUID workMatchId){
         return workMatchRepository.findByWorkMatchId(workMatchId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 workMatchId로 근무 매칭 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("해당 workMatchId로 근무 기록을 찾을 수 없습니다."));
     }
 
     public List<GetCaregiverMatchesResponse> getWorkMatchesByCaregiver(UUID caregiverId){
         return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
+    }
+
+    public List<GetWorkMatchByDateResponse> getWorkMatchByDate(UUID centerId, LocalDate date) {
+        return workMatchQueryRepository.findWorkMatchByDate(centerId, date);
     }
 
     public List<GetCaregiverMatchesByMonth> getWorkMatchesByMonth(UUID centerId, int year, int month, Integer day) {
@@ -48,7 +64,30 @@ public class WorkMatchQueryService {
         );
     }
 
-    // 정산 페이지
+    public List<GetWorkMatchByPaid> getWorkMatchByPaid(UUID centerId, Boolean isPaid){
+        return workMatchQueryRepository.findWorkMatchByPaid(centerId, isPaid);
+    }
+
+    public GetDashboardSettlementResponse getSettlementStatus(UUID centerId) {
+
+        BigDecimal totalSettledAmount = workMatchQueryRepository.getTotalSettledAmountThisMonth(centerId);
+        if (totalSettledAmount == null) {
+            totalSettledAmount = BigDecimal.ZERO;
+        }
+        Long unsettledCount = workMatchQueryRepository.countUnsettled(centerId);
+        if (unsettledCount == null) {
+            unsettledCount = 0L;
+        }
+
+        // TODO: 부정행위 알림 건수 조회 메서드 추가 시 적용할 것!
+        Long fraudAlertsCount = 0L;
+
+        return new GetDashboardSettlementResponse(totalSettledAmount, unsettledCount, fraudAlertsCount);
+    }
+
+    /**
+     *  정산 페이지
+     */
 
     // 정산 금액, 정산 건수 통계 조회
     public GetSettlementCenterSummaryResponse getSettlementSummary(UUID centerId){
@@ -89,6 +128,8 @@ public class WorkMatchQueryService {
     public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId){
         return workMatchQueryRepository.getCaregiverSettlementSummary(caregiverId);
     }
+
+
 }
 
 

@@ -5,7 +5,6 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jaega.homecare.domain.WorkLog.entity.QWorkLog;
 import jaega.homecare.domain.WorkMatch.dto.res.*;
 import jaega.homecare.domain.WorkMatch.entity.QWorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
@@ -257,7 +256,6 @@ public class WorkMatchQueryRepository {
 
     // 센터에 등록된 요양보호사 정산 금액, 건수 조회
     public GetSettlementCenterSummaryResponse getSettlementCenterSummary(UUID centerId) {
-        QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
@@ -265,13 +263,12 @@ public class WorkMatchQueryRepository {
         List<Tuple> results = queryFactory
                 .select(
                         workMatch.status,
-                        workLog.settlementAmount.sum(),
+                        workMatch.settlementAmount.sum(),
                         workMatch.count()
                 )
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
                 .where(caregiverCenter.center.centerId.eq(centerId))
                 .groupBy(workMatch.status)
                 .fetch();
@@ -283,7 +280,7 @@ public class WorkMatchQueryRepository {
 
         for (Tuple tuple : results) {
             WorkStatus status = tuple.get(workMatch.status);
-            BigDecimal sumAmount = tuple.get(workLog.settlementAmount.sum());
+            BigDecimal sumAmount = tuple.get(workMatch.settlementAmount.sum());
             Long count = tuple.get(workMatch.count());
 
             if (status == WorkStatus.COMPLETED) {
@@ -307,18 +304,16 @@ public class WorkMatchQueryRepository {
     // 요양보호사 개별 정산 금액, 건수 조회
     public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
-        QWorkLog workLog = QWorkLog.workLog;
 
         // 총 정산 금액 (isPaid = true만)
         BigDecimal totalAmount = Optional.ofNullable(
                 queryFactory
-                        .select(workLog.settlementAmount.sum())
-                        .from(workLog)
-                        .join(workLog.workMatch, workMatch)
+                        .select(workMatch.settlementAmount.sum())
+                        .from(workMatch)
                         .where(
                                 workMatch.caregiver.caregiverId.eq(caregiverId),
                                 workMatch.status.eq(WorkStatus.COMPLETED),
-                                workLog.isPaid.eq(true)
+                                workMatch.isPaid.eq(true)
                         )
                         .fetchOne()
         ).orElse(BigDecimal.ZERO);
@@ -373,7 +368,6 @@ public class WorkMatchQueryRepository {
             Integer month        // nullable
     ) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
-        QWorkLog workLog = QWorkLog.workLog;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
         QUser user = QUser.user;
@@ -399,21 +393,18 @@ public class WorkMatchQueryRepository {
                         GetCaregiverWorkResponse.class,
                         user.name,
                         workMatch.workDate,
-                        workLog.workTime_start,
-                        workLog.workTime_end,
-                        workLog.settlementAmount,
+                        workMatch.startTime,
+                        workMatch.endTime,
+                        workMatch.settlementAmount,
                         workMatch.status
                 ))
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
                 .where(where)
                 .orderBy(
-                        workLog.modifiedAt
-                                .coalesce(workLog.createdAt)
-                                .coalesce(workMatch.modifiedAt)
+                        workMatch.modifiedAt
                                 .coalesce(workMatch.createdAt)
                                 .desc()
                 )
@@ -428,7 +419,6 @@ public class WorkMatchQueryRepository {
             Integer month        // nullable
     ) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
-        QWorkLog workLog = QWorkLog.workLog;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
         QUser user = QUser.user;
@@ -452,21 +442,18 @@ public class WorkMatchQueryRepository {
                         GetCaregiverWorkResponse.class,
                         user.name,
                         workMatch.workDate,
-                        workLog.workTime_start,
-                        workLog.workTime_end,
-                        workLog.settlementAmount,
+                        workMatch.startTime,
+                        workMatch.endTime,
+                        workMatch.settlementAmount,
                         workMatch.status
                 ))
                 .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .leftJoin(workLog).on(workLog.workMatch.eq(workMatch))
                 .where(where)
                 .orderBy(
-                        workLog.modifiedAt
-                                .coalesce(workLog.createdAt)
-                                .coalesce(workMatch.modifiedAt)
+                        workMatch.modifiedAt
                                 .coalesce(workMatch.createdAt)
                                 .desc()
                 )
@@ -475,7 +462,6 @@ public class WorkMatchQueryRepository {
 
     // 이번 달 총 정산내역 조회
     public List<GetMonthlyPaymentResponse> getMonthlyPaidSettlements(UUID centerId, int monthsBack) {
-        QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
@@ -488,13 +474,12 @@ public class WorkMatchQueryRepository {
                         GetMonthlyPaymentResponse.class,
                         workMatch.workDate.year(),
                         workMatch.workDate.month(),
-                        workLog.settlementAmount.sum()
+                        workMatch.settlementAmount.sum()
                 ))
-                .from(workLog)
-                .join(workLog.workMatch, workMatch)
+                .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(workLog.isPaid.eq(true)
+                .where(workMatch.isPaid.eq(true)
                         .and(workMatch.status.eq(WorkStatus.COMPLETED))
                         .and(caregiverCenter.center.centerId.eq(centerId))
                         .and(workMatch.workDate.goe(startMonth)))
@@ -525,7 +510,6 @@ public class WorkMatchQueryRepository {
 
     // 일주일 간 미정산 내역 조회
     public List<GetDailyUnsettledResponse> getDailyUnsettledCount(UUID centerId) {
-        QWorkLog workLog = QWorkLog.workLog;
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
@@ -538,14 +522,13 @@ public class WorkMatchQueryRepository {
                 .select(Projections.constructor(
                         GetDailyUnsettledResponse.class,
                         workMatch.workDate,
-                        workLog.count(),
-                        workLog.settlementAmount.sum()
+                        workMatch.count(),
+                        workMatch.settlementAmount.sum()
                 ))
-                .from(workLog)
-                .join(workLog.workMatch, workMatch)
+                .from(workMatch)
                 .join(workMatch.caregiver, caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(workLog.isPaid.eq(false)
+                .where(workMatch.isPaid.eq(false)
                         .and(workMatch.status.ne(WorkStatus.COMPLETED))
                         .and(caregiverCenter.center.centerId.eq(centerId))
                         .and(workMatch.workDate.between(startDate, today))
@@ -565,5 +548,89 @@ public class WorkMatchQueryRepository {
         }
 
         return filled;
+    }
+
+    public List<GetWorkMatchByDateResponse> findWorkMatchByDate(UUID centerId, LocalDate date) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetWorkMatchByDateResponse.class,
+                        workMatch.workMatchId,
+                        workMatch.workDate,
+                        workMatch.startTime,
+                        workMatch.endTime,
+                        caregiver.user.name
+                ))
+                .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(workMatch.workDate.eq(date)
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
+                .orderBy(workMatch.startTime.asc())
+                .fetch();
+    }
+
+    public List<GetWorkMatchByPaid> findWorkMatchByPaid(UUID centerId, Boolean isPaid) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser user = QUser.user;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetWorkMatchByPaid.class,
+                        workMatch.workMatchId,
+                        workMatch.workDate,
+                        caregiver.user.name
+                ))
+                .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(workMatch.isPaid.eq(isPaid)
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
+                .orderBy(
+                        workMatch.workDate.desc())
+                .fetch();
+    }
+
+
+    // 이번 달 누적 정산 금액 조회
+    public BigDecimal getTotalSettledAmountThisMonth(UUID centerId) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        LocalDate now = LocalDate.now();
+        LocalDate firstDay = now.withDayOfMonth(1);
+
+        return queryFactory
+                .select(workMatch.settlementAmount.sum())
+                .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(workMatch.isPaid.eq(true)
+                        .and(workMatch.workDate.goe(firstDay))
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
+                .fetchOne();
+    }
+
+    // 미정산 건수 조회
+    public Long countUnsettled(UUID centerId) {
+        QWorkMatch workMatch = QWorkMatch.workMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        return queryFactory
+                .select(workMatch.count())
+                .from(workMatch)
+                .join(workMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(workMatch.isPaid.eq(false)
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
+                .fetchOne();
     }
 }

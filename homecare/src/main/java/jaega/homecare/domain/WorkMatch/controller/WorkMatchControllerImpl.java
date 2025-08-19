@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,5 +68,23 @@ public class WorkMatchControllerImpl implements WorkMatchController{
             @PathVariable UUID caregiverId
     ) {
         return ResponseEntity.ok(workMatchQueryService.getCaregiverSettlementSummary(caregiverId));
+    }
+
+    @Override
+    public ResponseEntity<GetWorkMatchResponse> getWorkMatch(@PathVariable UUID workMatchId) {
+        GetWorkMatchResponse responses = workMatchQueryService.findWorkMatch(workMatchId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @Override
+    public ResponseEntity<List<GetWorkMatchByDateResponse>> getWorkMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate) {
+        List<GetWorkMatchByDateResponse> response = workMatchQueryService.getWorkMatchByDate(centerId, workDate);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<List<GetWorkMatchByPaid>> getWorkMatchByPaid(@RequestParam UUID centerId, Boolean isPaid) {
+        List<GetWorkMatchByPaid> response = workMatchQueryService.getWorkMatchByPaid(centerId, isPaid);
+        return ResponseEntity.ok(response);
     }
 }

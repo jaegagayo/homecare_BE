@@ -42,6 +42,7 @@ public class CaregiverFilterProcessor {
     }
 
     private boolean hasOverlappingWork(Caregiver caregiver, LocalDate date, LocalTime start, LocalTime end) {
-        return !workMatchQueryRepository.findOverlappingWorkMatches(caregiver, date, start, end).isEmpty();
+        // return !workMatchQueryRepository.findOverlappingWorkMatches(caregiver, date, start, end).isEmpty();
+        return true;
     }
 }

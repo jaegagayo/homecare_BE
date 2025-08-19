@@ -1,8 +1,5 @@
 package jaega.homecare.global.dummy.service;
 
-import jaega.homecare.domain.WorkLog.entity.WorkLog;
-import jaega.homecare.domain.WorkLog.repository.WorkLogRepository;
-import jaega.homecare.domain.WorkLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
 import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
@@ -49,8 +46,6 @@ public class DummyDataService {
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final WorkMatchCommandService workMatchCommandService;
     private final WorkMatchRepository workMatchRepository;
-    private final WorkLogRepository workLogRepository;
-    private final WorkLogCommandService workLogCommandService;
     private final Random random = new Random();
 
     @Transactional
@@ -269,10 +264,10 @@ public class DummyDataService {
                     int statusChoice = random.nextBoolean() ? 1 : 2;
                     if (statusChoice == 1) {
                         workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.COMPLETED);
-                        List<WorkLog> logs = workLogRepository.findByWorkMatch(match);
-                        for (WorkLog log : logs) {
-                            log.togglePaidStatus();
-                        }
+//                        List<WorkLog> logs = workLogRepository.findByWorkMatch(match);
+//                        for (WorkLog log : logs) {
+//                            log.togglePaidStatus();
+//                        }
                     } else {
                         workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.CANCELLED);
                     }

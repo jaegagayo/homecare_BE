@@ -1,9 +1,8 @@
 package jaega.homecare.domain.center.controller;
 
-import jaega.homecare.domain.WorkLog.dto.res.GetDashboardSettlementResponse;
-import jaega.homecare.domain.WorkLog.service.query.WorkLogQueryService;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.WorkMatch.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.WorkMatch.service.query.WorkMatchQueryService;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
@@ -14,16 +13,13 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.command.CertificationCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiver.service.query.CertificationQueryService;
-import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
 import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.*;
 import jaega.homecare.domain.center.service.command.CenterCommandService;
-import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.users.entity.ServiceType;
-import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +39,6 @@ public class CenterControllerImpl implements CenterController{
     private final CaregiverQueryService caregiverQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final WorkMatchQueryService workMatchQueryService;
-    private final WorkLogQueryService workLogQueryService;
     private final CertificationCommandService certificationCommandService;
     private final CertificationQueryService certificationQueryService;
 
@@ -156,7 +151,7 @@ public class CenterControllerImpl implements CenterController{
 
     @Override
     public ResponseEntity<GetDashboardSettlementResponse> getDashboardSettlement(@RequestParam UUID centerId) {
-        GetDashboardSettlementResponse response = workLogQueryService.getSettlementStatus(centerId);
+        GetDashboardSettlementResponse response = workMatchQueryService.getSettlementStatus(centerId);
         return ResponseEntity.ok(response);
     }
 

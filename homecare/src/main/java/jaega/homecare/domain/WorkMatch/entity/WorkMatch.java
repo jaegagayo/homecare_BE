@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -36,28 +37,45 @@ public class WorkMatch extends BaseTimeEntity {
     @Column(name = "end_time")
     private LocalTime endTime;
 
-    private String location;
+    @Column(name = "distance_log")
+    private Double distanceLog;
+
+    @Column(name = "work_address")
+    private String workAddress;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private WorkStatus status;
 
+    @Column(name = "is_paid")
+    private boolean isPaid = false;
+
+    @Column(name = "settlement_account")
+    private BigDecimal settlementAmount;
+
     @Builder
-    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime, String location, WorkStatus status){
+    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime, Double distanceLog, String workAddress, boolean isPaid, BigDecimal settlementAmount) {
         this.workMatchId = workMatchId;
         this.caregiver = caregiver;
         this.workDate = workDate;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.location = location;
+        this.distanceLog = distanceLog;
+        this.workAddress = workAddress;
         this.status = WorkStatus.PLANNED;
-    }
-
-    public void changeWorkStatus(WorkStatus workStatus){
-        this.status = workStatus;
+        this.isPaid = isPaid;
+        this.settlementAmount = settlementAmount;
     }
 
     public void setWorkMatch(UUID workMatchId){
         this.workMatchId = workMatchId;
+    }
+
+    public void togglePaidStatus(){
+        this.isPaid = !isPaid;
+    }
+
+    public void changeWorkStatus(WorkStatus newStatus) {
+        this.status = newStatus;
     }
 }

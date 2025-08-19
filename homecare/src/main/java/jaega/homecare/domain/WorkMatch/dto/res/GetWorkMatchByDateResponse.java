@@ -1,11 +1,11 @@
-package jaega.homecare.domain.WorkLog.dto.res;
+package jaega.homecare.domain.WorkMatch.dto.res;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
-public record GetWorkLogByDateResponse(
-        UUID workLogId,
+public record GetWorkMatchByDateResponse(
+        UUID workMatchId,
         LocalDate workingDate,
         LocalTime workTimeStart,
         LocalTime workTimeEnd,
