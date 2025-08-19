@@ -32,7 +32,7 @@ public class WorkMatchQueryRepository {
     private final CaregiverRepository caregiverRepository;
 
     // 센터에 등록된 요양보호사 정산 내역 조회
-    public List<GetCaregiverMatchesByMonth> findWorkMatchesByMonth(UUID centerId, int year, int month, Integer day) {
+    public List<GetCaregiverMatchesByMonth> findWorkMatchByMonth(UUID centerId, int year, int month, Integer day) {
         QWorkMatch workMatch = QWorkMatch.workMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
@@ -110,7 +110,7 @@ public class WorkMatchQueryRepository {
     }
 
     // 매칭 알고리즘 사전 필터링
-    public List<WorkMatch> findOverlappingWorkMatches(
+    public List<WorkMatch> findOverlappingWorkMatch(
             Caregiver caregiver,
             LocalDate date,
             LocalTime startTime,

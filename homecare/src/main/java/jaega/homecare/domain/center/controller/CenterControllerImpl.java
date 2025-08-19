@@ -82,7 +82,7 @@ public class CenterControllerImpl implements CenterController{
 
     @Override
     public ResponseEntity<List<GetCaregiverMatchesResponse>> getWorkMatchByCaregiver(@PathVariable UUID caregiverId) {
-        List<GetCaregiverMatchesResponse> responses = workMatchQueryService.getWorkMatchesByCaregiver(caregiverId);
+        List<GetCaregiverMatchesResponse> responses = workMatchQueryService.getWorkMatchByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
     }
 
@@ -93,7 +93,7 @@ public class CenterControllerImpl implements CenterController{
             @RequestParam int month,
             @RequestParam(required = false) Integer day
     ) {
-        List<GetCaregiverMatchesByMonth> response = workMatchQueryService.getWorkMatchesByMonth(centerId, year, month, day);
+        List<GetCaregiverMatchesByMonth> response = workMatchQueryService.getWorkMatchByMonth(centerId, year, month, day);
         return ResponseEntity.ok(response);
     }
 

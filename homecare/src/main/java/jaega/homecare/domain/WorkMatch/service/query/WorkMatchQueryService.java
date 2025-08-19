@@ -38,7 +38,7 @@ public class WorkMatchQueryService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 workMatchId로 근무 기록을 찾을 수 없습니다."));
     }
 
-    public List<GetCaregiverMatchesResponse> getWorkMatchesByCaregiver(UUID caregiverId){
+    public List<GetCaregiverMatchesResponse> getWorkMatchByCaregiver(UUID caregiverId){
         return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
     }
 
@@ -46,8 +46,8 @@ public class WorkMatchQueryService {
         return workMatchQueryRepository.findWorkMatchByDate(centerId, date);
     }
 
-    public List<GetCaregiverMatchesByMonth> getWorkMatchesByMonth(UUID centerId, int year, int month, Integer day) {
-        return workMatchQueryRepository.findWorkMatchesByMonth(centerId, year, month, day);
+    public List<GetCaregiverMatchesByMonth> getWorkMatchByMonth(UUID centerId, int year, int month, Integer day) {
+        return workMatchQueryRepository.findWorkMatchByMonth(centerId, year, month, day);
     }
 
     public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
