@@ -1,4 +1,4 @@
-package jaega.homecare.domain.WorkLog.dto.res;
+package jaega.homecare.domain.WorkMatch.dto.res;
 
 import java.math.BigDecimal;
 

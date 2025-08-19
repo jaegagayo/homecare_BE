@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -51,4 +50,9 @@ public class CaregiverCenter {
         this.status = status;
         this.joinedAt = joinedAt;
     }
+
+    public void deregister() {
+        this.status = CaregiverStatus.INACTIVE;
+    }
+
 }

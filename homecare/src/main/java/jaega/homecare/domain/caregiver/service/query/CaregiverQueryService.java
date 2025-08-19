@@ -54,7 +54,7 @@ public class CaregiverQueryService {
 
 
     public GetDashboardPopularResponse getCaregiverStats(UUID centerId) {
-        Center center = centerQueryService.getCenterByUUID(centerId);
+        Center center = centerQueryService.findCenterByUUID(centerId);
 
         Long total = caregiverQueryRepository.countByCenterId(center.getCenterId());
         Long active = caregiverQueryRepository.countByCenterAndStatus(center.getCenterId(), CaregiverStatus.ACTIVE);

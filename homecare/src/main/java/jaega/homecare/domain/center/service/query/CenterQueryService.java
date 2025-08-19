@@ -15,13 +15,14 @@ public class CenterQueryService {
 
     private final CenterRepository centerRepository;
 
-    public Center getCenterByUUID(UUID centerId) {
+    public Center findCenterByUUID(UUID centerId) {
         return centerRepository.findByCenterId(centerId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 centerId로 센터를 찾을 수 없습니다."));
     }
 
-    public Center getCenterByUser(User user){
+    public Center findCenterByUser(User user){
         return centerRepository.findByUser(user)
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저 정보로 센터의 id를 가져올 수 없습니다."));
     }
+
 }

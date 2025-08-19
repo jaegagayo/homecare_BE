@@ -1,4 +1,4 @@
-package jaega.homecare.domain.WorkLog.dto.req;
+package jaega.homecare.domain.WorkMatch.dto.req;
 
 import java.util.UUID;
 
