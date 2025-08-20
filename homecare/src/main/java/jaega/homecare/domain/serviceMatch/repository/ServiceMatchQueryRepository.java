@@ -32,8 +32,8 @@ public class ServiceMatchQueryRepository {
                         requesterUser.name,
                         caregiverUser.name,
                         serviceMatch.serviceDate,
-                        serviceMatch.startTime,
-                        serviceMatch.endTime,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
                         serviceRequest.serviceType.stringValue(),
                         serviceMatch.status
                 ))
@@ -67,8 +67,8 @@ public class ServiceMatchQueryRepository {
                         caregiver.address,
                         caregiverUser.phone,
                         serviceMatch.serviceDate,
-                        serviceMatch.startTime,
-                        serviceMatch.endTime,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
                         serviceRequest.serviceType
                 ))
                 .from(serviceMatch)
@@ -101,8 +101,8 @@ public class ServiceMatchQueryRepository {
                         caregiverUser.name,
                         consumerUser.name,
                         serviceMatch.serviceDate,
-                        serviceMatch.startTime,
-                        serviceMatch.endTime,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
                         Expressions.constant(Collections.emptySet()), // ServiceType, 이후 별도 로딩
                         serviceRequest.address,
                         Expressions.constant(12000), // TODO: 하드코딩, 시급(추후 제거 필요)
@@ -145,8 +145,8 @@ public class ServiceMatchQueryRepository {
                         base.caregiverName(),
                         base.consumerName(),
                         base.serviceDate(),
-                        base.startTime(),
-                        base.endTime(),
+                        base.serviceStartTime(),
+                        base.serviceEndTime(),
                         serviceTypeMap.getOrDefault(base.caregiverId(), Collections.emptySet()),
                         base.address(),
                         base.hourlyWage(),

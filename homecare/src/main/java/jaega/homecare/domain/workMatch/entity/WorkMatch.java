@@ -32,10 +32,10 @@ public class WorkMatch extends BaseTimeEntity {
     private LocalDate workDate;
 
     @Column(name = "start_time")
-    private LocalTime startTime;
+    private LocalTime workStartTime;
 
     @Column(name = "end_time")
-    private LocalTime endTime;
+    private LocalTime workEndTime;
 
     @Column(name = "distance_log")
     private Double distanceLog;
@@ -54,12 +54,12 @@ public class WorkMatch extends BaseTimeEntity {
     private BigDecimal settlementAmount;
 
     @Builder
-    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workDate, LocalTime startTime, LocalTime endTime, Double distanceLog, String workAddress, boolean isPaid, BigDecimal settlementAmount) {
+    public WorkMatch(UUID workMatchId, Caregiver caregiver, LocalDate workDate, LocalTime workStartTime, LocalTime workEndTime, Double distanceLog, String workAddress, boolean isPaid, BigDecimal settlementAmount) {
         this.workMatchId = workMatchId;
         this.caregiver = caregiver;
         this.workDate = workDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.workStartTime = workStartTime;
+        this.workEndTime = workEndTime;
         this.distanceLog = distanceLog;
         this.workAddress = workAddress;
         this.status = WorkStatus.PLANNED;
@@ -71,7 +71,7 @@ public class WorkMatch extends BaseTimeEntity {
         this.workMatchId = workMatchId;
     }
 
-    public void togglePaidStatus(){
+    public void changePaidStatus(){
         this.isPaid = !isPaid;
     }
 

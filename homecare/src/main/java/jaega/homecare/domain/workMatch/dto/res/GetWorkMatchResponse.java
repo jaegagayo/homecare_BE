@@ -5,8 +5,8 @@ import java.util.UUID;
 
 public record GetWorkMatchResponse(
         UUID workMatchId,
-        LocalTime workTime_start,
-        LocalTime workTime_end,
+        LocalTime workStartTime,
+        LocalTime workEndTime,
         Double distanceLog,
         Boolean isPaid
 ) {

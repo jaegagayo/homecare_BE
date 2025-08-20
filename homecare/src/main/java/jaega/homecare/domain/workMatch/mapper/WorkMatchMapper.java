@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @Mapper(componentModel = "spring")
 public interface WorkMatchMapper {
 
-    @Mapping(target = "startTime", source = "request.workStartTime")
-    @Mapping(target = "endTime", source = "request.workEndTime")
+    @Mapping(target = "workStartTime", source = "request.workStartTime")
+    @Mapping(target = "workEndTime", source = "request.workEndTime")
     @Mapping(target = "workDate", source = "request.workDate")
     @Mapping(target = "workAddress", source = "request.workAddress")
     @Mapping(target = "distanceLog", source = "request.distanceLog")
@@ -25,8 +25,8 @@ public interface WorkMatchMapper {
     WorkMatch toEntity(CreateWorkMatchRequest request, Caregiver caregiver, BigDecimal settlementAmount);
 
     @Mapping(target = "workMatchId", source = "workMatchId")
-    @Mapping(target = "workTime_start", source = "startTime")
-    @Mapping(target = "workTime_end", source = "endTime")
+    @Mapping(target = "workStartTime", source = "workStartTime")
+    @Mapping(target = "workEndTime", source = "workEndTime")
     @Mapping(target = "distanceLog", source = "distanceLog")
     @Mapping(target = "isPaid", source = "paid")
     GetWorkMatchResponse toGetResponse(WorkMatch workMatch);

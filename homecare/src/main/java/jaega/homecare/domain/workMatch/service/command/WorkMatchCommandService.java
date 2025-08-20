@@ -26,15 +26,6 @@ public class WorkMatchCommandService {
     private final CaregiverQueryService caregiverQueryService;
     private final WorkMatchMapper workMatchMapper;
 
-    /**
-     * 특정 WorkMatch의 근무 상태 변경
-     */
-    public void changeWorkMatchStatus(UUID workMatchId, WorkStatus newStatus) {
-        WorkMatch workMatch = workMatchRepository.findByWorkMatchId(workMatchId)
-                .orElseThrow(() -> new IllegalArgumentException("WorkMatch not found: " + workMatchId));
-
-        workMatch.changeWorkStatus(newStatus);
-    }
 
     public void createWorkMatch(CreateWorkMatchRequest request){
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
@@ -63,13 +54,20 @@ public class WorkMatchCommandService {
     }
 
     /**
-     * 특정 WorkLog의 정산 상태 변경
+     * 특정 WorkMatch의 상태 변경
      */
-    public void togglePaidStatus(UUID workMatchId) {
+    public void changeWorkMatchStatus(UUID workMatchId, WorkStatus newStatus) {
+        WorkMatch workMatch = workMatchRepository.findByWorkMatchId(workMatchId)
+                .orElseThrow(() -> new IllegalArgumentException("WorkMatch not found: " + workMatchId));
+
+        workMatch.changeWorkStatus(newStatus);
+    }
+
+    public void changePaidStatus(UUID workMatchId) {
         WorkMatch workMatch = workMatchRepository.findByWorkMatchId(workMatchId)
                 .orElseThrow(() -> new IllegalArgumentException("WorkLog not found: " + workMatchId));
 
-        workMatch.togglePaidStatus();
+        workMatch.changePaidStatus();
     }
 
 }

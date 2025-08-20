@@ -172,17 +172,17 @@ public class DummyDataService {
         /*
         User user = userRepository.findByUserRole(UserRole.ROLE_CONSUMER).get(random.nextInt(userRepository.findByUserRole(UserRole.ROLE_CONSUMER).size()));
 
-        LocalTime startTime, endTime;
+        LocalTime serviceStartTime, serviceEndTime;
         int timeSlot = random.nextInt(3);
         if (timeSlot == 0) { // 오전 9시 ~ 12시
-            startTime = LocalTime.of(9, 0);
-            endTime = LocalTime.of(12, 0);
+            serviceStartTime = LocalTime.of(9, 0);
+            serviceEndTime = LocalTime.of(12, 0);
         } else if (timeSlot == 1) { // 오후 1시 ~ 4시
-            startTime = LocalTime.of(13, 0);
-            endTime = LocalTime.of(16, 0);
+            serviceStartTime = LocalTime.of(13, 0);
+            serviceEndTime = LocalTime.of(16, 0);
         } else { // 오후 5시 ~ 8시
-            startTime = LocalTime.of(17, 0);
-            endTime = LocalTime.of(20, 0);
+            serviceStartTime = LocalTime.of(17, 0);
+            serviceEndTime = LocalTime.of(20, 0);
         }
 
         Set<LocalDate> requestedDays = new HashSet<>();
@@ -203,8 +203,8 @@ public class DummyDataService {
         ServiceRequest serviceRequest = ServiceRequest.builder()
                 .address("서울시 강남구 테헤란로 " + index)
                 .location(new Location(37.500 + random.nextDouble() * 0.1, 86.037 + random.nextDouble() * 0.1))
-                .preferred_time_start(startTime)
-                .preferred_time_end(endTime)
+                .preferred_time_start(serviceStartTime)
+                .preferred_time_end(serviceEndTime)
                 .serviceType(ServiceType.values()[random.nextInt(ServiceType.values().length)])
                 .personalityType("친절한")
                 .additionalInformation("추가 정보" + index)
@@ -231,8 +231,8 @@ public class DummyDataService {
             CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(
                     serviceRequestId,
                     caregiverId,
-                    startTime,
-                    endTime,
+                    serviceStartTime,
+                    serviceEndTime,
                     requestedDays
             );
             serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
@@ -240,8 +240,8 @@ public class DummyDataService {
             // 근무 매칭 생성
             CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(
                     caregiverId,
-                    startTime,
-                    endTime,
+                    serviceStartTime,
+                    serviceEndTime,
                     requestedDays,
                     serviceRequest.getAddress(),
                     distanceLog
@@ -261,7 +261,7 @@ public class DummyDataService {
                         workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.COMPLETED);
 //                        List<WorkLog> logs = workLogRepository.findByWorkMatch(match);
 //                        for (WorkLog log : logs) {
-//                            log.togglePaidStatus();
+//                            log.changePaidStatus();
 //                        }
                     } else {
                         workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.CANCELLED);

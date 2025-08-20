@@ -57,8 +57,8 @@ public class WorkMatchQueryRepository {
                         caregiver.caregiverId,
                         user.name,
                         workMatch.workDate,
-                        workMatch.startTime,
-                        workMatch.endTime,
+                        workMatch.workStartTime,
+                        workMatch.workEndTime,
                         Expressions.constant(Collections.emptySet()),
                         caregiver.address,
                         workMatch.status
@@ -124,8 +124,8 @@ public class WorkMatchQueryRepository {
                         wm.caregiver.eq(caregiver),
                         wm.workDate.eq(date),
                         wm.status.eq(WorkStatus.PLANNED),
-                        wm.startTime.lt(endTime),
-                        wm.endTime.gt(startTime)
+                        wm.workStartTime.lt(endTime),
+                        wm.workEndTime.gt(startTime)
                 )
                 .fetch();
     }
@@ -393,8 +393,8 @@ public class WorkMatchQueryRepository {
                         GetCaregiverWorkResponse.class,
                         user.name,
                         workMatch.workDate,
-                        workMatch.startTime,
-                        workMatch.endTime,
+                        workMatch.workStartTime,
+                        workMatch.workEndTime,
                         workMatch.settlementAmount,
                         workMatch.status
                 ))
@@ -442,8 +442,8 @@ public class WorkMatchQueryRepository {
                         GetCaregiverWorkResponse.class,
                         user.name,
                         workMatch.workDate,
-                        workMatch.startTime,
-                        workMatch.endTime,
+                        workMatch.workStartTime,
+                        workMatch.workEndTime,
                         workMatch.settlementAmount,
                         workMatch.status
                 ))
@@ -560,8 +560,8 @@ public class WorkMatchQueryRepository {
                         GetWorkMatchByDateResponse.class,
                         workMatch.workMatchId,
                         workMatch.workDate,
-                        workMatch.startTime,
-                        workMatch.endTime,
+                        workMatch.workStartTime,
+                        workMatch.workEndTime,
                         caregiver.user.name
                 ))
                 .from(workMatch)
@@ -569,7 +569,7 @@ public class WorkMatchQueryRepository {
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(workMatch.workDate.eq(date)
                         .and(caregiverCenter.center.centerId.eq(centerId)))
-                .orderBy(workMatch.startTime.asc())
+                .orderBy(workMatch.workStartTime.asc())
                 .fetch();
     }
 
