@@ -4,6 +4,7 @@ import jaega.homecare.domain.users.entity.Disease;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -54,5 +55,27 @@ public class Consumer extends BaseTimeEntity {
 
     @Column(name = "guardian_phone", nullable = false)
     private String guardianPhone;
+
+    @Builder
+    public Consumer(User user, UUID consumerId, String residentialAddress, String visitAddress, String entranceType,
+                    Integer careGrade, boolean isMedicalAid, Integer weight, Disease disease, String livingSituation,
+                    String guardianName, String guardianPhone){
+        this.user = user;
+        this.consumerId = consumerId;
+        this.residentialAddress = residentialAddress;
+        this.visitAddress = visitAddress;
+        this.entranceType = entranceType;
+        this.careGrade = careGrade;
+        this.isMedicalAid = isMedicalAid;
+        this.weight = weight;
+        this.disease = disease;
+        this.livingSituation = livingSituation;
+        this.guardianName = guardianName;
+        this.guardianPhone = guardianPhone;
+    }
+
+    public void setConsumer(UUID consumerId){
+        this.consumerId = consumerId;
+    }
 
 }
