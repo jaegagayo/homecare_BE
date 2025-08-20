@@ -1,23 +1,14 @@
 package jaega.homecare.domain.serviceMatch.repository;
 
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
-import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.workMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
-import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
-import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
-import jaega.homecare.domain.serviceRequest.entity.QServiceRequest;
-import jaega.homecare.domain.users.entity.QUser;
-import jaega.homecare.domain.users.entity.ServiceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,8 +32,8 @@ public class ServiceMatchQueryRepository {
                         requesterUser.name,
                         caregiverUser.name,
                         serviceMatch.serviceDate,
-                        serviceMatch.startTime,
-                        serviceMatch.endTime,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
                         serviceRequest.serviceType.stringValue(),
                         serviceMatch.status
                 ))
@@ -76,8 +67,8 @@ public class ServiceMatchQueryRepository {
                         caregiver.address,
                         caregiverUser.phone,
                         serviceMatch.serviceDate,
-                        serviceMatch.startTime,
-                        serviceMatch.endTime,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
                         serviceRequest.serviceType
                 ))
                 .from(serviceMatch)
@@ -110,8 +101,8 @@ public class ServiceMatchQueryRepository {
                         caregiverUser.name,
                         consumerUser.name,
                         serviceMatch.serviceDate,
-                        serviceMatch.startTime,
-                        serviceMatch.endTime,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
                         Expressions.constant(Collections.emptySet()), // ServiceType, 이후 별도 로딩
                         serviceRequest.address,
                         Expressions.constant(12000), // TODO: 하드코딩, 시급(추후 제거 필요)
@@ -154,8 +145,8 @@ public class ServiceMatchQueryRepository {
                         base.caregiverName(),
                         base.consumerName(),
                         base.serviceDate(),
-                        base.startTime(),
-                        base.endTime(),
+                        base.serviceStartTime(),
+                        base.serviceEndTime(),
                         serviceTypeMap.getOrDefault(base.caregiverId(), Collections.emptySet()),
                         base.address(),
                         base.hourlyWage(),

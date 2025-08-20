@@ -6,8 +6,8 @@ public record GetServiceMatchByUUID(
         String consumerName,
         String caregiverName,
         String serviceDate,
-        String startTime,
-        String endTime,
+        String serviceStartTime,
+        String serviceEndTime,
         MatchStatus status
 ) {
 }

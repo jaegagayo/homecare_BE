@@ -1,5 +1,6 @@
 package jaega.homecare.domain.serviceRequest.mapper;
 
+import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.req.LocationDto;
 import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
@@ -13,18 +14,17 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ServiceRequestMapper {
 
-    @Mapping(target = "address", source = "request.address")
+    @Mapping(target = "consumer", source = "consumer")
+    @Mapping(target = "serviceAddress", source = "request.serviceAddress")
+    @Mapping(target = "addressType", source = "request.addressType")
     @Mapping(target = "location", expression = "java(map(request.location()))")
-    @Mapping(target = "preferred_time_start", source = "request.preferred_time_start")
-    @Mapping(target = "preferred_time_end", source = "request.preferred_time_end")
+    @Mapping(target = "requestDate", source = "request.requestDate")
+    @Mapping(target = "preferredStartTime", source = "request.preferredStartTime")
+    @Mapping(target = "preferredEndTime", source = "request.preferredEndTime")
+    @Mapping(target = "duration", source = "request.duration")
     @Mapping(target = "serviceType", source = "request.serviceType")
-    @Mapping(target = "personalityType", source = "request.personalityType")
     @Mapping(target = "additionalInformation", source = "request.additionalInformation")
-    @Mapping(target = "requestedDays", ignore = true)
-    @Mapping(target = "serviceRequestId", ignore = true)
-    @Mapping(target = "consumer", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    ServiceRequest toEntity(ConsumerServiceRequest request);
+    ServiceRequest toEntity(ConsumerServiceRequest request, Consumer consumer);
 
     GetServiceRequestResponse toFindResponseDto(ServiceRequest request);
 

@@ -8,8 +8,6 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.mapper.ServiceRequestMapper;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
-import jaega.homecare.domain.users.entity.User;
-import jaega.homecare.domain.users.service.query.UserQueryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import java.util.UUID;
 public class ServiceRequestCommandService {
 
     private final ServiceRequestRepository serviceRequestRepository;
-    private final UserQueryService userQueryService;
     private final ConsumerQueryService consumerQueryService;
     private final ServiceRequestMapper serviceRequestMapper;
 
@@ -29,9 +26,9 @@ public class ServiceRequestCommandService {
     public GetCreateServiceResponse createServiceRequest(ConsumerServiceRequest request){
         Consumer consumer = consumerQueryService.getConsumer(request.consumerId());
 
-        ServiceRequest serviceRequest = serviceRequestMapper.toEntity(request);
+        ServiceRequest serviceRequest = serviceRequestMapper.toEntity(request, consumer);
 
-        serviceRequest.setServiceRequest(UUID.randomUUID(), consumer, ServiceRequestStatus.PENDING, request.requestedDays());
+        serviceRequest.initializeServiceRequest(UUID.randomUUID(), ServiceRequestStatus.PENDING);
         serviceRequestRepository.save(serviceRequest);
 
         return serviceRequestMapper.toGetCreateResponse(serviceRequest);

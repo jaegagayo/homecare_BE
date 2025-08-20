@@ -29,22 +29,12 @@ public class ServiceMatchCommandService {
 
     public void createServiceMatch(CreateServiceMatchRequest request){
         ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(request.serviceRequestId());
+
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
 
-        Set<LocalDate> serviceDays = request.service_days();
-        if(serviceDays == null || serviceDays.isEmpty()){
-            throw new IllegalArgumentException("service_days 리스트는 비어 있을 수 없습니다.");
-        }
-
-        List<ServiceMatch> serviceMatches = serviceDays.stream()
-                        .map(day -> {
-                            ServiceMatch serviceMatch = serviceMatchMapper.toEntity(request, day, serviceRequest, caregiver);
-                            serviceMatch.setServiceMatch(UUID.randomUUID());
-                            return serviceMatch;
-                        })
-                        .toList();
-
-        serviceMatchRepository.saveAll(serviceMatches);
+        ServiceMatch serviceMatch = serviceMatchMapper.toEntity(request, serviceRequest, caregiver);
+        serviceMatch.initializeServiceMatch(UUID.randomUUID());
+        serviceMatchRepository.save(serviceMatch);
 
     }
 }

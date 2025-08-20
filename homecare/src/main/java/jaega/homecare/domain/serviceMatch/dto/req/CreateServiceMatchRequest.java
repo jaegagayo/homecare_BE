@@ -9,8 +9,8 @@ import java.util.UUID;
 public record CreateServiceMatchRequest(
         UUID serviceRequestId,
         UUID caregiverId,
-        LocalTime serviceTime_start,
-        LocalTime serviceTime_end,
-        Set<LocalDate> service_days
+        LocalTime serviceStartTime,
+        LocalTime serviceEndTime,
+        LocalDate serviceDate
 ) {
 }

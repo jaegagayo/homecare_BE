@@ -1,7 +1,7 @@
 package jaega.homecare.domain.consumer.controller;
 
-import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
-import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
+import jaega.homecare.domain.workMatch.dto.req.CreateWorkMatchRequest;
+import jaega.homecare.domain.workMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
@@ -45,16 +45,16 @@ public class ConsumerControllerImpl implements ConsumerController {
 
         CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(request.serviceRequestId(),
                 request.caregiverId(),
-                serviceRequest.getPreferred_time_start(),
-                serviceRequest.getPreferred_time_end(),
-                serviceRequest.getRequestedDays());
+                serviceRequest.getPreferredStartTime(),
+                serviceRequest.getPreferredEndTime(),
+                serviceRequest.getRequestDate());
         serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
         CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(request.caregiverId(),
-                serviceRequest.getPreferred_time_start(),
-                serviceRequest.getPreferred_time_end(),
-                serviceRequest.getRequestedDays(),
-                serviceRequest.getAddress(),
+                serviceRequest.getPreferredStartTime(),
+                serviceRequest.getPreferredEndTime(),
+                serviceRequest.getRequestDate(),
+                serviceRequest.getServiceAddress(),
                 request.distanceLog());
         workMatchCommandService.createWorkMatch(createWorkMatchRequest);
 
