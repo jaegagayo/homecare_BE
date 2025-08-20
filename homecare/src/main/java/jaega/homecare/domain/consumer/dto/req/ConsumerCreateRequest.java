@@ -1,12 +1,20 @@
 package jaega.homecare.domain.consumer.dto.req;
 
-import java.time.LocalDate;
+import jaega.homecare.domain.consumer.entity.CognitiveStatus;
+import jaega.homecare.domain.users.entity.Disease;
 
 public record ConsumerCreateRequest(
-        String name,
-        String email,
-        String password,
-        String phone,
-        LocalDate birthDate
+        // Consumer 회원가입
+        String residentialAddress,
+        String visitAddress,
+        String entranceType,
+        Integer careGrade,
+        boolean isMedicalAid,
+        Integer weight,
+        Disease disease,
+        CognitiveStatus cognitiveStatus,
+        String livingSituation,
+        String guardianName,
+        String guardianPhone
 ) {
 }

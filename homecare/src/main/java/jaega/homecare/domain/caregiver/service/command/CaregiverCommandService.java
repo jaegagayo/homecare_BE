@@ -30,6 +30,8 @@ public class CaregiverCommandService {
     private final CenterQueryService centerQueryService;
     private final CaregiverCenterCommandService caregiverCenterCommandService;
 
+    // TODO: 기존 : 센터에서 요양보호사 생성, 변경 필요 : 요양보호사가 직접 회원가입 후 센터 선택
+    // TODO: 자격증 데이터만 생성하고 후에, 변경하는 것으로 되어있으나 자격증도 같이 등록하면 될듯 합니다!
     public Caregiver createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user, UUID centerId) {
         String address = createCaregiverRequest.address();
         Center center = centerQueryService.findCenterByUUID(centerId);
