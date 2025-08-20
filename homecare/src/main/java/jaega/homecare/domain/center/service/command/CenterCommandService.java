@@ -11,9 +11,11 @@ import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.mapper.CenterMapper;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
+import jaega.homecare.domain.users.dto.req.UserCreateRequest;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.repository.UserRepository;
+import jaega.homecare.domain.users.service.command.UserCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +35,7 @@ public class CenterCommandService {
     private final CaregiverMapper caregiverMapper;
     private final PasswordEncoder passwordEncoder;
     private final CenterQueryService centerQueryService;
+    private final UserCommandService userCommandService;
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverCenterCommandService caregiverCenterCommandService;
 
@@ -47,9 +50,16 @@ public class CenterCommandService {
         // User 생성
         String rawPassword = generateRandomPassword(8);
         String encodedPassword = passwordEncoder.encode(rawPassword);
-        User user = caregiverMapper.toUserEntity(createCaregiverRequest, encodedPassword);
-        user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
-        userRepository.save(user);
+
+        UserCreateRequest request = new UserCreateRequest(
+                createCaregiverRequest.name(),
+                createCaregiverRequest.email(),
+                encodedPassword,
+                createCaregiverRequest.phone(),
+                createCaregiverRequest.birthDate()
+        );
+
+        User user = userCommandService.createUser(request, UserRole.ROLE_CAREGIVER);
 
         Caregiver caregiver = caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
 

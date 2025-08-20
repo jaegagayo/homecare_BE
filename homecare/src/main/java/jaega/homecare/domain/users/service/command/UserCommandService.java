@@ -34,7 +34,7 @@ public class UserCommandService {
         return userMapper.toLoginResponse(user.getUserId());
     }
 
-    public UUID createUser(UserCreateRequest request, UserRole role){
+    public User createUser(UserCreateRequest request, UserRole role){
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
@@ -45,6 +45,6 @@ public class UserCommandService {
         user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
         userRepository.save(user);
 
-        return user.getUserId();
+        return user;
     }
 }

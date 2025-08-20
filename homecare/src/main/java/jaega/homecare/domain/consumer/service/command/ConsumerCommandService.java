@@ -23,15 +23,13 @@ public class ConsumerCommandService {
     private final ConsumerRepository consumerRepository;
     private final ConsumerMapper consumerMapper;
     private final UserCommandService userCommandService;
-    private final UserQueryService userQueryService;
 
     public void signupConsumer(ConsumerSignupRequest request){
-        UUID userId = userCommandService.createUser(request.user(), UserRole.ROLE_CONSUMER);
-        createConsumer(request.consumer(), userId);
+        User user = userCommandService.createUser(request.user(), UserRole.ROLE_CONSUMER);
+        createConsumer(request.consumer(), user);
     }
 
-    public void createConsumer(ConsumerCreateRequest request, UUID userId){
-        User user = userQueryService.getUser(userId);
+    public void createConsumer(ConsumerCreateRequest request, User user){
         Consumer consumer = consumerMapper.toConsumer(request, user);
         consumer.setConsumer(UUID.randomUUID());
         consumerRepository.save(consumer);
