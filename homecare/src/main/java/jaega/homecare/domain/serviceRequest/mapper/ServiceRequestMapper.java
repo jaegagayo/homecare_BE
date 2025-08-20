@@ -22,7 +22,7 @@ public interface ServiceRequestMapper {
     @Mapping(target = "additionalInformation", source = "request.additionalInformation")
     @Mapping(target = "requestedDays", ignore = true)
     @Mapping(target = "serviceRequestId", ignore = true)
-    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "consumer", ignore = true)
     @Mapping(target = "status", ignore = true)
     ServiceRequest toEntity(ConsumerServiceRequest request);
 

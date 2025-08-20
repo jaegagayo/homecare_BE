@@ -175,6 +175,7 @@ public class DummyDataService {
     }
 
     private void createDummyServiceRequest(int index) {
+        /*
         User user = userRepository.findByUserRole(UserRole.ROLE_CONSUMER).get(random.nextInt(userRepository.findByUserRole(UserRole.ROLE_CONSUMER).size()));
 
         LocalTime startTime, endTime;
@@ -276,5 +277,7 @@ public class DummyDataService {
                 }
             }
         }
+
+         */
     }
 }

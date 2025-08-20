@@ -1,6 +1,5 @@
 package jaega.homecare.domain.WorkMatch.mapper;
 
-import jaega.homecare.domain.WorkLog.dto.req.CreateWorkLogRequest;
 import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
 import jaega.homecare.domain.WorkMatch.dto.res.GetWorkMatchResponse;
 import jaega.homecare.domain.WorkMatch.entity.WorkMatch;

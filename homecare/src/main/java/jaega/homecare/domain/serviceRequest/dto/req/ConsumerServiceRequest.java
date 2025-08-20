@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public record ConsumerServiceRequest(
-        UUID userId,
+        UUID consumerId,
         String address,
         LocationDto location,
 

@@ -1,8 +1,8 @@
 package jaega.homecare.domain.serviceRequest.entity;
 
+import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.Location;
-import jaega.homecare.domain.users.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,8 +25,8 @@ public class ServiceRequest {
     private UUID serviceRequestId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_userId")
-    private User user;
+    @JoinColumn(name = "consumer_id")
+    private Consumer consumer;
 
     private String address;
 
@@ -53,7 +53,7 @@ public class ServiceRequest {
     private String additionalInformation;
 
     @Builder
-    public ServiceRequest(UUID serviceRequestId, User user, String address, Location location, LocalTime preferred_time_start, LocalTime preferred_time_end,
+    public ServiceRequest(UUID serviceRequestId, Consumer consumer, String address, Location location, LocalTime preferred_time_start, LocalTime preferred_time_end,
                           ServiceType serviceType, ServiceRequestStatus status, String personalityType, Set<LocalDate> requestedDays, String additionalInformation){
         this.address = address;
         this.location = location;
@@ -65,9 +65,9 @@ public class ServiceRequest {
         this.additionalInformation = additionalInformation;
     }
 
-    public void setServiceRequest(UUID serviceRequestId, User user, ServiceRequestStatus status, Set<LocalDate> requestedDays){
+    public void setServiceRequest(UUID serviceRequestId, Consumer consumer, ServiceRequestStatus status, Set<LocalDate> requestedDays){
         this.serviceRequestId = serviceRequestId;
-        this.user = user;
+        this.consumer = consumer;
         this.status = status;
         this.requestedDays = requestedDays;
     }
