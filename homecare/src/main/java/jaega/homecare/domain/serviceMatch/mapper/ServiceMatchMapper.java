@@ -22,7 +22,7 @@ public interface ServiceMatchMapper {
     @Mapping(target = "status", ignore = true)
     ServiceMatch toEntity(CreateServiceMatchRequest request, LocalDate serviceDate, ServiceRequest serviceRequest, Caregiver caregiver);
 
-    @Mapping(target = "consumerName", source = "serviceRequest.user.name")
+    @Mapping(target = "consumerName", source = "serviceRequest.consumer.user.name")
     @Mapping(target = "caregiverName", source = "caregiver.user.name")
     @Mapping(target = "serviceDate", source = "serviceDate")
     @Mapping(target = "startTime", source = "startTime")

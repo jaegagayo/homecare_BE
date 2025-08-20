@@ -27,11 +27,12 @@ public class ServiceMatchQueryRepository {
     private final CaregiverRepository caregiverRepository;
 
     public List<GetServiceMatchByCenterResponse> findMatchesByCenterId(UUID centerId) {
+        /*
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-        QUser requesterUser = QUser.user;
+        QUser requesterUser = QConsumer.user;
         QUser caregiverUser = new QUser("caregiverUser");
 
         return queryFactory
@@ -54,9 +55,13 @@ public class ServiceMatchQueryRepository {
                 .where(caregiverCenter.center.centerId.eq(centerId))
                 .orderBy(serviceMatch.serviceDate.desc())
                 .fetch();
+
+         */
+        return null;
     }
 
     public List<GetServiceMatchByConsumerResponse> findByUserId(UUID userId) {
+        /*
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -83,9 +88,13 @@ public class ServiceMatchQueryRepository {
                 .where(requesterUser.userId.eq(userId))
                 .orderBy(serviceMatch.serviceDate.desc())
                 .fetch();
+
+         */
+        return null;
     }
 
     public List<GetCaregiverMatchesResponse> findByCaregiverId(UUID caregiverId) {
+        /*
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -154,5 +163,9 @@ public class ServiceMatchQueryRepository {
                         base.notes()
                 ))
                 .toList();
+
+         */
+
+        return null;
     }
 }

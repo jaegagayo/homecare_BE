@@ -1,5 +1,7 @@
 package jaega.homecare.domain.serviceRequest.service.query;
 
+import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 public class ServiceRequestQueryService {
 
     private final ServiceRequestRepository serviceRequestRepository;
-    private final UserQueryService userQueryService;
+    private final ConsumerQueryService consumerQueryService;
     private final ServiceRequestMapper serviceRequestMapper;
 
     public ServiceRequest getServiceRequest(UUID serviceRequestId){
@@ -30,34 +32,34 @@ public class ServiceRequestQueryService {
     }
 
 
-    public List<ServiceRequest> getServiceRequestsByUser(User user){
-        List<ServiceRequest> requests = serviceRequestRepository.findByUser(user);
+    public List<ServiceRequest> getServiceRequestsByUser(Consumer consumer){
+        List<ServiceRequest> requests = serviceRequestRepository.findByConsumer(consumer);
         if (requests.isEmpty()) {
             throw new NoSuchElementException("해당 유저의 서비스 요청 정보가 없습니다.");
         }
         return requests;
     }
 
-    public List<ServiceRequest> getServiceRequestByUserAndStatus(User user, ServiceRequestStatus status){
-        List<ServiceRequest> requests = serviceRequestRepository.findAllByUserAndStatus(user, status);
+    public List<ServiceRequest> getServiceRequestByUserAndStatus(Consumer consumer, ServiceRequestStatus status){
+        List<ServiceRequest> requests = serviceRequestRepository.findAllByConsumerAndStatus(consumer, status);
         if (requests.isEmpty()) {
             throw new NoSuchElementException("해당 유저의 서비스 요청 정보가 없습니다.");
         }
         return requests;
     }
 
-    public List<GetServiceRequestResponse> findConsumerRequests(UUID userId){
-        User user = userQueryService.getUser(userId);
-        List<ServiceRequest> serviceRequests = getServiceRequestsByUser(user);
+    public List<GetServiceRequestResponse> findConsumerRequests(UUID consumerId){
+        Consumer consumer = consumerQueryService.getConsumer(consumerId);
+        List<ServiceRequest> serviceRequests = getServiceRequestsByUser(consumer);
 
         return serviceRequests.stream()
                 .map(serviceRequestMapper::toFindResponseDto)
                 .collect(Collectors.toList());
     }
 
-    public List<GetServiceRequestResponse> findConsumerRequestsByStatus(UUID userId, ServiceRequestStatus status){
-        User user = userQueryService.getUser(userId);
-        List<ServiceRequest> serviceRequests = getServiceRequestByUserAndStatus(user, status);
+    public List<GetServiceRequestResponse> findConsumerRequestsByStatus(UUID consumerId, ServiceRequestStatus status){
+        Consumer consumer = consumerQueryService.getConsumer(consumerId);
+        List<ServiceRequest> serviceRequests = getServiceRequestByUserAndStatus(consumer, status);
 
         return serviceRequests.stream()
                 .map(serviceRequestMapper::toFindResponseDto)

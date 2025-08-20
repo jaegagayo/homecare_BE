@@ -1,6 +1,7 @@
 package jaega.homecare.domain.consumer.entity;
 
 import jaega.homecare.domain.users.entity.Disease;
+import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,13 +18,17 @@ public class Consumer extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @Column(name = "consumer_id", unique = true)
     private UUID consumerId;
 
     @Column(name = "residential_address", nullable = false)
     private String residentialAddress;
 
-    @Column(name = "visit_addres", nullable = false)
+    @Column(name = "visit_address", nullable = false)
     private String visitAddress;
 
     @Column(name = "entranceType", columnDefinition = "TEXT")
