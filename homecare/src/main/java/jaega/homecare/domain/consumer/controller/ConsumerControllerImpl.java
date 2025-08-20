@@ -3,14 +3,13 @@ package jaega.homecare.domain.consumer.controller;
 import jaega.homecare.domain.workMatch.dto.req.CreateWorkMatchRequest;
 import jaega.homecare.domain.workMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
-import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
-import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +33,8 @@ public class ConsumerControllerImpl implements ConsumerController {
     private final ServiceRequestQueryService serviceRequestQueryService;
 
     @Override
-    public ResponseEntity<Void> createConsumer(@RequestBody ConsumerCreateRequest request) {
-        consumerCommandService.createUser(request, UserRole.ROLE_CONSUMER);
+    public ResponseEntity<Void> createConsumer(@RequestBody ConsumerSignupRequest request) {
+        consumerCommandService.signupConsumer(request);
         return ResponseEntity.noContent().build();
     }
 

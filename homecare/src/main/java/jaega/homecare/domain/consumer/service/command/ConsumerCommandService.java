@@ -1,16 +1,18 @@
 package jaega.homecare.domain.consumer.service.command;
 
 import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
+import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
+import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
-import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
-import jaega.homecare.domain.users.repository.UserRepository;
+import jaega.homecare.domain.users.service.command.UserCommandService;
+import jaega.homecare.domain.users.service.query.UserQueryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -18,19 +20,18 @@ import java.util.UUID;
 @Transactional
 public class ConsumerCommandService {
 
-    private final UserRepository userRepository;
+    private final ConsumerRepository consumerRepository;
     private final ConsumerMapper consumerMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final UserCommandService userCommandService;
 
-    public void createUser(ConsumerCreateRequest request, UserRole role){
-        if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-        }
+    public void signupConsumer(ConsumerSignupRequest request){
+        User user = userCommandService.createUser(request.user(), UserRole.ROLE_CONSUMER);
+        createConsumer(request.consumer(), user);
+    }
 
-        String password = passwordEncoder.encode(request.password());
-
-        User user = consumerMapper.toEntity(request, password);
-        user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
-        userRepository.save(user);
+    public void createConsumer(ConsumerCreateRequest request, User user){
+        Consumer consumer = consumerMapper.toConsumer(request, user);
+        consumer.setConsumer(UUID.randomUUID());
+        consumerRepository.save(consumer);
     }
 }
