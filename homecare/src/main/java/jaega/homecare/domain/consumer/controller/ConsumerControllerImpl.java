@@ -1,7 +1,7 @@
 package jaega.homecare.domain.consumer.controller;
 
-import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
-import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
+import jaega.homecare.domain.workMatch.dto.req.CreateWorkMatchRequest;
+import jaega.homecare.domain.workMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;

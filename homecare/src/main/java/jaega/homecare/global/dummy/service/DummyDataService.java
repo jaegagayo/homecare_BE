@@ -1,10 +1,7 @@
 package jaega.homecare.global.dummy.service;
 
-import jaega.homecare.domain.WorkMatch.dto.req.CreateWorkMatchRequest;
-import jaega.homecare.domain.WorkMatch.entity.WorkMatch;
-import jaega.homecare.domain.WorkMatch.entity.WorkStatus;
-import jaega.homecare.domain.WorkMatch.repository.WorkMatchRepository;
-import jaega.homecare.domain.WorkMatch.service.command.WorkMatchCommandService;
+import jaega.homecare.domain.workMatch.repository.WorkMatchRepository;
+import jaega.homecare.domain.workMatch.service.command.WorkMatchCommandService;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
@@ -14,10 +11,7 @@ import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.repository.CenterRepository;
-import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
-import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
-import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
 import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;

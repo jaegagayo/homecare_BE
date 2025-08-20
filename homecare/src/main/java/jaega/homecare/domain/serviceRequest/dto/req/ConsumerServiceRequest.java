@@ -21,7 +21,7 @@ public record ConsumerServiceRequest(
         LocalTime preferred_time_end,
         ServiceType serviceType,
         String personalityType,
-        Set<LocalDate> requestedDays,
+        LocalDate requestDate,
         String additionalInformation
 ) {
 }

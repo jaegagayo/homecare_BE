@@ -1,23 +1,14 @@
 package jaega.homecare.domain.serviceMatch.repository;
 
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jaega.homecare.domain.WorkMatch.dto.res.GetCaregiverMatchesResponse;
-import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.workMatch.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
-import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
-import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
-import jaega.homecare.domain.serviceRequest.entity.QServiceRequest;
-import jaega.homecare.domain.users.entity.QUser;
-import jaega.homecare.domain.users.entity.ServiceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor

@@ -1,6 +1,6 @@
 package jaega.homecare.domain.match.processor;
 
-import jaega.homecare.domain.WorkMatch.repository.WorkMatchQueryRepository;
+import jaega.homecare.domain.workMatch.repository.WorkMatchQueryRepository;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
