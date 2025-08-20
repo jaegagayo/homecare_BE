@@ -46,16 +46,16 @@ public class ConsumerControllerImpl implements ConsumerController {
 
         CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(request.serviceRequestId(),
                 request.caregiverId(),
-                serviceRequest.getPreferred_time_start(),
-                serviceRequest.getPreferred_time_end(),
-                serviceRequest.getRequestedDays());
+                serviceRequest.getPreferredStartTime(),
+                serviceRequest.getPreferredEndTime(),
+                serviceRequest.getRequestDate());
         serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
         CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(request.caregiverId(),
-                serviceRequest.getPreferred_time_start(),
-                serviceRequest.getPreferred_time_end(),
-                serviceRequest.getRequestedDays(),
-                serviceRequest.getAddress(),
+                serviceRequest.getPreferredStartTime(),
+                serviceRequest.getPreferredEndTime(),
+                serviceRequest.getRequestDate(),
+                serviceRequest.getServiceAddress(),
                 request.distanceLog());
         workMatchCommandService.createWorkMatch(createWorkMatchRequest);
 

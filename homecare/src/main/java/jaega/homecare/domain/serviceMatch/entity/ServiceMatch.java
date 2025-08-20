@@ -56,7 +56,7 @@ public class ServiceMatch {
         this.endTime = endTime;
     }
 
-    public void setServiceMatch(UUID serviceMatchId){
+    public void initializeServiceMatch(UUID serviceMatchId){
         this.serviceMatchId = serviceMatchId;
     }
 }

@@ -26,9 +26,9 @@ public class ServiceRequestCommandService {
     public GetCreateServiceResponse createServiceRequest(ConsumerServiceRequest request){
         Consumer consumer = consumerQueryService.getConsumer(request.consumerId());
 
-        ServiceRequest serviceRequest = serviceRequestMapper.toEntity(request);
+        ServiceRequest serviceRequest = serviceRequestMapper.toEntity(request, consumer);
 
-        serviceRequest.setServiceRequest(UUID.randomUUID(), consumer, ServiceRequestStatus.PENDING, request.requestDate());
+        serviceRequest.initializeServiceRequest(UUID.randomUUID(), ServiceRequestStatus.PENDING);
         serviceRequestRepository.save(serviceRequest);
 
         return serviceRequestMapper.toGetCreateResponse(serviceRequest);

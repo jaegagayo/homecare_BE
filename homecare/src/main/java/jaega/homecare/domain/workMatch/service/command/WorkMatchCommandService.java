@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -42,20 +39,11 @@ public class WorkMatchCommandService {
     public void createWorkMatch(CreateWorkMatchRequest request){
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
 
-        Set<LocalDate> workingDays = request.working_days();
-        if (workingDays == null || workingDays.isEmpty()) {
-            throw new IllegalArgumentException("working_day 리스트는 비어 있을 수 없습니다.");
-        }
+        BigDecimal settlementAmount = calculateSettlementAmount(request.workStartTime(), request.workEndTime(), request.distanceLog());
 
-        BigDecimal settlementAmount = calculateSettlementAmount(request.workTime_start(), request.workTime_end(), request.distanceLog());
-
-        List<WorkMatch> workMatches = workingDays.stream()
-                .map(day -> {
-                    WorkMatch workMatch = workMatchMapper.toEntity(request, caregiver, day, settlementAmount);
-                    workMatch.setWorkMatch(UUID.randomUUID());
-                    return workMatch;
-                })
-                .toList();
+        WorkMatch workMatch = workMatchMapper.toEntity(request, caregiver, settlementAmount);
+        workMatch.initializeWorkMatch(UUID.randomUUID());
+        workMatchRepository.save(workMatch);
     }
 
     public BigDecimal calculateSettlementAmount(LocalTime start, LocalTime end, Double distanceKm) {

@@ -67,7 +67,7 @@ public class WorkMatch extends BaseTimeEntity {
         this.settlementAmount = settlementAmount;
     }
 
-    public void setWorkMatch(UUID workMatchId){
+    public void initializeWorkMatch(UUID workMatchId){
         this.workMatchId = workMatchId;
     }
 

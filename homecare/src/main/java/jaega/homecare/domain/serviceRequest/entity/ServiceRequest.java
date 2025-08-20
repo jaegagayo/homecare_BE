@@ -39,6 +39,9 @@ public class ServiceRequest {
     @Column(name = "location", nullable = false)
     private Location location;
 
+    @Column(name = "request_date", nullable = false)
+    private LocalDate requestDate;          // 서비스 신청일
+
     @Column(name = "preferred_start_time", nullable = false)
     private LocalTime preferredStartTime;   // 선호 시간 (시작)
 
@@ -56,15 +59,11 @@ public class ServiceRequest {
     @Column(name = "status", nullable = false)
     private ServiceRequestStatus status;    // 신청 상태
 
-    @Column(name = "request_date", nullable = false)
-    private LocalDate requestDate;          // 서비스 신청일
-
     @Column(name = "additional_information")
     private String additionalInformation;
 
     @Builder
-    public ServiceRequest(UUID serviceRequestId, Consumer consumer, String serviceAddress, AddressType addressType, Location location, LocalTime preferredStartTime, LocalTime preferredEndTime, Integer duration, ServiceType serviceType, ServiceRequestStatus status, LocalDate requestDate, String additionalInformation) {
-        this.serviceRequestId = serviceRequestId;
+    public ServiceRequest(Consumer consumer, String serviceAddress, AddressType addressType, Location location, LocalTime preferredStartTime, LocalTime preferredEndTime, Integer duration, ServiceType serviceType, LocalDate requestDate, String additionalInformation) {
         this.consumer = consumer;
         this.serviceAddress = serviceAddress;
         this.addressType = addressType;
@@ -73,15 +72,12 @@ public class ServiceRequest {
         this.preferredEndTime = preferredEndTime;
         this.duration = duration;
         this.serviceType = serviceType;
-        this.status = status;
         this.requestDate = requestDate;
         this.additionalInformation = additionalInformation;
     }
 
-    public void setServiceRequest(UUID serviceRequestId, Consumer consumer, ServiceRequestStatus status, LocalDate requestDate){
+    public void initializeServiceRequest(UUID serviceRequestId, ServiceRequestStatus status){
         this.serviceRequestId = serviceRequestId;
-        this.consumer = consumer;
         this.status = status;
-        this.requestDate = requestDate;
     }
 }
