@@ -47,6 +47,9 @@ public class Consumer extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Disease disease;
 
+    @Enumerated(EnumType.STRING)
+    private CognitiveStatus cognitiveStatus;
+
     @Column(name ="livingSituation", columnDefinition = "TEXT")
     private String livingSituation;
 
@@ -58,8 +61,8 @@ public class Consumer extends BaseTimeEntity {
 
     @Builder
     public Consumer(User user, UUID consumerId, String residentialAddress, String visitAddress, String entranceType,
-                    Integer careGrade, boolean isMedicalAid, Integer weight, Disease disease, String livingSituation,
-                    String guardianName, String guardianPhone){
+                    Integer careGrade, boolean isMedicalAid, Integer weight, Disease disease, CognitiveStatus cognitiveStatus,
+                    String livingSituation, String guardianName, String guardianPhone){
         this.user = user;
         this.consumerId = consumerId;
         this.residentialAddress = residentialAddress;
@@ -69,6 +72,7 @@ public class Consumer extends BaseTimeEntity {
         this.isMedicalAid = isMedicalAid;
         this.weight = weight;
         this.disease = disease;
+        this.cognitiveStatus = cognitiveStatus;
         this.livingSituation = livingSituation;
         this.guardianName = guardianName;
         this.guardianPhone = guardianPhone;

@@ -7,6 +7,7 @@ import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.mapper.UserMapper;
 import jaega.homecare.domain.users.repository.UserRepository;
+import jaega.homecare.domain.users.service.query.UserQueryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
