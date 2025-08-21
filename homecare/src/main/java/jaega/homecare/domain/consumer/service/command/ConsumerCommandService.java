@@ -31,7 +31,7 @@ public class ConsumerCommandService {
 
     public void createConsumer(ConsumerCreateRequest request, User user){
         Consumer consumer = consumerMapper.toConsumer(request, user);
-        consumer.setConsumer(UUID.randomUUID());
+        consumer.initializeConsumer(UUID.randomUUID());
         consumerRepository.save(consumer);
     }
 }
