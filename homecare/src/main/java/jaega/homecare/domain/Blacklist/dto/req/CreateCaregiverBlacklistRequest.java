@@ -1,10 +1,9 @@
-package jaega.homecare.domain.caregiverBlacklist.dto.req;
+package jaega.homecare.domain.Blacklist.dto.req;
 
 import java.util.UUID;
 
 public record CreateCaregiverBlacklistRequest(
     UUID caregiverId,
-    UUID reporterId,
-    String reason
+    UUID consumerId
 ) {
 }

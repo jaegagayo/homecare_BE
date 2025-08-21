@@ -78,7 +78,7 @@ public class Consumer extends BaseTimeEntity {
         this.guardianPhone = guardianPhone;
     }
 
-    public void setConsumer(UUID consumerId){
+    public void initializeConsumer(UUID consumerId){
         this.consumerId = consumerId;
     }
 
