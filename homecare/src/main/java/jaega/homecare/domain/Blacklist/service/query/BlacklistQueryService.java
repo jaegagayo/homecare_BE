@@ -1,6 +1,6 @@
 package jaega.homecare.domain.Blacklist.service.query;
 
-import jaega.homecare.domain.Blacklist.dto.res.GetCaregiverBlacklistResponse;
+import jaega.homecare.domain.Blacklist.dto.res.GetBlacklistByConsumerResponse;
 import jaega.homecare.domain.Blacklist.entity.Blacklist;
 import jaega.homecare.domain.Blacklist.mapper.BlacklistMapper;
 import jaega.homecare.domain.Blacklist.repository.BlacklistRepository;
@@ -18,13 +18,13 @@ public class BlacklistQueryService {
     private final BlacklistRepository blacklistRepository;
     private final BlacklistMapper blacklistMapper;
 
-    public Blacklist getCaregiverBlacklist(UUID caregiverBlacklistId){
-        return blacklistRepository.findByBlacklistId(caregiverBlacklistId)
+    public Blacklist getBlacklist(UUID blacklistId){
+        return blacklistRepository.findByBlacklistId(blacklistId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 블랙리스트입니다."));
     }
 
     // 특정 신고자의 블랙리스트 조회
-    public List<GetCaregiverBlacklistResponse> getCaregiverBlacklistsByConsumer(UUID consumerId) {
+    public List<GetBlacklistByConsumerResponse> getBlacklistByConsumer(UUID consumerId) {
         List<Blacklist> blacklists = blacklistRepository.findByConsumer_ConsumerId(consumerId);
         return blacklists.stream()
                 .map(blacklistMapper::toGetResponse)
