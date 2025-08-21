@@ -1,7 +1,7 @@
 package jaega.homecare.domain.Blacklist.controller;
 
-import jaega.homecare.domain.Blacklist.dto.req.CreateCaregiverBlacklistRequest;
-import jaega.homecare.domain.Blacklist.dto.res.GetCaregiverBlacklistResponse;
+import jaega.homecare.domain.Blacklist.dto.req.CreateBlacklistByConsumerRequest;
+import jaega.homecare.domain.Blacklist.dto.res.GetBlacklistByConsumerResponse;
 import jaega.homecare.domain.Blacklist.service.command.BlacklistCommandService;
 import jaega.homecare.domain.Blacklist.service.query.BlacklistQueryService;
 import lombok.RequiredArgsConstructor;
@@ -21,20 +21,20 @@ public class BlacklistControllerImpl implements BlacklistController {
     private final BlacklistQueryService blacklistQueryService;
 
     @Override
-    public ResponseEntity<UUID> createCaregiverBlacklist(@RequestBody CreateCaregiverBlacklistRequest request) {
-        UUID blacklistId = blacklistCommandService.createCaregiverBlacklist(request);
+    public ResponseEntity<UUID> createBlacklistByConsumer(@RequestBody CreateBlacklistByConsumerRequest request) {
+        UUID blacklistId = blacklistCommandService.createBlacklistByConsumer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(blacklistId);
     }
 
     @Override
-    public ResponseEntity<Void> deleteCaregiverBlacklist(@PathVariable UUID caregiverBlacklistId){
-        blacklistCommandService.deleteCaregiverBlacklist(caregiverBlacklistId);
+    public ResponseEntity<Void> deleteBlacklistByConsumer(@PathVariable UUID caregiverBlacklistId){
+        blacklistCommandService.deleteBlacklistByConsumer(caregiverBlacklistId);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<List<GetCaregiverBlacklistResponse>> getCaregiverBlacklistsByConsumer(@PathVariable UUID consumerId) {
-        List<GetCaregiverBlacklistResponse> responses = blacklistQueryService.getCaregiverBlacklistsByConsumer(consumerId);
+    public ResponseEntity<List<GetBlacklistByConsumerResponse>> getBlacklistByConsumer(@PathVariable UUID consumerId) {
+        List<GetBlacklistByConsumerResponse> responses = blacklistQueryService.getBlacklistByConsumer(consumerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 }

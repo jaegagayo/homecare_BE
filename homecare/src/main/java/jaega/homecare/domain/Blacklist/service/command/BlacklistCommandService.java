@@ -1,6 +1,6 @@
 package jaega.homecare.domain.Blacklist.service.command;
 
-import jaega.homecare.domain.Blacklist.dto.req.CreateCaregiverBlacklistRequest;
+import jaega.homecare.domain.Blacklist.dto.req.CreateBlacklistByConsumerRequest;
 import jaega.homecare.domain.Blacklist.entity.Blacklist;
 import jaega.homecare.domain.Blacklist.mapper.BlacklistMapper;
 import jaega.homecare.domain.Blacklist.repository.BlacklistRepository;
@@ -26,7 +26,7 @@ public class BlacklistCommandService {
     private final BlacklistMapper blacklistMapper;
     private final BlacklistQueryService blacklistQueryService;
 
-    public UUID createCaregiverBlacklist(CreateCaregiverBlacklistRequest request) {
+    public UUID createBlacklistByConsumer(CreateBlacklistByConsumerRequest request) {
         // 연관된 엔티티들 조회
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
         Consumer consumer = consumerQueryService.getConsumer(request.consumerId());
@@ -40,8 +40,8 @@ public class BlacklistCommandService {
         return savedBlacklist.getBlacklistId();
     }
 
-    public void deleteCaregiverBlacklist(UUID caregiverBlacklistId){
-        Blacklist blacklist = blacklistQueryService.getCaregiverBlacklist(caregiverBlacklistId);
+    public void deleteBlacklistByConsumer(UUID caregiverBlacklistId){
+        Blacklist blacklist = blacklistQueryService.getBlacklist(caregiverBlacklistId);
         blacklistRepository.delete(blacklist);
 
     }
