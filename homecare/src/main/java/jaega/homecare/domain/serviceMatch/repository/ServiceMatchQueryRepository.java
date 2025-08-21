@@ -1,7 +1,7 @@
 package jaega.homecare.domain.serviceMatch.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jaega.homecare.domain.workMatch.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.workLog.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
