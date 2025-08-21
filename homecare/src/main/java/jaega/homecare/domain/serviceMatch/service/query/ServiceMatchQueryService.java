@@ -1,7 +1,5 @@
 package jaega.homecare.domain.serviceMatch.service.query;
 
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.mapper.ServiceMatchMapper;
@@ -11,7 +9,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,17 +25,16 @@ public class ServiceMatchQueryService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 serviceMatchId로 서비스 매칭 결과를 찾을 수 없습니다."));
     }
 
-    public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
-        return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
-    }
-
-    public List<GetServiceMatchByConsumerResponse> getMatchesByConsumer(UUID userId){
-        return serviceMatchQueryRepository.findByUserId(userId);
-    }
-
+    // UUID 기반 매칭 결과 조회
     public GetServiceMatchByUUID getMatchesByUUID(UUID serviceMatchId){
         ServiceMatch serviceMatch = getServiceMatch(serviceMatchId);
         return serviceMatchMapper.toGetResponseByUUID(serviceMatch);
     }
+
+//    // Center 기반 매칭 결과 조회
+//    public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
+//        return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
+//    }
+
 
 }

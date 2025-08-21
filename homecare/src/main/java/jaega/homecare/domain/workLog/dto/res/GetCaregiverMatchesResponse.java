@@ -13,9 +13,11 @@ public record GetCaregiverMatchesResponse(
         Long caregiverId,
         String caregiverName,
         String consumerName,
+
         LocalDate serviceDate,
-        LocalTime startTime,
-        LocalTime endTime,
+        LocalTime serviceStartTime,
+        LocalTime serviceEndTime,
+
         Set<ServiceType> workType,
         String address,
         int hourlyWage,

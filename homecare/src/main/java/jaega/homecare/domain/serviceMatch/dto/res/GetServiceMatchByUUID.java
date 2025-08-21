@@ -8,6 +8,6 @@ public record GetServiceMatchByUUID(
         String serviceDate,
         String serviceStartTime,
         String serviceEndTime,
-        MatchStatus status
+        MatchStatus matchStatus
 ) {
 }

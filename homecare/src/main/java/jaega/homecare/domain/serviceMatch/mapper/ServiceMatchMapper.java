@@ -25,6 +25,6 @@ public interface ServiceMatchMapper {
     @Mapping(target = "serviceDate", source = "serviceDate")
     @Mapping(target = "serviceStartTime", source = "serviceStartTime")
     @Mapping(target = "serviceEndTime", source = "serviceEndTime")
-    @Mapping(target = "status", source = "status")
+    @Mapping(target = "matchStatus", source = "matchStatus")
     GetServiceMatchByUUID toGetResponseByUUID(ServiceMatch serviceMatch);
 }

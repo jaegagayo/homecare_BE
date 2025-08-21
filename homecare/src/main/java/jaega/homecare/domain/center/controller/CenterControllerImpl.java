@@ -74,14 +74,14 @@ public class CenterControllerImpl implements CenterController{
         return ResponseEntity.ok(caregivers);
     }
 
-    @Override
-    public ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId){
-        List<GetServiceMatchByCenterResponse> notifications = serviceMatchQueryService.getMatchesByCenter(centerId);
-        return ResponseEntity.ok(notifications);
-    }
+//    @Override
+//    public ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId){
+//        List<GetServiceMatchByCenterResponse> notifications = serviceMatchQueryService.getMatchesByCenter(centerId);
+//        return ResponseEntity.ok(notifications);
+//    }
 
     @Override
-    public ResponseEntity<List<GetCaregiverMatchesResponse>> getWorkMatchByCaregiver(@PathVariable UUID caregiverId) {
+    public ResponseEntity<List<GetCaregiverMatchesResponse>> getWorkLogByCaregiver(@PathVariable UUID caregiverId) {
         List<GetCaregiverMatchesResponse> responses = workLogQueryService.getWorkLogByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
     }

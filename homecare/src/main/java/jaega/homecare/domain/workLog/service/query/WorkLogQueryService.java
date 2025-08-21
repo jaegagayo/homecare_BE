@@ -42,6 +42,10 @@ public class WorkLogQueryService {
         return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
     }
 
+    public List<GetWorkLogByPaid> getWorkLogByPaid(UUID centerId, Boolean isPaid){
+        return workLogQueryRepository.findWorkLogByPaid(centerId, isPaid);
+    }
+
     public List<GetWorkLogByDateResponse> getWorkLogByDate(UUID centerId, LocalDate date) {
         return workLogQueryRepository.findWorkLogByDate(centerId, date);
     }
@@ -62,10 +66,6 @@ public class WorkLogQueryService {
                 waiting,
                 distribution
         );
-    }
-
-    public List<GetWorkLogByPaid> getWorkLogByPaid(UUID centerId, Boolean isPaid){
-        return workLogQueryRepository.findWorkLogByPaid(centerId, isPaid);
     }
 
     public GetDashboardSettlementResponse getSettlementStatus(UUID centerId) {

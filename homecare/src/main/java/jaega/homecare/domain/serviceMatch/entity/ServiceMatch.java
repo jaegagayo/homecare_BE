@@ -34,7 +34,7 @@ public class ServiceMatch {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "match_status")
-    private MatchStatus status;
+    private MatchStatus matchStatus;
 
     @Column(name = "service_date")
     private LocalDate serviceDate;
@@ -49,7 +49,7 @@ public class ServiceMatch {
     public ServiceMatch(ServiceRequest serviceRequest, Caregiver caregiver, LocalDate serviceDate, LocalTime serviceStartTime, LocalTime serviceEndTime) {
         this.serviceRequest = serviceRequest;
         this.caregiver = caregiver;
-        this.status = MatchStatus.PENDING;
+        this.matchStatus = MatchStatus.PENDING;
         this.serviceDate = serviceDate;
         this.serviceStartTime = serviceStartTime;
         this.serviceEndTime = serviceEndTime;

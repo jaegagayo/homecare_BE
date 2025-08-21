@@ -18,7 +18,7 @@ public record GetServiceRequestById(
         @Schema(description = "선호 종료 시간", example = "18:00:00")
         LocalTime preferredEndTime,
         ServiceType serviceType,
-        ServiceRequestStatus status,
+        ServiceRequestStatus requestStatus,
         LocalDate requestDate,
         Location location
 ) {

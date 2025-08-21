@@ -28,7 +28,7 @@ public class ServiceRequestCommandService {
 
         ServiceRequest serviceRequest = serviceRequestMapper.toEntity(request, consumer);
 
-        serviceRequest.initializeServiceRequest(UUID.randomUUID(), ServiceRequestStatus.PENDING);
+        serviceRequest.initializeServiceRequest(UUID.randomUUID());
         serviceRequestRepository.save(serviceRequest);
 
         return serviceRequestMapper.toGetCreateResponse(serviceRequest);

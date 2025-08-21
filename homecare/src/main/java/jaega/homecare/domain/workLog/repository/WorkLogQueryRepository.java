@@ -180,7 +180,7 @@ public class WorkLogQueryRepository {
     }
 
     /**
-     * 대시보드
+     *  대시보드
      */
 
     // 오늘 근무하는 요양보호사 수 조회
@@ -204,7 +204,7 @@ public class WorkLogQueryRepository {
                 .fetchOne();
     }
 
-    // 오늚 미배정된 요양보호사 수 조회
+    // 오늘 미배정된 요양보호사 수 조회
     public Long countUnassignedCaregiversToday(UUID centerId) {
         QCaregiver caregiver = QCaregiver.caregiver;
         QWorkLog workLog = QWorkLog.workLog;

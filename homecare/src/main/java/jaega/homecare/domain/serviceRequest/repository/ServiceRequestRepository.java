@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, Long> {
     Optional<ServiceRequest> findByServiceRequestId(UUID serviceRequestId);
 
-    List<ServiceRequest> findAllByConsumerAndStatus(Consumer consumer, ServiceRequestStatus status);
+    List<ServiceRequest> findAllByConsumerAndRequestStatus(Consumer consumer, ServiceRequestStatus requestStatus);
 
     List<ServiceRequest> findByConsumer(Consumer consumer);
 }
