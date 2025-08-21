@@ -1,7 +1,7 @@
 package jaega.homecare.global.dummy.service;
 
-import jaega.homecare.domain.workMatch.repository.WorkMatchRepository;
-import jaega.homecare.domain.workMatch.service.command.WorkMatchCommandService;
+import jaega.homecare.domain.workLog.repository.WorkLogRepository;
+import jaega.homecare.domain.workLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
@@ -38,8 +38,8 @@ public class DummyDataService {
     private final CertificationRepository certificationRepository;
 
     private final ServiceMatchCommandService serviceMatchCommandService;
-    private final WorkMatchCommandService workMatchCommandService;
-    private final WorkMatchRepository workMatchRepository;
+    private final WorkLogCommandService workLogCommandService;
+    private final WorkLogRepository workLogRepository;
     private final Random random = new Random();
 
     @Transactional
@@ -238,7 +238,7 @@ public class DummyDataService {
             serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
             // 근무 매칭 생성
-            CreateWorkMatchRequest createWorkMatchRequest = new CreateWorkMatchRequest(
+            CreateWorkLogRequest createWorkMatchRequest = new CreateWorkLogRequest(
                     caregiverId,
                     serviceStartTime,
                     serviceEndTime,
@@ -248,26 +248,26 @@ public class DummyDataService {
             );
             workMatchCommandService.createWorkMatch(createWorkMatchRequest);
 
-            // WorkMatch 상태 설정 (오늘 이후는 ACTIVE만 PLANNED)
-            List<WorkMatch> createdMatches = workMatchRepository.findByCaregiverAndWorkDateIn(
+            // WorkLog 상태 설정 (오늘 이후는 ACTIVE만 PLANNED)
+            List<WorkLog> createdMatches = workLogRepository.findByCaregiverAndWorkDateIn(
                     matchedCaregiver, requestedDays
             );
 
-            for (WorkMatch match : createdMatches) {
+            for (WorkLog match : createdMatches) {
                 LocalDate workDate = match.getWorkDate();
                 if (workDate.isBefore(now)) {
                     int statusChoice = random.nextBoolean() ? 1 : 2;
                     if (statusChoice == 1) {
-                        workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.COMPLETED);
+                        workMatchCommandService.changeWorkLogStatus(match.getWorkMatchId(), WorkStatus.COMPLETED);
 //                        List<WorkLog> logs = workLogRepository.findByWorkMatch(match);
 //                        for (WorkLog log : logs) {
 //                            log.changePaidStatus();
 //                        }
                     } else {
-                        workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.CANCELLED);
+                        workMatchCommandService.changeWorkLogStatus(match.getWorkMatchId(), WorkStatus.CANCELLED);
                     }
                 } else {
-                    workMatchCommandService.changeWorkMatchStatus(match.getWorkMatchId(), WorkStatus.PLANNED);
+                    workMatchCommandService.changeWorkLogStatus(match.getWorkMatchId(), WorkStatus.PLANNED);
                 }
             }
         }

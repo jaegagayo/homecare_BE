@@ -1,7 +1,7 @@
 package jaega.homecare.domain.serviceRequest.entity;
 
 public enum ServiceRequestStatus {
-    PENDING,
-    ASSIGNED,
-    COMPLETED
+    PENDING,    // 대기
+    ASSIGNED,   // 배정 완료
+    CANCELED    // 취소
 }

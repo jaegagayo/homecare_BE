@@ -57,7 +57,7 @@ public class ServiceRequest {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ServiceRequestStatus status;    // 신청 상태
+    private ServiceRequestStatus requestStatus;    // 신청 상태
 
     @Column(name = "additional_information")
     private String additionalInformation;
@@ -74,10 +74,10 @@ public class ServiceRequest {
         this.serviceType = serviceType;
         this.requestDate = requestDate;
         this.additionalInformation = additionalInformation;
+        this.requestStatus = ServiceRequestStatus.PENDING;
     }
 
-    public void initializeServiceRequest(UUID serviceRequestId, ServiceRequestStatus status){
+    public void initializeServiceRequest(UUID serviceRequestId){
         this.serviceRequestId = serviceRequestId;
-        this.status = status;
     }
 }

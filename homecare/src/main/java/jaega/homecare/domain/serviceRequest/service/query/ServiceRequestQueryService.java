@@ -40,8 +40,8 @@ public class ServiceRequestQueryService {
         return requests;
     }
 
-    public List<ServiceRequest> getServiceRequestByUserAndStatus(Consumer consumer, ServiceRequestStatus status){
-        List<ServiceRequest> requests = serviceRequestRepository.findAllByConsumerAndStatus(consumer, status);
+    public List<ServiceRequest> getServiceRequestByUserAndStatus(Consumer consumer, ServiceRequestStatus requestStatus){
+        List<ServiceRequest> requests = serviceRequestRepository.findAllByConsumerAndRequestStatus(consumer, requestStatus);
         if (requests.isEmpty()) {
             throw new NoSuchElementException("해당 유저의 서비스 요청 정보가 없습니다.");
         }

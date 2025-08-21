@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByConsumerResponse;
+import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
+import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,13 @@ public interface ConsumerController {
     @PostMapping("/confirm")
     ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request);
 
-    @Operation(summary = "특정 수요자의 매칭 스케줄 조회", description = "특정 수요자의 매칭된 결과를 토대로 스케줄을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "특정 수요자의 매칭 스케줄 조회 성공")
-    @GetMapping("/schedule/{consumerId}")
-    ResponseEntity<List<GetServiceMatchByConsumerResponse>> getMatchesByConsumer(@PathVariable UUID consumerId);
+    @Operation(summary = "특정 수요자의 주간 스케줄 조회", description = "특정 수요자의 매칭된 결과를 토대로 주간 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 수요자의 주간 스케줄 조회 성공")
+    @GetMapping("/schedules/{consumerId}")
+    ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@PathVariable UUID consumerId);
+
+    @Operation(summary = "특정 스케줄 상세 조회", description = "수요자가 선택한 특정 스케줄의 상세 정보를 불러옵니다.")
+    @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")
+    @GetMapping("/schedules/{consumerId}/{id}")
+    ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id);
 }
