@@ -2,11 +2,9 @@ package jaega.homecare.domain.matchReview.dto.req;
 
 import java.util.UUID;
 
-public record CreateMatchReviewRequest(
+public record CreateReviewRequest(
+        UUID consumerId,
         UUID serviceMatchId,
-        UUID writerId,
-        String caregiverName,
-        Integer serviceMatchTime,
         Integer reviewScore,
         String reviewContent
 ) {
