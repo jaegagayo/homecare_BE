@@ -23,8 +23,8 @@ public interface SettlementMapper {
                         BigDecimal settlementAmount);
 
     @Mapping(target = "settlementId", source = "settlementId")
-    @Mapping(target = "serviceStartTime", source = "serviceStartTime")
-    @Mapping(target = "serviceEndTime", source = "serviceEndTime")
+    @Mapping(target = "serviceStartTime", source = "settlement.serviceMatch.serviceStartTime")
+    @Mapping(target = "serviceEndTime", source = "settlement.serviceMatch.serviceEndTime")
     @Mapping(target = "distanceLog", source = "distanceLog")
     @Mapping(target = "isPaid", source = "paid")
     GetSettlementResponse toGetResponse(Settlement settlement);

@@ -1,6 +1,5 @@
 package jaega.homecare.domain.settlement.service.command;
 
-import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
@@ -30,7 +29,7 @@ public class SettlementCommandService {
     private final SettlementQueryService settlementQueryService;
     private final SettlementMapper settlementMapper;
 
-    public void createWorkMatch(CreateSettlementRequest request){
+    public void createSettlement(CreateSettlementRequest request){
         CaregiverCenter caregiverCenter = caregiverCenterQueryService.getCaregiverCenter(request.caregiverCenterId());
         ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
 

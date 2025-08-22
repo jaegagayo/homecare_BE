@@ -1,7 +1,5 @@
 package jaega.homecare.global.dummy.service;
 
-import jaega.homecare.domain.workLog.repository.WorkLogRepository;
-import jaega.homecare.domain.workLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
@@ -38,8 +36,6 @@ public class DummyDataService {
     private final CertificationRepository certificationRepository;
 
     private final ServiceMatchCommandService serviceMatchCommandService;
-    private final WorkLogCommandService workLogCommandService;
-    private final WorkLogRepository workLogRepository;
     private final Random random = new Random();
 
     @Transactional
