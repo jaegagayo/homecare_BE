@@ -1,7 +1,8 @@
 package jaega.homecare.domain.center.controller;
 
-import jaega.homecare.domain.settlement.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.settlement.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
@@ -73,11 +74,11 @@ public class CenterControllerImpl implements CenterController{
         return ResponseEntity.ok(caregivers);
     }
 
-//    @Override
-//    public ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId){
-//        List<GetServiceMatchByCenterResponse> notifications = serviceMatchQueryService.getMatchesByCenter(centerId);
-//        return ResponseEntity.ok(notifications);
-//    }
+    @Override
+    public ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId){
+        List<GetServiceMatchByCenterResponse> notifications = serviceMatchQueryService.getMatchesByCenter(centerId);
+        return ResponseEntity.ok(notifications);
+    }
 
     @Override
     public ResponseEntity<List<GetCaregiverMatchesResponse>> getServiceMatchByCaregiver(@PathVariable UUID caregiverId) {

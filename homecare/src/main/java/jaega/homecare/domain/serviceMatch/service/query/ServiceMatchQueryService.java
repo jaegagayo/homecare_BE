@@ -1,12 +1,13 @@
 package jaega.homecare.domain.serviceMatch.service.query;
 
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.mapper.ServiceMatchMapper;
 import jaega.homecare.domain.serviceMatch.repository.DashboardStats;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchRepository;
-import jaega.homecare.domain.settlement.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.settlement.dto.res.WorkPlaceDistribution;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,10 +38,10 @@ public class ServiceMatchQueryService {
         return serviceMatchMapper.toGetResponseByUUID(serviceMatch);
     }
 
-//    // Center 기반 매칭 결과 조회, CaregiverCenter
-//    public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
-//        return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
-//    }
+    // Center 기반 매칭 결과 조회, CaregiverCenter
+    public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
+        return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
+    }
 
     public List<GetCaregiverMatchesResponse> getServiceMatchByCaregiver(UUID caregiverId){
         return serviceMatchQueryRepository.findByCaregiverId(caregiverId);

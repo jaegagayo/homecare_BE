@@ -11,14 +11,14 @@ import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.consumer.entity.QConsumer;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.serviceRequest.entity.QServiceRequest;
-import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.settlement.dto.res.WorkPlaceDistribution;
 import jaega.homecare.domain.users.entity.QUser;
 import jaega.homecare.domain.users.entity.ServiceType;
-import jaega.homecare.domain.settlement.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -34,37 +34,38 @@ public class ServiceMatchQueryRepository {
     private final JPAQueryFactory queryFactory;
     private final CaregiverRepository caregiverRepository;
 
-//    // Center의
-//    public List<GetServiceMatchByCenterResponse> findMatchesByCenterId(UUID centerId) {
-//        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
-//        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
-//        QCaregiver caregiver = QCaregiver.caregiver;
-//        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-//        QConsumer consumer = QConsumer.consumer;
-//
-//        QUser caregiverUser = caregiver.user;
-//        QUser consumerUser = consumer.user;
-//
-//        return queryFactory
-//                .select(Projections.constructor(
-//                        GetServiceMatchByCenterResponse.class,
-//                        consumerUser.name,
-//                        caregiverUser.name,
-//                        serviceMatch.serviceDate,
-//                        serviceMatch.serviceStartTime,
-//                        serviceMatch.serviceEndTime,
-//                        serviceRequest.serviceType.stringValue(),
-//                        serviceMatch.matchStatus
-//                ))
-//                .from(serviceMatch)
-//                .join(serviceMatch.serviceRequest, serviceRequest)
-//                .join(serviceRequest.consumer.user, consumerUser)
-//                .join(serviceMatch.caregiver.user, caregiverUser)
-//                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-//                .where(caregiverCenter.center.centerId.eq(centerId))
-//                .orderBy(serviceMatch.serviceDate.desc())
-//                .fetch();
-//    }
+    // Center의 배정된 내역 조회
+    public List<GetServiceMatchByCenterResponse> findMatchesByCenterId(UUID centerId) {
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+        QConsumer consumer = QConsumer.consumer;
+        QUser caregiverUser = new QUser("caregiverUser");
+        QUser consumerUser = new QUser("consumerUser");
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetServiceMatchByCenterResponse.class,
+                        consumerUser.name,
+                        caregiverUser.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceType.stringValue(),
+                        serviceMatch.matchStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .join(consumer.user, consumerUser)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(caregiver.user, caregiverUser)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(caregiverCenter.center.centerId.eq(centerId))
+                .orderBy(serviceMatch.serviceDate.desc())
+                .fetch();
+    }
 
     public List<GetCaregiverMatchesResponse> findByCaregiverId(UUID caregiverId) {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
@@ -102,8 +103,6 @@ public class ServiceMatchQueryRepository {
                 .orderBy(serviceMatch.id.desc())
                 .fetch();
 
-        System.out.println(baseList+"123");
-
         // 2. caregiverIds 추출
         Set<UUID> caregiverIds = baseList.stream()
                 .map(GetCaregiverMatchesResponse::caregiverId)
@@ -134,7 +133,7 @@ public class ServiceMatchQueryRepository {
                         base.serviceStartTime(),
                         base.serviceEndTime(),
                         serviceTypeMap.getOrDefault(base.caregiverId(), Collections.emptySet()),
-                        base.address(),
+                        base.serviceAddress(),
                         base.hourlyWage(),
                         base.status(),
                         base.notes()
