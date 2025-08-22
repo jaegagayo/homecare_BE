@@ -23,7 +23,7 @@ public class CaregiverCenterQueryService {
 
     // 특정 요양보호사가 ACTIVE 상태로 속한 센터 목록 조회
     public List<CaregiverCenter> getActiveCaregiverCenters(UUID caregiverId) {
-        return caregiverCenterRepository.findByCaregiverIdAndStatus(caregiverId, CaregiverStatus.ACTIVE);
+        return caregiverCenterRepository.findByCaregiver_CaregiverIdAndStatus(caregiverId, CaregiverStatus.ACTIVE);
     }
 
 
