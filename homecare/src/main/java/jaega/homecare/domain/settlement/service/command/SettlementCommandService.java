@@ -29,6 +29,9 @@ public class SettlementCommandService {
     private final SettlementQueryService settlementQueryService;
     private final SettlementMapper settlementMapper;
 
+    /**
+     * 요양보호사가 정산 내역을 관리할 센터 선정 후 정산 기록 생성
+     */
     public void createSettlement(CreateSettlementRequest request){
         CaregiverCenter caregiverCenter = caregiverCenterQueryService.getCaregiverCenter(request.caregiverCenterId());
         ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
@@ -40,6 +43,9 @@ public class SettlementCommandService {
         settlementRepository.save(settlement);
     }
 
+    /**
+     * 정산 금액 계산 메서드
+     */
     public BigDecimal calculateSettlementAmount(LocalTime start, LocalTime end, Double distanceKm) {
         BigDecimal hourlyRate = new BigDecimal("15000");  // 시간당 단가
         BigDecimal distanceRate = new BigDecimal("500");  // 거리당 단가

@@ -9,8 +9,8 @@ public record GetServiceMatchByCenterResponse(
         String consumerName,
         String caregiverName,
         LocalDate serviceDate,
-        LocalTime startTime,
-        LocalTime endTime,
+        LocalTime serviceStartTime,
+        LocalTime serviceEndTime,
         String serviceType,
         MatchStatus status
 ) {}

@@ -9,6 +9,7 @@ import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.entity.QSettlement;
@@ -150,7 +151,7 @@ public class SettlementQueryRepository {
                         base.serviceStartTime(),
                         base.serviceEndTime(),
                         serviceTypeMap.getOrDefault(base.caregiverId(), Collections.emptySet()),
-                        base.address(),
+                        base.serviceAddress(),
                         base.matchStatus()
                 ))
                 .toList();

@@ -1,7 +1,7 @@
 package jaega.homecare.domain.settlement.service.query;
 
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
-import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
 import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.entity.Settlement;
 import jaega.homecare.domain.settlement.mapper.SettlementMapper;
@@ -22,7 +22,6 @@ public class SettlementQueryService {
 
     private final SettlementRepository settlementRepository;
     private final SettlementQueryRepository settlementQueryRepository;
-    private final ServiceMatchQueryRepository serviceMatchQueryRepository;
     private final SettlementMapper settlementMapper;
 
     // 엔티티 조회용

@@ -1,4 +1,4 @@
-package jaega.homecare.domain.settlement.dto.res;
+package jaega.homecare.domain.center.dto.res;
 
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.users.entity.ServiceType;
@@ -16,7 +16,7 @@ public record GetCaregiverMatchesByMonth(
         LocalTime serviceStartTime,
         LocalTime serviceEndTime,
         Set<ServiceType> serviceType,
-        String address,
+        String serviceAddress,
         MatchStatus matchStatus
 ) {
 }

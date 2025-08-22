@@ -9,9 +9,9 @@ import java.time.LocalTime;
 
 public record GetCaregiverWorkResponse (
         String caregiverName,
-        LocalDate workDate,
-        LocalTime workStart,
-        LocalTime workEnd,
+        LocalDate serviceDate,
+        LocalTime serviceStartTime,
+        LocalTime serviceEndTime,
         BigDecimal settlementAmount,
         MatchStatus matchStatus
 ) {}

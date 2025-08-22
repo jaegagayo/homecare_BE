@@ -3,7 +3,6 @@ package jaega.homecare.domain.serviceRequest.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
-import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.time.LocalDate;

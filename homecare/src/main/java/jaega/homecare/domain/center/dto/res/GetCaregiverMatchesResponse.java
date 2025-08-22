@@ -1,4 +1,4 @@
-package jaega.homecare.domain.settlement.dto.res;
+package jaega.homecare.domain.center.dto.res;
 
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.users.entity.ServiceType;
@@ -19,7 +19,7 @@ public record GetCaregiverMatchesResponse(
         LocalTime serviceEndTime,
 
         Set<ServiceType> workType,
-        String address,
+        String serviceAddress,
         int hourlyWage,
         MatchStatus status,
         String notes

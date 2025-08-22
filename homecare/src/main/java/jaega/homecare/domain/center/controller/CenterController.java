@@ -3,8 +3,9 @@ package jaega.homecare.domain.center.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jaega.homecare.domain.settlement.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.settlement.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
@@ -52,10 +53,10 @@ public interface CenterController {
     @GetMapping("/{centerId}/caregiver")
     ResponseEntity<List<GetCaregiverResponse>> getAllCaregivers(@PathVariable UUID centerId);
 
-//    @Operation(summary = "배정 내역 전체 조회 API", description = "배정된 신청자-요양보호사 전체 목록을 최신순으로 조회합니다.")
-//    @ApiResponse(responseCode = "200", description = "요양 보호사 전체 조회 성공")
-//    @GetMapping("/{centerId}/assign")
-//    ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId);
+    @Operation(summary = "배정 내역 전체 조회 API", description = "배정된 신청자-요양보호사 전체 목록을 최신순으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양 보호사 전체 조회 성공")
+    @GetMapping("/{centerId}/assign")
+    ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId);
 
     @Operation(summary = "특정 요양 보호사의 매칭 스케줄 조회", description = "특정 요양 보호사의 매칭 스케줄들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 요양 보호사의 매칭 스케줄 조회 성공")
