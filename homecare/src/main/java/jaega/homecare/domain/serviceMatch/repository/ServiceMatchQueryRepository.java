@@ -230,7 +230,7 @@ public class ServiceMatchQueryRepository {
                 .toList();
     }
 
-    // 센터에 등록된 요양보호사 정산 내역 조회 (월별)
+    // 특정 년도, 월(필수), 일(선택) 의 요양보호사 매칭 스케줄 조회
     public List<GetCaregiverMatchesByMonth> findMatchesByMonth(UUID centerId, int year, int month, Integer day) {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QCaregiver caregiver = QCaregiver.caregiver;

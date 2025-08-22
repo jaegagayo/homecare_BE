@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -107,13 +106,4 @@ public class SettlementControllerImpl implements SettlementController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     *
-     *     // 센터에 등록된 요양보호사의 스케줄 조회 (일별)
-     */
-    @Override
-    public ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate serviceDate) {
-        List<GetSettlementByDateResponse> response = settlementQueryService.getSettlementByDate(centerId, serviceDate);
-        return ResponseEntity.ok(response);
-    }
 }

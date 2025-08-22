@@ -9,7 +9,6 @@ import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
-import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.entity.QSettlement;
 import jaega.homecare.domain.settlement.entity.Settlement;
@@ -51,34 +50,6 @@ public class SettlementQueryRepository {
                 .where(settlement.isPaid.eq(isPaid)
                         .and(caregiverCenter.center.centerId.eq(centerId)))
                 .orderBy(settlement.serviceMatch.serviceDate.desc())
-                .fetch();
-    }
-
-    // 센터에 등록된 요양보호사의 스케줄 조회 (일별)
-    // TODO : 도메인상 매우 애매한 위치에 있습니다! 정산 금액을 조회하지 않습니다.
-    // TODO : 각 센터에 등록된 요양보호사의(CaregiverCenter) 스케줄을 조회하기 위해 현재 도메인에 위치해있습니다!
-    public List<GetSettlementByDateResponse> findSettlementByDate(UUID centerId, LocalDate serviceDate) {
-        QSettlement settlement = QSettlement.settlement;
-        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-
-        return queryFactory
-                .select(Projections.constructor(
-                        GetSettlementByDateResponse.class,
-                        settlement.settlementId,
-                        settlement.serviceMatch.serviceDate,
-                        settlement.serviceMatch.serviceStartTime,
-                        settlement.serviceMatch.serviceEndTime,
-                        caregiverCenter.caregiver.user.name
-                ))
-                .from(settlement)
-                .join(settlement.serviceMatch, serviceMatch)
-                .join(caregiverCenter)
-                .on(caregiverCenter.caregiver.eq(serviceMatch.caregiver)
-                        .and(caregiverCenter.center.centerId.eq(centerId)))
-                .where(settlement.serviceMatch.serviceDate.eq(serviceDate)
-                        .and(caregiverCenter.center.centerId.eq(centerId)))
-                .orderBy(settlement.serviceMatch.serviceStartTime.asc())
                 .fetch();
     }
 

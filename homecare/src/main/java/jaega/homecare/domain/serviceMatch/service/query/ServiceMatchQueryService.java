@@ -47,7 +47,7 @@ public class ServiceMatchQueryService {
         return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
     }
 
-    // 센터에 등록된 요양보호사 조회
+    // 특정 년도, 월(필수), 일(선택) 의 요양보호사 매칭 스케줄 조회
     public List<GetCaregiverMatchesByMonth> getMatchesByMonth(UUID centerId, int year, int month, Integer day) {
         return serviceMatchQueryRepository.findMatchesByMonth(centerId, year, month, day);
     }

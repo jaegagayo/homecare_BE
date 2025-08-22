@@ -63,8 +63,8 @@ public interface CenterController {
     @GetMapping("/schedule/{caregiverId}")
     ResponseEntity<List<GetCaregiverMatchesResponse>> getServiceMatchByCaregiver(@PathVariable UUID caregiverId);
 
-    @Operation(summary = "특정 년도, 월의 요양보호사 매칭 스케줄 조회", description = "특정 년도, 월에 해당하는 요양보호사의 스케줄을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "특정 년도, 월의 요양보호사 매칭 스케줄 조회")
+    @Operation(summary = "특정 년도, 월(필수), 일(선택) 의 요양보호사 매칭 스케줄 조회", description = "특정 년도, 월(필수), 일(선택) 의 요양보호사 매칭 스케줄 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 년도, 월, 일의 요양보호사 매칭 스케줄 조회")
     @GetMapping("/schedule/date")
     ResponseEntity<List<GetCaregiverMatchesByMonth>> getMatchesByMonth(
             @RequestParam UUID centerId,

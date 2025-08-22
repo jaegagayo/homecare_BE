@@ -1,6 +1,5 @@
 package jaega.homecare.domain.settlement.service.query;
 
-import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.entity.Settlement;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,10 +39,6 @@ public class SettlementQueryService {
         return settlementQueryRepository.findSettlementByPaid(centerId, isPaid);
     }
 
-    // 센터에 등록된 요양보호사의 스케줄 조회 (일별)
-    public List<GetSettlementByDateResponse> getSettlementByDate(UUID centerId, LocalDate serviceDate) {
-        return settlementQueryRepository.findSettlementByDate(centerId, serviceDate);
-    }
 
     /**
      *

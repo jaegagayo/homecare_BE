@@ -115,7 +115,7 @@ public class CenterControllerImpl implements CenterController{
 
     /**
      *
-     * 특정 년도, 월의 요양보호사 매칭 스케줄 조회
+     * 특정 년도, 월(필수), 일(선택) 의 요양보호사 매칭 스케줄 조회
      */
     @Override
     public ResponseEntity<List<GetCaregiverMatchesByMonth>> getMatchesByMonth(
