@@ -1,6 +1,6 @@
-package jaega.homecare.domain.matchReview.repository;
+package jaega.homecare.domain.review.repository;
 
-import jaega.homecare.domain.matchReview.entity.Review;
+import jaega.homecare.domain.review.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

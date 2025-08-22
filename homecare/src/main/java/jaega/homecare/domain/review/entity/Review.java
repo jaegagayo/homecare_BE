@@ -1,4 +1,4 @@
-package jaega.homecare.domain.matchReview.entity;
+package jaega.homecare.domain.review.entity;
 
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.global.audit.BaseTimeEntity;

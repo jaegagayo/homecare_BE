@@ -1,8 +1,8 @@
-package jaega.homecare.domain.matchReview.mapper;
+package jaega.homecare.domain.review.mapper;
 
-import jaega.homecare.domain.matchReview.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.matchReview.dto.res.GetReviewResponse;
-import jaega.homecare.domain.matchReview.entity.Review;
+import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.review.dto.res.GetReviewResponse;
+import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

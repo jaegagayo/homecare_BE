@@ -1,4 +1,4 @@
-package jaega.homecare.domain.matchReview.dto.req;
+package jaega.homecare.domain.review.dto.req;
 
 import java.util.UUID;
 

@@ -1,10 +1,10 @@
-package jaega.homecare.domain.matchReview.controller;
+package jaega.homecare.domain.review.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jaega.homecare.domain.matchReview.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.matchReview.dto.res.GetReviewResponse;
+import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,9 +1,9 @@
-package jaega.homecare.domain.matchReview.service.command;
+package jaega.homecare.domain.review.service.command;
 
-import jaega.homecare.domain.matchReview.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.matchReview.entity.Review;
-import jaega.homecare.domain.matchReview.mapper.ReviewMapper;
-import jaega.homecare.domain.matchReview.repository.ReviewRepository;
+import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.review.entity.Review;
+import jaega.homecare.domain.review.mapper.ReviewMapper;
+import jaega.homecare.domain.review.repository.ReviewRepository;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jakarta.transaction.Transactional;

@@ -1,9 +1,9 @@
-package jaega.homecare.domain.matchReview.controller;
+package jaega.homecare.domain.review.controller;
 
-import jaega.homecare.domain.matchReview.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.matchReview.dto.res.GetReviewResponse;
-import jaega.homecare.domain.matchReview.service.command.ReviewCommandService;
-import jaega.homecare.domain.matchReview.service.query.ReviewQueryService;
+import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.review.dto.res.GetReviewResponse;
+import jaega.homecare.domain.review.service.command.ReviewCommandService;
+import jaega.homecare.domain.review.service.query.ReviewQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,9 +1,9 @@
-package jaega.homecare.domain.matchReview.service.query;
+package jaega.homecare.domain.review.service.query;
 
-import jaega.homecare.domain.matchReview.dto.res.GetReviewResponse;
-import jaega.homecare.domain.matchReview.entity.Review;
-import jaega.homecare.domain.matchReview.mapper.ReviewMapper;
-import jaega.homecare.domain.matchReview.repository.ReviewRepository;
+import jaega.homecare.domain.review.dto.res.GetReviewResponse;
+import jaega.homecare.domain.review.entity.Review;
+import jaega.homecare.domain.review.mapper.ReviewMapper;
+import jaega.homecare.domain.review.repository.ReviewRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

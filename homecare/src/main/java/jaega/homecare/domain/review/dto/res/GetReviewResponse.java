@@ -1,4 +1,4 @@
-package jaega.homecare.domain.matchReview.dto.res;
+package jaega.homecare.domain.review.dto.res;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
