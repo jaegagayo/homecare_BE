@@ -185,7 +185,7 @@ public class SettlementQueryRepository {
         );
     }
 
-    // 센터에 등록된 요양보호사의 근무 상태, 월-연도별 내역 조회 // 이것도 리팩터링좀 보자
+    // 센터에 등록된 요양보호사의 근무 상태, 월-연도별 내역 조회
     public List<GetCaregiverWorkResponse> getCaregiverWorkListByCenter(
             UUID centerId,
             MatchStatus matchStatus,   // nullable
