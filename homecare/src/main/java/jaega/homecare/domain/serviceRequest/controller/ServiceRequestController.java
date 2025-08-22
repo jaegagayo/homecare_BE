@@ -27,12 +27,12 @@ public interface ServiceRequestController {
     @Operation(summary  = "수요자가 신청한 서비스 내역 조회 API", description = "수요자가 신청한 서비스를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 조회 성공")
     @GetMapping
-    ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequest(@RequestParam UUID userId);
+    ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequest(@RequestParam UUID consumerId);
 
     @Operation(summary  = "수요자가 신청한 서비스 내역 조회 API (신청 서비스 상태 조건)", description = "수요자가 신청한 서비스를 신청한 서비스의 상태를 조건으로 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 신청 상태를 조건으로 조회 성공")
     @GetMapping("/status")
-    ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID userId, ServiceRequestStatus status);
+    ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID consumerId, ServiceRequestStatus status);
 
     @Operation(summary = "수요자가 신청한 서비스 내역 상세 조회", description = "수요자가 신청한 서비스 내역을 서비스 내역의 아이디로 상세 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 상세 조회 성공")

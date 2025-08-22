@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public record GetCaregiverMatchesResponse(
         UUID serviceMatchId,
-        Long caregiverId,
+        UUID caregiverId,
         String caregiverName,
         String consumerName,
 

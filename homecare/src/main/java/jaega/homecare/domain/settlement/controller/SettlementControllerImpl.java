@@ -19,8 +19,11 @@ import java.util.UUID;
 public class SettlementControllerImpl implements SettlementController {
     private final SettlementQueryService settlementQueryService;
 
-
-    // 정산 페이지
+    @Override
+    public ResponseEntity<GetSettlementResponse> getSettlement(@PathVariable UUID settlementId) {
+        GetSettlementResponse responses = settlementQueryService.findSettlement(settlementId);
+        return ResponseEntity.ok(responses);
+    }
 
     /**
      * 센터에 해당하는 요양보호사 근무 현황 조회
@@ -47,13 +50,13 @@ public class SettlementControllerImpl implements SettlementController {
         return ResponseEntity.ok(result);
     }
 
-    // 연, 월 정산 보여주기 인듯?
+    // 센터의 최근 6개월 간 정산 내역 조회
     @Override
     public List<GetMonthlyPaymentResponse> getMonthlyPaid(@RequestParam UUID centerId) {
         return settlementQueryService.getMonthlyPaidSettlements(centerId);
     }
 
-    // 일일 미정산 보여주기
+    // 센터의 최근 일주일간 정산 내역 조회
     @Override
     public List<GetDailyUnsettledResponse> getDailyUnsettled(@RequestParam UUID centerId) {
         return settlementQueryService.getDailyUnsettledCount(centerId);
@@ -71,12 +74,6 @@ public class SettlementControllerImpl implements SettlementController {
             @PathVariable UUID caregiverId
     ) {
         return ResponseEntity.ok(settlementQueryService.getCaregiverSettlementSummary(caregiverId));
-    }
-
-    @Override
-    public ResponseEntity<GetSettlementResponse> getSettlement(@PathVariable UUID workLogId) {
-        GetSettlementResponse responses = settlementQueryService.findSettlement(workLogId);
-        return ResponseEntity.ok(responses);
     }
 
 

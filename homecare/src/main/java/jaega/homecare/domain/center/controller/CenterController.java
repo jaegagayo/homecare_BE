@@ -60,7 +60,7 @@ public interface CenterController {
     @Operation(summary = "특정 요양 보호사의 매칭 스케줄 조회", description = "특정 요양 보호사의 매칭 스케줄들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 요양 보호사의 매칭 스케줄 조회 성공")
     @GetMapping("/schedule/{caregiverId}")
-    ResponseEntity<List<GetCaregiverMatchesResponse>> getWorkLogByCaregiver(@PathVariable UUID caregiverId);
+    ResponseEntity<List<GetCaregiverMatchesResponse>> getServiceMatchByCaregiver(@PathVariable UUID caregiverId);
 
     @Operation(summary = "특정 년도, 월의 요양보호사 매칭 스케줄 조회", description = "특정 년도, 월에 해당하는 요양보호사의 스케줄을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 년도, 월의 요양보호사 매칭 스케줄 조회")

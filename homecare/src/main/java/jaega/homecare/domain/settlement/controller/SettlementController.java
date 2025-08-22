@@ -21,6 +21,11 @@ import java.util.UUID;
 @RequestMapping("/api/settlement")
 public interface SettlementController {
 
+    @Operation(summary = "근무 기록 조회 API", description = "근무 기록의 ID를 기반으로 정보를 조회합니다.")
+    @ApiResponse(responseCode = "204", description = "근무 기록 ID 기반 조회 성공")
+    @GetMapping("/{settlementId}")
+    ResponseEntity<GetSettlementResponse> getSettlement(@RequestParam UUID settlementId);
+
     @Operation(summary = "센터의 요양 보호사 정산 내역 조회", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회합니다.")
     @ApiResponse(responseCode = "204", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회 성공")
     @GetMapping(("/{centerId}/caregivers/work"))
@@ -65,10 +70,6 @@ public interface SettlementController {
 
 
 
-    @Operation(summary = "근무 기록 조회 API", description = "근무 기록의 ID를 기반으로 정보를 조회합니다.")
-    @ApiResponse(responseCode = "204", description = "근무 기록 ID 기반 조회 성공")
-    @GetMapping
-    ResponseEntity<GetSettlementResponse> getSettlement(@RequestParam UUID workLogId);
 
     @Operation(summary = "정산 상태 기반 근무 기록 조회 API", description = "정산 상태를 기반으로 특정 근무 기록들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 정산 상태 기반 근무 기록 조회 성공")

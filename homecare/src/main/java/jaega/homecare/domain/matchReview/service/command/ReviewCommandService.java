@@ -29,6 +29,8 @@ public class ReviewCommandService {
         ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
 
         UUID verificationConsumerId = serviceMatch.getServiceRequest().getConsumer().getConsumerId();
+        System.out.println(verificationConsumerId+"123");
+        System.out.println(request.consumerId()+"456");
         if(!request.consumerId().equals(verificationConsumerId)){
             throw new AccessDeniedException("본인의 매칭에 대해서만 리뷰를 작성할 수 있습니다.");
         }

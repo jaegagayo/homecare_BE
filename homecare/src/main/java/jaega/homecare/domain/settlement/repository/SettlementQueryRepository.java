@@ -47,6 +47,7 @@ public class SettlementQueryRepository {
                         caregiver.user.name
                 ))
                 .from(settlement)
+                .join(settlement.serviceMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
                 .where(settlement.isPaid.eq(isPaid)
                         .and(caregiverCenter.center.centerId.eq(centerId)))
@@ -101,7 +102,7 @@ public class SettlementQueryRepository {
                         GetCaregiverMatchesByMonth.class,
                         settlement.settlementId,
                         caregiver.caregiverId,
-                        user.name,
+                        caregiver.user.name,
                         settlement.serviceMatch.serviceDate,
                         settlement.serviceMatch.serviceStartTime,
                         settlement.serviceMatch.serviceEndTime,
@@ -110,8 +111,9 @@ public class SettlementQueryRepository {
                         settlement.serviceMatch.matchStatus
                 ))
                 .from(settlement)
-                .join(caregiver.user, user)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .join(settlement.caregiverCenter, caregiverCenter) // settlement -> caregiverCenter
+                .join(caregiverCenter.caregiver, caregiver)       // caregiverCenter -> caregiver
+                .join(caregiver.user, user)                       // caregiver -> user
                 .where(
                         settlement.serviceMatch.serviceDate.between(startDate, endDate),
                         caregiverCenter.center.centerId.eq(centerId)
@@ -325,6 +327,7 @@ public class SettlementQueryRepository {
                         settlement.serviceMatch.matchStatus
                 ))
                 .from(settlement)
+                .join(settlement.serviceMatch.caregiver, caregiver)
                 .join(caregiver.user, user)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(where)
@@ -385,7 +388,7 @@ public class SettlementQueryRepository {
                 .fetch();
     }
 
-    // 이번 달 총 정산내역 조회
+    // 센터의 6개월 간 정산 내역 표시
     public List<GetMonthlyPaymentResponse> getMonthlyPaidSettlements(UUID centerId, int monthsBack) {
         QSettlement settlement = QSettlement.settlement;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -402,16 +405,16 @@ public class SettlementQueryRepository {
                         settlement.settlementAmount.sum()
                 ))
                 .from(settlement)
+                .join(settlement.serviceMatch.caregiver, caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(settlement.isPaid.eq(true)
                         .and(settlement.serviceMatch.matchStatus.eq(MatchStatus.COMPLETED))
                         .and(caregiverCenter.center.centerId.eq(centerId))
                         .and(settlement.serviceMatch.serviceDate.goe(startMonth)))
                 .groupBy(settlement.serviceMatch.serviceDate.year(), settlement.serviceMatch.serviceDate.month())
-                .orderBy(settlement.serviceMatch.serviceDate.year().desc(), settlement.serviceMatch.serviceDate.desc())
+                .orderBy(settlement.serviceMatch.serviceDate.year().desc(), settlement.serviceMatch.serviceDate.month().desc())
                 .fetch();
 
-        // 누락된 월 채우기
         Map<String, BigDecimal> map = rawResults.stream()
                 .collect(Collectors.toMap(
                         r -> r.year() + "-" + r.month(),
@@ -419,7 +422,7 @@ public class SettlementQueryRepository {
                 ));
 
         List<GetMonthlyPaymentResponse> filled = new ArrayList<>();
-        for (int i = 0; i < monthsBack; i++) {
+        for (int i = 0 ; i <= monthsBack; i++) { // 최신 월부터
             LocalDate target = now.minusMonths(i);
             String key = target.getYear() + "-" + target.getMonthValue();
             filled.add(new GetMonthlyPaymentResponse(
@@ -441,18 +444,19 @@ public class SettlementQueryRepository {
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(6); // 최근 7일
 
-        // 실제 DB에서 미정산 내역 조회
+        // DB에서 미정산 내역 조회
         List<GetDailyUnsettledResponse> rawResults = queryFactory
                 .select(Projections.constructor(
                         GetDailyUnsettledResponse.class,
                         settlement.serviceMatch.serviceDate,
-                        settlement.count(),
-                        settlement.settlementAmount.sum()
+                        settlement.settlementId.count().coalesce(0L),
+                        settlement.settlementAmount.sum().coalesce(BigDecimal.ZERO)
                 ))
                 .from(settlement)
+                .join(settlement.serviceMatch.caregiver, caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(settlement.isPaid.eq(false)
-                        .and(settlement.serviceMatch.matchStatus.ne(MatchStatus.COMPLETED))
+                        .and(settlement.serviceMatch.matchStatus.eq(MatchStatus.COMPLETED))
                         .and(caregiverCenter.center.centerId.eq(centerId))
                         .and(settlement.serviceMatch.serviceDate.between(startDate, today))
                 )
@@ -460,10 +464,11 @@ public class SettlementQueryRepository {
                 .orderBy(settlement.serviceMatch.serviceDate.asc())
                 .fetch();
 
-        // 누락된 날짜 채우기
+        // 날짜별 map 생성
         Map<LocalDate, GetDailyUnsettledResponse> map = rawResults.stream()
                 .collect(Collectors.toMap(GetDailyUnsettledResponse::date, r -> r));
 
+        // 누락된 날짜 채우기
         List<GetDailyUnsettledResponse> filled = new ArrayList<>();
         for (int i = 0; i <= 6; i++) {
             LocalDate date = startDate.plusDays(i);
@@ -476,34 +481,34 @@ public class SettlementQueryRepository {
     // 이번 달 누적 정산 금액 조회
     public BigDecimal getTotalSettledAmountThisMonth(UUID centerId) {
         QSettlement settlement = QSettlement.settlement;
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         LocalDate now = LocalDate.now();
         LocalDate firstDay = now.withDayOfMonth(1);
 
-        return queryFactory
+        BigDecimal total = queryFactory
                 .select(settlement.settlementAmount.sum())
                 .from(settlement)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(settlement.isPaid.eq(true)
-                        .and(settlement.serviceMatch.serviceDate.goe(firstDay))
-                        .and(caregiverCenter.center.centerId.eq(centerId)))
+                .where(
+                        settlement.isPaid.eq(true)
+                                .and(settlement.serviceMatch.serviceDate.goe(firstDay))
+                                .and(settlement.caregiverCenter.center.centerId.eq(centerId))
+                )
                 .fetchOne();
+
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     // 미정산 건수 조회
     public Long countUnsettled(UUID centerId) {
         QSettlement settlement = QSettlement.settlement;
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         return queryFactory
-                .select(settlement.count())
+                .select(settlement.countDistinct()) // 혹은 countDistinct(settlement.id)로 명시
                 .from(settlement)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(settlement.isPaid.eq(false)
-                        .and(caregiverCenter.center.centerId.eq(centerId)))
+                .where(
+                        settlement.isPaid.eq(false)
+                                .and(settlement.caregiverCenter.center.centerId.eq(centerId))
+                )
                 .fetchOne();
     }
 }

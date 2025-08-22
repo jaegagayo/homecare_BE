@@ -80,7 +80,7 @@ public class CenterControllerImpl implements CenterController{
 //    }
 
     @Override
-    public ResponseEntity<List<GetCaregiverMatchesResponse>> getWorkLogByCaregiver(@PathVariable UUID caregiverId) {
+    public ResponseEntity<List<GetCaregiverMatchesResponse>> getServiceMatchByCaregiver(@PathVariable UUID caregiverId) {
         List<GetCaregiverMatchesResponse> responses = serviceMatchQueryService.getServiceMatchByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
     }

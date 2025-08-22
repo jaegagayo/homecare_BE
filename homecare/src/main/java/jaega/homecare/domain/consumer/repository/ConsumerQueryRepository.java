@@ -2,7 +2,6 @@ package jaega.homecare.domain.consumer.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
@@ -29,13 +28,12 @@ public class ConsumerQueryRepository {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QConsumer consumer = QConsumer.consumer;
         QCaregiver caregiver = QCaregiver.caregiver;
-        QUser caregiverUser = caregiver.user;
 
         return queryFactory
                 .select(Projections.constructor(
                         ConsumerScheduleResponse.class,
                         serviceRequest.serviceRequestId,
-                        caregiverUser.name,
+                        caregiver.user.name,
                         serviceMatch.serviceDate,
                         serviceMatch.serviceStartTime,
                         serviceMatch.serviceEndTime,
@@ -47,7 +45,6 @@ public class ConsumerQueryRepository {
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceRequest.consumer, consumer)
                 .join(serviceMatch.caregiver, caregiver)
-                .join(caregiver.user, caregiverUser)
                 .where(
                         consumer.consumerId.eq(consumerId),
                         serviceMatch.serviceDate.between(weekStart, weekEnd)

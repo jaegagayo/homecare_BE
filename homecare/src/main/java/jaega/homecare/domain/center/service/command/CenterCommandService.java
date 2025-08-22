@@ -16,6 +16,7 @@ import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.users.service.command.UserCommandService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,6 +41,7 @@ public class CenterCommandService {
     private final CaregiverCenterCommandService caregiverCenterCommandService;
 
     // 요양보호사 등록
+    @Transactional
     public void registerCaregiver(CreateCaregiverRequest createCaregiverRequest, UserRole role, UUID centerId) {
         Center center = centerQueryService.findCenterByUUID(centerId);
 
@@ -61,12 +63,11 @@ public class CenterCommandService {
 
         User user = userCommandService.createUser(request, UserRole.ROLE_CAREGIVER);
 
-        Caregiver caregiver = caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
-
-        caregiverCenterCommandService.createCaregiverCenter(center, caregiver);
+        caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
     }
 
     // 요양보호사 말소
+    @Transactional
     public void deregisterCaregiver(UUID centerId, UUID caregiverId) {
         CaregiverCenter caregiverCenter = caregiverCenterCommandService.getCaregiverCenterByAllId(centerId, caregiverId);
 

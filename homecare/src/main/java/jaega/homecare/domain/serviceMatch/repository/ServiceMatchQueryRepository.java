@@ -6,6 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
@@ -71,15 +72,15 @@ public class ServiceMatchQueryRepository {
         QCaregiver caregiver = QCaregiver.caregiver;
         QConsumer consumer = QConsumer.consumer;
 
-        QUser caregiverUser = caregiver.user;
-        QUser consumerUser = consumer.user;
+        QUser caregiverUser = new QUser("caregiverUser");
+        QUser consumerUser = new QUser("consumerUser");
 
         // 1. 기본 정보 조회 (serviceTypes는 비워둠)
         List<GetCaregiverMatchesResponse> baseList = queryFactory
                 .select(Projections.constructor(
                         GetCaregiverMatchesResponse.class,
                         serviceMatch.serviceMatchId,
-                        caregiver.id,
+                        caregiver.caregiverId,
                         caregiverUser.name,
                         consumerUser.name,
                         serviceMatch.serviceDate,
@@ -95,13 +96,16 @@ public class ServiceMatchQueryRepository {
                 .join(serviceMatch.caregiver, caregiver)
                 .join(caregiver.user, caregiverUser)
                 .join(serviceMatch.serviceRequest, serviceRequest)
-                .join(serviceRequest.consumer.user, consumerUser)
+                .join(serviceRequest.consumer, consumer)
+                .join(consumer.user, consumerUser)
                 .where(caregiver.caregiverId.eq(caregiverId))
                 .orderBy(serviceMatch.id.desc())
                 .fetch();
 
+        System.out.println(baseList+"123");
+
         // 2. caregiverIds 추출
-        Set<Long> caregiverIds = baseList.stream()
+        Set<UUID> caregiverIds = baseList.stream()
                 .map(GetCaregiverMatchesResponse::caregiverId)
                 .collect(Collectors.toSet());
 
@@ -110,12 +114,12 @@ public class ServiceMatchQueryRepository {
         }
 
         // 3. serviceTypes 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByIds(caregiverIds);
+        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
 
         // 4. Map<Long, Set<ServiceType>> 변환
-        Map<Long, Set<ServiceType>> serviceTypeMap = rows.stream()
+        Map<UUID, Set<ServiceType>> serviceTypeMap = rows.stream()
                 .collect(Collectors.groupingBy(
-                        row -> (Long) row[0],
+                        row -> (UUID) row[0],
                         Collectors.mapping(row -> (ServiceType) row[1], Collectors.toSet())
                 ));
 
@@ -179,16 +183,14 @@ public class ServiceMatchQueryRepository {
         Tuple row = result.get(0);
         return new DashboardStats(row.get(0, Long.class), row.get(1, Long.class), row.get(2, Long.class));
     }
-
     // 요양 보호사 대시보드의 근무지 별 분포 통계 조회
     public List<WorkPlaceDistribution> getWorkPlaceDistributionByServiceType(UUID centerId) {
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
-        // 센터 소속 활동 중인 요양보호사(+서비스타입) 조회
-        List<Tuple> rows = queryFactory
-                .select(caregiver, caregiver.serviceTypes)
-                .from(caregiver)
+        // 센터 소속 활동 중인 요양보호사 조회 (fetch join으로 serviceTypes 포함)
+        List<Caregiver> caregivers = queryFactory
+                .selectFrom(caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(
                         caregiverCenter.center.centerId.eq(centerId),
@@ -196,14 +198,14 @@ public class ServiceMatchQueryRepository {
                 )
                 .fetch();
 
-        if (rows.isEmpty()) {
+        if (caregivers.isEmpty()) {
             return Collections.emptyList();
         }
 
         // ServiceType별 카운트 계산
         Map<ServiceType, Long> serviceTypeCount = new HashMap<>();
-        for (Tuple row : rows) {
-            Set<ServiceType> serviceTypes = row.get(caregiver.serviceTypes);
+        for (Caregiver cg : caregivers) {
+            Set<ServiceType> serviceTypes = cg.getServiceTypes(); // 이미 Set<ServiceType>
             if (serviceTypes != null) {
                 for (ServiceType st : serviceTypes) {
                     serviceTypeCount.put(st, serviceTypeCount.getOrDefault(st, 0L) + 1);
@@ -216,11 +218,15 @@ public class ServiceMatchQueryRepository {
 
         // DTO 변환
         return serviceTypeCount.entrySet().stream()
-                .map(entry -> new WorkPlaceDistribution(
-                        entry.getKey(),
-                        entry.getValue(),
-                        total > 0 ? (double) entry.getValue() * 100 / total : 0.0
-                ))
+                .map(entry -> {
+                    double percent = total > 0 ? (double) entry.getValue() * 100 / total : 0.0;
+                    percent = Math.round(percent * 10) / 10.0; // 소수점 첫째 자리까지
+                    return new WorkPlaceDistribution(
+                            entry.getKey(),
+                            entry.getValue(),
+                            percent
+                    );
+                })
                 .toList();
     }
 }

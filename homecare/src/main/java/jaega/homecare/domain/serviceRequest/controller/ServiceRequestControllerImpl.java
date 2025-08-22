@@ -31,14 +31,14 @@ public class ServiceRequestControllerImpl implements ServiceRequestController{
     }
 
     @Override
-    public ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequest(@RequestParam UUID userId){
-        List<GetServiceRequestResponse> response = serviceRequestQueryService.findConsumerRequests(userId);
+    public ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequest(@RequestParam UUID consumerId){
+        List<GetServiceRequestResponse> response = serviceRequestQueryService.findConsumerRequests(consumerId);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID userId, ServiceRequestStatus status){
-        List<GetServiceRequestResponse> response = serviceRequestQueryService.findConsumerRequestsByStatus(userId, status);
+    public ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID consumerId, ServiceRequestStatus status){
+        List<GetServiceRequestResponse> response = serviceRequestQueryService.findConsumerRequestsByStatus(consumerId, status);
         return ResponseEntity.ok(response);
     }
 
