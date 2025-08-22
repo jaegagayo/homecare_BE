@@ -27,7 +27,7 @@ public class ServiceMatchCommandService {
     private final CaregiverQueryService caregiverQueryService;
     private final ServiceMatchMapper serviceMatchMapper;
 
-    public void createServiceMatch(CreateServiceMatchRequest request){
+    public UUID createServiceMatch(CreateServiceMatchRequest request){
         ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(request.serviceRequestId());
 
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
@@ -36,5 +36,6 @@ public class ServiceMatchCommandService {
         serviceMatch.initializeServiceMatch(UUID.randomUUID());
         serviceMatchRepository.save(serviceMatch);
 
+        return serviceMatch.getServiceMatchId();
     }
 }
