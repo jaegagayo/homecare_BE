@@ -42,30 +42,23 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.noContent().build();
     }
 
-    /*
     @Override
     public ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request){
 
         ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(request.serviceRequestId());
 
-        CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(request.serviceRequestId(),
-                request.caregiverId(),
-                serviceRequest.getPreferredStartTime(),
-                serviceRequest.getPreferredEndTime(),
-                serviceRequest.getRequestDate());
-        UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
-
-        CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
-                request.caregiverCenterId(),
-                serviceMatchId,
-                request.distanceLog());
-        settlementCommandService.createWorkMatch(createSettlementRequest);
-
+        serviceMatchCommandService.createServiceMatch(
+                new CreateServiceMatchRequest(
+                        request.serviceRequestId(),
+                        request.caregiverId(),
+                        serviceRequest.getPreferredStartTime(),
+                        serviceRequest.getPreferredEndTime(),
+                        serviceRequest.getRequestDate()
+                )
+        );
         return ResponseEntity.noContent().build();
     }
 
-
-     */
     @Override
     public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@PathVariable UUID consumerId){
         LocalDate today = LocalDate.now();

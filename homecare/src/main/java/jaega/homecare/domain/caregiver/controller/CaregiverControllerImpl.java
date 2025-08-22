@@ -1,0 +1,58 @@
+package jaega.homecare.domain.caregiver.controller;
+
+import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
+import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
+import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
+import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
+import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
+import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
+import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/caregiver")
+public class CaregiverControllerImpl implements CaregiverController {
+
+    private final SettlementCommandService settlementCommandService;
+    private final ServiceMatchQueryService serviceMatchQueryService;
+    private final CaregiverCenterQueryService caregiverCenterQueryService;
+
+    @Override
+    public ResponseEntity<List<SelectableCaregiverCenter>> getMyActiveCenters(@RequestParam UUID caregiverId) {
+        List<CaregiverCenter> centers = caregiverCenterQueryService.getActiveCaregiverCenters(caregiverId);
+
+        List<SelectableCaregiverCenter> response = centers.stream()
+                .map(c -> new SelectableCaregiverCenter(
+                        c.getCaregiverCenterId(),
+                        c.getCenter().getName(),
+                        c.getCenter().getUser().getPhone()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> chooseCaregiverCenter(@RequestBody ChoiceCaregiverCenterRequest request) {
+        ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
+
+
+        settlementCommandService.createSettlement(
+                new CreateSettlementRequest(
+                        request.caregiverCenterId(),
+                        serviceMatch.getServiceMatchId(),
+                        request.distanceLog()
+                )
+        );
+
+        return ResponseEntity.noContent().build();
+    }
+
+}

@@ -13,5 +13,7 @@ public interface CaregiverCenterRepository extends JpaRepository<CaregiverCenter
 
     List<CaregiverCenter> findByStatus(CaregiverStatus status);
 
+    List<CaregiverCenter> findByCaregiverIdAndStatus(UUID caregiverId, CaregiverStatus status);
+
     Optional<CaregiverCenter> findByCaregiverCenterIdAndStatus(UUID caregiverCenterId, CaregiverStatus status);
 }
