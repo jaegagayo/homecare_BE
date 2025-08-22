@@ -7,6 +7,7 @@ import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.entity.QConsumer;
+import jaega.homecare.domain.review.entity.QReview;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.serviceRequest.entity.QServiceRequest;
 import jaega.homecare.domain.users.entity.QUser;
@@ -61,6 +62,7 @@ public class ConsumerQueryRepository {
         QConsumer consumer = QConsumer.consumer;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser caregiverUser = caregiver.user;
+        QReview review = QReview.review;
 
         return queryFactory.
                 select(Projections.constructor(
@@ -74,13 +76,14 @@ public class ConsumerQueryRepository {
                         serviceRequest.serviceAddress,
                         serviceRequest.serviceType,
                         serviceMatch.matchStatus,
-                        Expressions.constant(false)
+                        review.id.isNotNull() // 리뷰 존재 여부
                 ))
                 .from(serviceMatch)
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceRequest.consumer, consumer)
                 .join(serviceMatch.caregiver, caregiver)
                 .join(caregiver.user, caregiverUser)
+                .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
                 .where(serviceRequest.serviceRequestId.eq(serviceRequestId))
                 .fetchOne();
     }
