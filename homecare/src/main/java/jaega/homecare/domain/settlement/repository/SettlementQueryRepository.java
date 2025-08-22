@@ -57,7 +57,7 @@ public class SettlementQueryRepository {
     // 센터에 등록된 요양보호사 정산 내역 조회 (일별)
     public List<GetSettlementByDateResponse> findSettlementByDate(UUID centerId, LocalDate date) {
         QSettlement settlement = QSettlement.settlement;
-        QCaregiver caregiver = QCaregiver.caregiver;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
         return queryFactory
@@ -67,10 +67,13 @@ public class SettlementQueryRepository {
                         settlement.serviceMatch.serviceDate,
                         settlement.serviceMatch.serviceStartTime,
                         settlement.serviceMatch.serviceEndTime,
-                        caregiver.user.name
+                        caregiverCenter.caregiver.user.name
                 ))
                 .from(settlement)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .join(settlement.serviceMatch, serviceMatch)
+                .join(caregiverCenter)
+                .on(caregiverCenter.caregiver.eq(serviceMatch.caregiver)
+                        .and(caregiverCenter.center.centerId.eq(centerId)))
                 .where(settlement.serviceMatch.serviceDate.eq(date)
                         .and(caregiverCenter.center.centerId.eq(centerId)))
                 .orderBy(settlement.serviceMatch.serviceStartTime.asc())
