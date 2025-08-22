@@ -82,7 +82,6 @@ public class ConsumerQueryRepository {
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceRequest.consumer, consumer)
                 .join(serviceMatch.caregiver, caregiver)
-                .join(caregiver.user, caregiverUser)
                 .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
                 .where(serviceRequest.serviceRequestId.eq(serviceRequestId))
                 .fetchOne();
