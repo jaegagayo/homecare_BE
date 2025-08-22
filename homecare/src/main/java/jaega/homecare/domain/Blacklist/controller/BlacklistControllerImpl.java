@@ -20,18 +20,30 @@ public class BlacklistControllerImpl implements BlacklistController {
     private final BlacklistCommandService blacklistCommandService;
     private final BlacklistQueryService blacklistQueryService;
 
+    /**
+     *
+     * 블랙리스트 생성 API
+     */
     @Override
     public ResponseEntity<UUID> createBlacklistByConsumer(@RequestBody CreateBlacklistByConsumerRequest request) {
         UUID blacklistId = blacklistCommandService.createBlacklistByConsumer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(blacklistId);
     }
 
+    /**
+     *
+     * 블랙리스트 해제 API
+     */
     @Override
     public ResponseEntity<Void> deleteBlacklistByConsumer(@PathVariable UUID caregiverBlacklistId){
         blacklistCommandService.deleteBlacklistByConsumer(caregiverBlacklistId);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     *
+     * 신고자별 블랙리스트 조회 API
+     */
     @Override
     public ResponseEntity<List<GetBlacklistByConsumerResponse>> getBlacklistByConsumer(@PathVariable UUID consumerId) {
         List<GetBlacklistByConsumerResponse> responses = blacklistQueryService.getBlacklistByConsumer(consumerId);

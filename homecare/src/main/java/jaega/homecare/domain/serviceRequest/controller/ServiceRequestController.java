@@ -33,6 +33,7 @@ public interface ServiceRequestController {
     @GetMapping("/status")
     ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID consumerId, ServiceRequestStatus status);
 
+
     @Operation(summary = "수요자가 신청한 서비스 내역 상세 조회", description = "수요자가 신청한 서비스 내역을 서비스 내역의 아이디로 상세 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 상세 조회 성공")
     @GetMapping("/{serviceRequestId}")

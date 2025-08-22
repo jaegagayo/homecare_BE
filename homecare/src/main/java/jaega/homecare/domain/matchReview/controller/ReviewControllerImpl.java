@@ -20,6 +20,10 @@ public class ReviewControllerImpl implements ReviewController {
     private final ReviewCommandService reviewCommandService;
     private final ReviewQueryService reviewQueryService;
 
+    /**
+     *
+     * 리뷰 생성 API
+     */
     // TODO : JWT 인증 로직 구현 시 직접 consumerId에서 가져오는 게 아닌 인증값에서 가져오도록 할 것 !
     // TODO : 추가로, Exception 또한 JWT에서 하기 !!
     @Override
@@ -28,6 +32,10 @@ public class ReviewControllerImpl implements ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewId);
     }
 
+    /**
+     *
+     * 리뷰 조회 API
+     */
     @Override
     public ResponseEntity<GetReviewResponse> getReviewByServiceMatch(@PathVariable UUID serviceMatchId) {
         GetReviewResponse response = reviewQueryService.getReviewByServiceMatch(serviceMatchId);

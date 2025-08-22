@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,8 +20,8 @@ import java.util.UUID;
 @RequestMapping("/api/settlement")
 public interface SettlementController {
 
-    @Operation(summary = "근무 기록 조회 API", description = "근무 기록의 ID를 기반으로 정보를 조회합니다.")
-    @ApiResponse(responseCode = "204", description = "근무 기록 ID 기반 조회 성공")
+    @Operation(summary = "정산 내역 조회 API", description = "정산 내역의 ID를 기반으로 정보를 조회합니다.")
+    @ApiResponse(responseCode = "204", description = "정산 내역 ID 기반 조회 성공")
     @GetMapping("/{settlementId}")
     ResponseEntity<GetSettlementResponse> getSettlement(@RequestParam UUID settlementId);
 
@@ -67,9 +66,6 @@ public interface SettlementController {
     ResponseEntity<GetCaregiverSettlementSummaryResponse> getCaregiverSettlementSummary(
             @PathVariable UUID caregiverId
     );
-
-
-
 
     @Operation(summary = "정산 상태 기반 근무 기록 조회 API", description = "정산 상태를 기반으로 특정 근무 기록들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 정산 상태 기반 근무 기록 조회 성공")

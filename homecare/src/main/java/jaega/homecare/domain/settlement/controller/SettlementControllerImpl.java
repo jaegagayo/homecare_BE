@@ -19,6 +19,10 @@ import java.util.UUID;
 public class SettlementControllerImpl implements SettlementController {
     private final SettlementQueryService settlementQueryService;
 
+    /**
+     *
+     * 정산 내역 ID 기반 조회
+     */
     @Override
     public ResponseEntity<GetSettlementResponse> getSettlement(@PathVariable UUID settlementId) {
         GetSettlementResponse responses = settlementQueryService.findSettlement(settlementId);
@@ -39,6 +43,10 @@ public class SettlementControllerImpl implements SettlementController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     *
+     * 센터의 요양보호사 개별 정산 내역 조회
+     */
     @Override
     public ResponseEntity<List<GetCaregiverWorkResponse>> getCaregiverWorkListByCaregiver(
             @PathVariable UUID caregiverId,
@@ -50,25 +58,37 @@ public class SettlementControllerImpl implements SettlementController {
         return ResponseEntity.ok(result);
     }
 
-    // 센터의 최근 6개월 간 정산 내역 조회
+    /**
+     *
+     * 센터의 최근 6개월 간 정산 내역 조회
+     */
     @Override
     public List<GetMonthlyPaymentResponse> getMonthlyPaid(@RequestParam UUID centerId) {
         return settlementQueryService.getMonthlyPaidSettlements(centerId);
     }
 
-    // 센터의 최근 일주일간 정산 내역 조회
+    /**
+     *
+     * 센터의 최근 일주일간 정산 내역 조회
+     */
     @Override
     public List<GetDailyUnsettledResponse> getDailyUnsettled(@RequestParam UUID centerId) {
         return settlementQueryService.getDailyUnsettledCount(centerId);
     }
 
-    // 얜 필요 없을 것 같은데?
+    /**
+     *
+     * 센터의 정산 금액 및 정산 상태 통계 조회
+     */
     @Override
     public GetSettlementCenterSummaryResponse getSettlementSummary(@RequestParam UUID centerId) {
         return settlementQueryService.getSettlementSummary(centerId);
     }
 
-    // 확정이 된 애들 중에서 정산이 된 / 아닌 애들만 보여주면 될 것 같은데?
+    /**
+     *
+     * 센터의 요양보호사 정산 금액 및 정산 상태 통계 조회
+     */
     @Override
     public ResponseEntity<GetCaregiverSettlementSummaryResponse> getCaregiverSettlementSummary(
             @PathVariable UUID caregiverId
@@ -76,7 +96,10 @@ public class SettlementControllerImpl implements SettlementController {
         return ResponseEntity.ok(settlementQueryService.getCaregiverSettlementSummary(caregiverId));
     }
 
-
+    /**
+     *
+     * 정산 상태 기반 근무 기록 조회 API
+     */
     @Override
     public ResponseEntity<List<GetSettlementByPaid>> getSettlementByPaid(@RequestParam UUID centerId, Boolean isPaid) {
         List<GetSettlementByPaid> response = settlementQueryService.getSettlementByPaid(centerId, isPaid);

@@ -18,6 +18,10 @@ import java.util.UUID;
 public class ServiceMatchControllerImpl implements ServiceMatchController {
     private final SettlementQueryService settlementQueryService;
 
+    /**
+     *
+     * 특정 날짜의 근무 기록 조회 API
+     */
     @Override
     public ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate) {
         List<GetSettlementByDateResponse> response = settlementQueryService.getSettlementByDate(centerId, workDate);

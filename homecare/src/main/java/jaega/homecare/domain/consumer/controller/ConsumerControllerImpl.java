@@ -3,12 +3,10 @@ package jaega.homecare.domain.consumer.controller;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
-import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
-import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
@@ -33,12 +31,20 @@ public class ConsumerControllerImpl implements ConsumerController {
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final ConsumerQueryService consumerQueryService;
 
+    /**
+     *
+     * 수요자 회원가입 API
+     */
     @Override
     public ResponseEntity<Void> createConsumer(@RequestBody ConsumerSignupRequest request) {
         consumerCommandService.signupConsumer(request);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     *
+     * 요양보호사 확정
+     */
     @Override
     public ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request){
 
@@ -56,6 +62,10 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     *
+     * 특정 수요자의 주간 스케줄 조회
+     */
     @Override
     public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@PathVariable UUID consumerId){
         LocalDate today = LocalDate.now();
@@ -63,6 +73,10 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     *
+     * 특정 스케줄 상세 조회
+     */
     @Override
     public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
         ConsumerScheduleDetailResponse response = consumerQueryService.getScheduleDetail(id);

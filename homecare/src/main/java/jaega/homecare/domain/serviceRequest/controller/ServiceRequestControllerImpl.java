@@ -24,24 +24,40 @@ public class ServiceRequestControllerImpl implements ServiceRequestController{
     private final ServiceRequestCommandService serviceRequestCommandService;
     private final ServiceRequestQueryService serviceRequestQueryService;
 
+    /**
+     *
+     * 수요자 서비스 요청 API
+     */
     @Override
     public ResponseEntity<GetCreateServiceResponse> createServiceRequest(@RequestBody ConsumerServiceRequest request){
         GetCreateServiceResponse response = serviceRequestCommandService.createServiceRequest(request);
         return ResponseEntity.ok(response);
     }
 
+    /**
+     *
+     * 수요자가 신청한 서비스 내역 조회 API
+     */
     @Override
     public ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequest(@RequestParam UUID consumerId){
         List<GetServiceRequestResponse> response = serviceRequestQueryService.findConsumerRequests(consumerId);
         return ResponseEntity.ok(response);
     }
 
+    /**
+     *
+     * 수요자가 신청한 서비스 내역 조회 API (신청 서비스 상태 조건)
+     */
     @Override
     public ResponseEntity<List<GetServiceRequestResponse>> getConsumerServiceRequestByStatus(@RequestParam UUID consumerId, ServiceRequestStatus status){
         List<GetServiceRequestResponse> response = serviceRequestQueryService.findConsumerRequestsByStatus(consumerId, status);
         return ResponseEntity.ok(response);
     }
 
+    /**
+     *
+     * 수요자가 신청한 서비스 내역 상세 조회
+     */
     @Override
     public ResponseEntity<GetServiceRequestById> getServiceRequestById(UUID serviceRequestId) {
         GetServiceRequestById response = serviceRequestQueryService.findServiceRequestById(serviceRequestId);

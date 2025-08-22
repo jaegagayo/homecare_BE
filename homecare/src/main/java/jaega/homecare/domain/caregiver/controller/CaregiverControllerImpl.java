@@ -24,6 +24,10 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final CaregiverCenterQueryService caregiverCenterQueryService;
 
+    /**
+     *
+     * 활성화된 센터 목록 조회
+     */
     @Override
     public ResponseEntity<List<SelectableCaregiverCenter>> getMyActiveCenters(@RequestParam UUID caregiverId) {
         List<CaregiverCenter> centers = caregiverCenterQueryService.getActiveCaregiverCenters(caregiverId);
@@ -39,6 +43,10 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     *
+     * 요양보호사 센터 선택
+     */
     @Override
     public ResponseEntity<Void> chooseCaregiverCenter(@RequestBody ChoiceCaregiverCenterRequest request) {
         ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
