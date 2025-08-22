@@ -27,7 +27,7 @@ public class Settlement extends BaseTimeEntity {
     @JoinColumn(name = "serviceMatch_id")
     private ServiceMatch serviceMatch;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caregiverCenter_id")
     private CaregiverCenter caregiverCenter;
 
