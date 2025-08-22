@@ -109,11 +109,11 @@ public class SettlementControllerImpl implements SettlementController {
 
     /**
      *
-     * 특정 날짜의 정산 내역 조회 API
+     *     // 센터에 등록된 요양보호사의 스케줄 조회 (일별)
      */
     @Override
-    public ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate) {
-        List<GetSettlementByDateResponse> response = settlementQueryService.getSettlementByDate(centerId, workDate);
+    public ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate serviceDate) {
+        List<GetSettlementByDateResponse> response = settlementQueryService.getSettlementByDate(centerId, serviceDate);
         return ResponseEntity.ok(response);
     }
 }

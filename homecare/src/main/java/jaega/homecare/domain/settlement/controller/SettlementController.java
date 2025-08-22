@@ -80,8 +80,8 @@ public interface SettlementController {
             )
             @RequestParam Boolean isPaid);
 
-    @Operation(summary = "특정 날짜의 정산 내역 조회 API", description = "특정 근무 날짜의 정산 내역들을 모두 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "특정 날짜의 정산 내역 조회 성공")
+    @Operation(summary = "센터에 등록된 요양보호사의 스케줄 조회 API", description = "센터에 등록된 요양보호사의 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터에 등록된 요양보호사의 스케줄 조회 성공")
     @GetMapping("/workDay")
-    ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate);
+    ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate serviceDate);
 }

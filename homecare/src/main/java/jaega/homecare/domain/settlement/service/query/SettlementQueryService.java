@@ -41,9 +41,9 @@ public class SettlementQueryService {
         return settlementQueryRepository.findSettlementByPaid(centerId, isPaid);
     }
 
-    // 특정 날짜의 정산 내역 조회
-    public List<GetSettlementByDateResponse> getSettlementByDate(UUID centerId, LocalDate date) {
-        return settlementQueryRepository.findSettlementByDate(centerId, date);
+    // 센터에 등록된 요양보호사의 스케줄 조회 (일별)
+    public List<GetSettlementByDateResponse> getSettlementByDate(UUID centerId, LocalDate serviceDate) {
+        return settlementQueryRepository.findSettlementByDate(centerId, serviceDate);
     }
 
     /**
