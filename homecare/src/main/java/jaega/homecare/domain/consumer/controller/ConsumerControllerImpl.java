@@ -3,8 +3,8 @@ package jaega.homecare.domain.consumer.controller;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
-import jaega.homecare.domain.workLog.dto.req.CreateWorkLogRequest;
-import jaega.homecare.domain.workLog.service.command.WorkLogCommandService;
+import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
+import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
@@ -31,7 +31,7 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     private final ConsumerCommandService consumerCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
-    private final WorkLogCommandService workLogCommandService;
+    private final SettlementCommandService settlementCommandService;
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final ConsumerQueryService consumerQueryService;
@@ -42,6 +42,7 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.noContent().build();
     }
 
+    /*
     @Override
     public ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request){
 
@@ -52,19 +53,19 @@ public class ConsumerControllerImpl implements ConsumerController {
                 serviceRequest.getPreferredStartTime(),
                 serviceRequest.getPreferredEndTime(),
                 serviceRequest.getRequestDate());
-        serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
+        UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
-        CreateWorkLogRequest createWorkLogRequest = new CreateWorkLogRequest(request.caregiverId(),
-                serviceRequest.getPreferredStartTime(),
-                serviceRequest.getPreferredEndTime(),
-                serviceRequest.getRequestDate(),
-                serviceRequest.getServiceAddress(),
+        CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
+                request.caregiverCenterId(),
+                serviceMatchId,
                 request.distanceLog());
-        workLogCommandService.createWorkMatch(createWorkLogRequest);
+        settlementCommandService.createWorkMatch(createSettlementRequest);
 
         return ResponseEntity.noContent().build();
     }
 
+
+     */
     @Override
     public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@PathVariable UUID consumerId){
         LocalDate today = LocalDate.now();

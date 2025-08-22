@@ -3,12 +3,18 @@ package jaega.homecare.domain.serviceMatch.service.query;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.mapper.ServiceMatchMapper;
+import jaega.homecare.domain.serviceMatch.repository.DashboardStats;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchRepository;
+import jaega.homecare.domain.settlement.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
+import jaega.homecare.domain.settlement.dto.res.WorkPlaceDistribution;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,10 +37,31 @@ public class ServiceMatchQueryService {
         return serviceMatchMapper.toGetResponseByUUID(serviceMatch);
     }
 
-//    // Center 기반 매칭 결과 조회
+//    // Center 기반 매칭 결과 조회, CaregiverCenter
 //    public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
 //        return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
 //    }
 
+    public List<GetCaregiverMatchesResponse> getServiceMatchByCaregiver(UUID caregiverId){
+        return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
+    }
 
+    public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
+
+        LocalDate today = LocalDate.now();
+
+        DashboardStats dashboardStats = serviceMatchQueryRepository.getDashboardStats(centerId, today);
+        List<WorkPlaceDistribution> distributions = serviceMatchQueryRepository.getWorkPlaceDistributionByServiceType(centerId);
+
+        Long workingToday = dashboardStats.assignedCaregivers() != null ? dashboardStats.assignedCaregivers() : 0;
+        Long unassignedCaregivers = dashboardStats.totalCaregivers() - workingToday;
+        Long waitingApplicants = dashboardStats.waitingApplicants() != null ? dashboardStats.waitingApplicants() : 0;
+
+        return new GetDashboardWorkStatusResponse(
+                workingToday,
+                unassignedCaregivers,
+                waitingApplicants,
+                distributions
+        );
+    }
 }

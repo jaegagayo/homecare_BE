@@ -22,10 +22,13 @@ public interface ConsumerController {
     @PostMapping("/register")
     ResponseEntity<Void> createConsumer(@RequestBody ConsumerSignupRequest request);
 
+    /*
     @Operation(summary = "요양보호사 확정", description = "수요자가 배정된 요양보호사를 최종 확정합니다.")
     @ApiResponse(responseCode = "204", description = "수요자에게 요양보호자 배정 성공")
     @PostMapping("/confirm")
     ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request);
+
+     */
 
     @Operation(summary = "특정 수요자의 주간 스케줄 조회", description = "특정 수요자의 매칭된 결과를 토대로 주간 스케줄을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 수요자의 주간 스케줄 조회 성공")
