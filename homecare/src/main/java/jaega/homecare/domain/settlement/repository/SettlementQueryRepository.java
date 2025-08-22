@@ -3,19 +3,17 @@ package jaega.homecare.domain.settlement.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
-import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
+import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.entity.QSettlement;
 import jaega.homecare.domain.settlement.entity.Settlement;
 import jaega.homecare.domain.users.entity.QUser;
-import jaega.homecare.domain.users.entity.ServiceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -77,84 +75,6 @@ public class SettlementQueryRepository {
                         .and(caregiverCenter.center.centerId.eq(centerId)))
                 .orderBy(settlement.serviceMatch.serviceStartTime.asc())
                 .fetch();
-    }
-
-    // 센터에 등록된 요양보호사 정산 내역 조회 (월별)
-    public List<GetCaregiverMatchesByMonth> findSettlementByMonth(UUID centerId, int year, int month, Integer day) {
-        QSettlement settlement = QSettlement.settlement;
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QUser user = QUser.user;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-
-        LocalDate startDate;
-        LocalDate endDate;
-
-        if (day != null) {
-            startDate = LocalDate.of(year, month, day);
-            endDate = startDate;
-        } else {
-            startDate = LocalDate.of(year, month, 1);
-            endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-        }
-
-        // 1. 기본 정보 조회 (serviceTypes 제외)
-        List<GetCaregiverMatchesByMonth> baseList = queryFactory
-                .select(Projections.constructor(
-                        GetCaregiverMatchesByMonth.class,
-                        settlement.settlementId,
-                        caregiver.caregiverId,
-                        caregiver.user.name,
-                        settlement.serviceMatch.serviceDate,
-                        settlement.serviceMatch.serviceStartTime,
-                        settlement.serviceMatch.serviceEndTime,
-                        Expressions.constant(Collections.emptySet()),
-                        caregiver.address,
-                        settlement.serviceMatch.matchStatus
-                ))
-                .from(settlement)
-                .join(settlement.caregiverCenter, caregiverCenter) // settlement -> caregiverCenter
-                .join(caregiverCenter.caregiver, caregiver)       // caregiverCenter -> caregiver
-                .join(caregiver.user, user)                       // caregiver -> user
-                .where(
-                        settlement.serviceMatch.serviceDate.between(startDate, endDate),
-                        caregiverCenter.center.centerId.eq(centerId)
-                )
-                .orderBy(settlement.serviceMatch.serviceDate.desc(), settlement.createdAt.desc())
-                .fetch();
-
-        // 2. caregiverId 추출
-        Set<UUID> caregiverIds = baseList.stream()
-                .map(GetCaregiverMatchesByMonth::caregiverId)
-                .collect(Collectors.toSet());
-
-        if (caregiverIds.isEmpty()) {
-            return baseList;
-        }
-
-        // 3. serviceTypes 별도 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
-
-        // 4. Map<Long, Set<ServiceType>> 변환
-        Map<UUID, Set<ServiceType>> serviceTypeMap = rows.stream()
-                .collect(Collectors.groupingBy(
-                        row -> (UUID) row[0],
-                        Collectors.mapping(row -> (ServiceType) row[1], Collectors.toSet())
-                ));
-
-        // 5. DTO 재생성
-        return baseList.stream()
-                .map(base -> new GetCaregiverMatchesByMonth(
-                        base.settlementId(),
-                        base.caregiverId(),
-                        base.caregiverName(),
-                        base.serviceDate(),
-                        base.serviceStartTime(),
-                        base.serviceEndTime(),
-                        serviceTypeMap.getOrDefault(base.caregiverId(), Collections.emptySet()),
-                        base.serviceAddress(),
-                        base.matchStatus()
-                ))
-                .toList();
     }
 
     // 매칭 알고리즘 사전 필터링

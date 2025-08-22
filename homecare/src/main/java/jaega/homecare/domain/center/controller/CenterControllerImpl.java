@@ -109,7 +109,7 @@ public class CenterControllerImpl implements CenterController{
      */
     @Override
     public ResponseEntity<List<GetCaregiverMatchesResponse>> getServiceMatchByCaregiver(@PathVariable UUID caregiverId) {
-        List<GetCaregiverMatchesResponse> responses = serviceMatchQueryService.getServiceMatchByCaregiver(caregiverId);
+        List<GetCaregiverMatchesResponse> responses = serviceMatchQueryService.getMatchesByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
     }
 
@@ -124,7 +124,7 @@ public class CenterControllerImpl implements CenterController{
             @RequestParam int month,
             @RequestParam(required = false) Integer day
     ) {
-        List<GetCaregiverMatchesByMonth> response = settlementQueryService.getSettlementByMonth(centerId, year, month, day);
+        List<GetCaregiverMatchesByMonth> response = serviceMatchQueryService.getMatchesByMonth(centerId, year, month, day);
         return ResponseEntity.ok(response);
     }
 

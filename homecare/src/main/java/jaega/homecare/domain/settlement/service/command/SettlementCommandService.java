@@ -23,7 +23,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SettlementCommandService {
     private final SettlementRepository settlementRepository;
-    private final CaregiverQueryService caregiverQueryService;
     private final CaregiverCenterQueryService caregiverCenterQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final SettlementQueryService settlementQueryService;

@@ -1,5 +1,6 @@
 package jaega.homecare.domain.serviceMatch.service.query;
 
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -15,8 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,10 +43,16 @@ public class ServiceMatchQueryService {
         return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
     }
 
-    public List<GetCaregiverMatchesResponse> getServiceMatchByCaregiver(UUID caregiverId){
+    public List<GetCaregiverMatchesResponse> getMatchesByCaregiver(UUID caregiverId){
         return serviceMatchQueryRepository.findByCaregiverId(caregiverId);
     }
 
+    // 센터에 등록된 요양보호사 조회
+    public List<GetCaregiverMatchesByMonth> getMatchesByMonth(UUID centerId, int year, int month, Integer day) {
+        return serviceMatchQueryRepository.findMatchesByMonth(centerId, year, month, day);
+    }
+
+    // 대시보드 매칭 스케줄 조회
     public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
 
         LocalDate today = LocalDate.now();

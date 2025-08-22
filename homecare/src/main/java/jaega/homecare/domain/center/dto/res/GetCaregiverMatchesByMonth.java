@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public record GetCaregiverMatchesByMonth(
-        UUID settlementId,
+        UUID serviceMatchId,
         UUID caregiverId,
         String caregiverName,
         LocalDate serviceDate,

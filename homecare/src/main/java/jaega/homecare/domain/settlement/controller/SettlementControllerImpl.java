@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,11 +99,21 @@ public class SettlementControllerImpl implements SettlementController {
 
     /**
      *
-     * 정산 상태 기반 근무 기록 조회 API
+     * 정산 상태 기반 정산 내역 조회 API
      */
     @Override
     public ResponseEntity<List<GetSettlementByPaid>> getSettlementByPaid(@RequestParam UUID centerId, Boolean isPaid) {
         List<GetSettlementByPaid> response = settlementQueryService.getSettlementByPaid(centerId, isPaid);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     *
+     * 특정 날짜의 정산 내역 조회 API
+     */
+    @Override
+    public ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate) {
+        List<GetSettlementByDateResponse> response = settlementQueryService.getSettlementByDate(centerId, workDate);
         return ResponseEntity.ok(response);
     }
 }

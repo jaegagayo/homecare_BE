@@ -10,6 +10,7 @@ import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
@@ -226,6 +227,82 @@ public class ServiceMatchQueryRepository {
                             percent
                     );
                 })
+                .toList();
+    }
+
+    // 센터에 등록된 요양보호사 정산 내역 조회 (월별)
+    public List<GetCaregiverMatchesByMonth> findMatchesByMonth(UUID centerId, int year, int month, Integer day) {
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser user = QUser.user;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        LocalDate startDate;
+        LocalDate endDate;
+
+        if (day != null) {
+            startDate = LocalDate.of(year, month, day);
+            endDate = startDate;
+        } else {
+            startDate = LocalDate.of(year, month, 1);
+            endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        }
+
+        // 1. 기본 정보 조회 (serviceTypes 제외)
+        List<GetCaregiverMatchesByMonth> baseList = queryFactory
+                .select(Projections.constructor(
+                        GetCaregiverMatchesByMonth.class,
+                        serviceMatch.serviceMatchId,
+                        caregiver.caregiverId,
+                        caregiver.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        Expressions.constant(Collections.emptySet()),
+                        caregiver.address,
+                        serviceMatch.matchStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(caregiver.user, user)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(caregiverCenter.center.centerId.eq(centerId)
+                        .and(serviceMatch.serviceDate.between(startDate, endDate)))
+                .orderBy(serviceMatch.serviceDate.desc(), serviceMatch.serviceStartTime.asc())
+                .fetch();
+
+        // 2. caregiverId 추출
+        Set<UUID> caregiverIds = baseList.stream()
+                .map(GetCaregiverMatchesByMonth::caregiverId)
+                .collect(Collectors.toSet());
+
+        if (caregiverIds.isEmpty()) {
+            return baseList;
+        }
+
+        // 3. serviceTypes 별도 조회
+        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
+
+        // 4. Map<Long, Set<ServiceType>> 변환
+        Map<UUID, Set<ServiceType>> serviceTypeMap = rows.stream()
+                .collect(Collectors.groupingBy(
+                        row -> (UUID) row[0],
+                        Collectors.mapping(row -> (ServiceType) row[1], Collectors.toSet())
+                ));
+
+        // 5. DTO 재생성
+        return baseList.stream()
+                .map(base -> new GetCaregiverMatchesByMonth(
+                        base.serviceMatchId(),
+                        base.caregiverId(),
+                        base.caregiverName(),
+                        base.serviceDate(),
+                        base.serviceStartTime(),
+                        base.serviceEndTime(),
+                        serviceTypeMap.getOrDefault(base.caregiverId(), Collections.emptySet()),
+                        base.serviceAddress(),
+                        base.matchStatus()
+                ))
                 .toList();
     }
 }

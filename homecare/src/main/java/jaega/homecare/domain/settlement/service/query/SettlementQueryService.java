@@ -36,18 +36,20 @@ public class SettlementQueryService {
         return settlementMapper.toGetResponse(settlement);
     }
 
+    // 정산 상태 기반 정산 내역 조회
     public List<GetSettlementByPaid> getSettlementByPaid(UUID centerId, Boolean isPaid){
         return settlementQueryRepository.findSettlementByPaid(centerId, isPaid);
     }
 
+    // 특정 날짜의 정산 내역 조회
     public List<GetSettlementByDateResponse> getSettlementByDate(UUID centerId, LocalDate date) {
         return settlementQueryRepository.findSettlementByDate(centerId, date);
     }
 
-    public List<GetCaregiverMatchesByMonth> getSettlementByMonth(UUID centerId, int year, int month, Integer day) {
-        return settlementQueryRepository.findSettlementByMonth(centerId, year, month, day);
-    }
-
+    /**
+     *
+     * 센터 대시보드의 정산 현황 조회
+     */
     public GetDashboardSettlementResponse getSettlementStatus(UUID centerId) {
 
         BigDecimal totalSettledAmount = settlementQueryRepository.getTotalSettledAmountThisMonth(centerId);
@@ -64,10 +66,6 @@ public class SettlementQueryService {
 
         return new GetDashboardSettlementResponse(totalSettledAmount, unsettledCount, fraudAlertsCount);
     }
-
-    /**
-     *  정산 페이지
-     */
 
     // 정산 금액, 정산 건수 통계 조회
     public GetSettlementCenterSummaryResponse getSettlementSummary(UUID centerId){

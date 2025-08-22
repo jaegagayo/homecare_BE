@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,8 +68,8 @@ public interface SettlementController {
             @PathVariable UUID caregiverId
     );
 
-    @Operation(summary = "정산 상태 기반 근무 기록 조회 API", description = "정산 상태를 기반으로 특정 근무 기록들을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "특정 정산 상태 기반 근무 기록 조회 성공")
+    @Operation(summary = "정산 상태 기반 정산 내역 조회 API", description = "정산 상태를 기반으로 특정 정산 내역들을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 정산 상태 기반 정산 내역 조회 성공")
     @GetMapping("/paid")
     ResponseEntity<List<GetSettlementByPaid>> getSettlementByPaid(
             @RequestParam UUID centerId,
@@ -78,4 +79,9 @@ public interface SettlementController {
                     required = true
             )
             @RequestParam Boolean isPaid);
+
+    @Operation(summary = "특정 날짜의 정산 내역 조회 API", description = "특정 근무 날짜의 정산 내역들을 모두 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 날짜의 정산 내역 조회 성공")
+    @GetMapping("/workDay")
+    ResponseEntity<List<GetSettlementByDateResponse>> getServiceMatchByWorkDay(@RequestParam UUID centerId, @RequestParam LocalDate workDate);
 }
