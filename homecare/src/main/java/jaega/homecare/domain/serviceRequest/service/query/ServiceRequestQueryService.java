@@ -8,8 +8,6 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.mapper.ServiceRequestMapper;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
-import jaega.homecare.domain.users.entity.User;
-import jaega.homecare.domain.users.service.query.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

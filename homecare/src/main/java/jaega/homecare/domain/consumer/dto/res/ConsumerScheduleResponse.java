@@ -1,7 +1,7 @@
 package jaega.homecare.domain.consumer.dto.res;
 
-import com.amazonaws.services.ec2.model.ServiceType;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
+import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

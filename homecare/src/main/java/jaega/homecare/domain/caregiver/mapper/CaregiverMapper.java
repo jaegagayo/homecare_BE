@@ -3,7 +3,6 @@ package jaega.homecare.domain.caregiver.mapper;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
-import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.users.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

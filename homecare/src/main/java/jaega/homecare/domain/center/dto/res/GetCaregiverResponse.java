@@ -11,5 +11,5 @@ public record GetCaregiverResponse(
         String name,
         String phone,
         Set<ServiceType> serviceTypes,
-        CaregiverStatus status
+        CaregiverStatus caregiverStatus
 ) { }

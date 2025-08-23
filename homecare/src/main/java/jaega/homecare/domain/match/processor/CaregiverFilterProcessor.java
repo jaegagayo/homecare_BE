@@ -1,7 +1,7 @@
 package jaega.homecare.domain.match.processor;
 
-import jaega.homecare.domain.workLog.repository.WorkLogQueryRepository;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.settlement.repository.SettlementQueryRepository;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CaregiverFilterProcessor {
 
-    private final WorkLogQueryRepository workLogQueryRepository;
+    private final SettlementQueryRepository settlementQueryRepository;
 
     public List<Caregiver> filter(ServiceRequest request, List<Caregiver> candidates, LocalDate applyDate) {
         return candidates.stream()
@@ -42,6 +42,6 @@ public class CaregiverFilterProcessor {
     }
 
     private boolean hasOverlappingWork(Caregiver caregiver, LocalDate date, LocalTime start, LocalTime end) {
-        return !workLogQueryRepository.findOverlappingWorkLog(caregiver, date, start, end).isEmpty();
+        return !settlementQueryRepository.findOverlappingWorkLog(caregiver, date, start, end).isEmpty();
     }
 }

@@ -1,7 +1,5 @@
 package jaega.homecare.global.dummy.service;
 
-import jaega.homecare.domain.workLog.repository.WorkLogRepository;
-import jaega.homecare.domain.workLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
@@ -11,18 +9,24 @@ import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.repository.CenterRepository;
+import jaega.homecare.domain.consumer.entity.CognitiveStatus;
+import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.consumer.repository.ConsumerRepository;
+import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
+import jaega.homecare.domain.serviceRequest.entity.AddressType;
+import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
+import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
+import jaega.homecare.domain.settlement.repository.SettlementRepository;
+import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -33,13 +37,14 @@ public class DummyDataService {
     private final UserRepository userRepository;
     private final CenterRepository centerRepository;
     private final CaregiverRepository caregiverRepository;
+    private final ConsumerRepository consumerRepository;
+    private final SettlementRepository settlementRepository;
     private final CaregiverCenterRepository caregiverCenterRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
 
     private final ServiceMatchCommandService serviceMatchCommandService;
-    private final WorkLogCommandService workLogCommandService;
-    private final WorkLogRepository workLogRepository;
+    private final SettlementCommandService settlementCommandService;
     private final Random random = new Random();
 
     @Transactional
@@ -56,7 +61,12 @@ public class DummyDataService {
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
         IntStream.range(0, caregivers.size()).forEach(index -> createDummyCaregiver(index, caregivers));
 
-        // 더미 서비스 요청 30개 생성
+
+        // ✅ 4. Consumer 생성
+        List<User> consumers = userRepository.findByUserRole(UserRole.ROLE_CONSUMER);
+        IntStream.range(0, consumers.size()).forEach(index -> createDummyConsumer(index, consumers));
+
+        // ✅ 5. ServiceRequest 생성 (Consumer 기반)
         IntStream.range(0, 30).forEach(this::createDummyServiceRequest);
     }
 
@@ -168,53 +178,73 @@ public class DummyDataService {
         certificationRepository.save(certification);
     }
 
-    private void createDummyServiceRequest(int index) {
-        /*
-        User user = userRepository.findByUserRole(UserRole.ROLE_CONSUMER).get(random.nextInt(userRepository.findByUserRole(UserRole.ROLE_CONSUMER).size()));
+    private void createDummyConsumer(int index, List<User> consumers) {
+        User user = consumers.get(index);
 
+        Consumer consumer = Consumer.builder()
+                .user(user)
+                .consumerId(UUID.randomUUID())
+                .residentialAddress("서울시 마포구 월드컵북로 " + index)
+                .visitAddress("서울시 강남구 봉은사로 " + index)
+                .entranceType("공동현관 비밀번호: " + (1000 + random.nextInt(9000)))
+                .careGrade(random.nextInt(5) + 1)
+                .isMedicalAid(random.nextBoolean())
+                .weight(40 + random.nextInt(40)) // 40~80kg
+                .disease(Disease.values()[random.nextInt(Disease.values().length)])
+                .cognitiveStatus(CognitiveStatus.values()[random.nextInt(CognitiveStatus.values().length)])
+                .livingSituation("혼자 거주")
+                .guardianName("보호자" + index)
+                .guardianPhone("010-9999-" + String.format("%04d", index))
+                .build();
+
+        consumer.initializeConsumer(UUID.randomUUID());
+        consumerRepository.save(consumer);
+    }
+
+    private void createDummyServiceRequest(int index) {
+        // ✅ Consumer 중 하나 선택
+        List<Consumer> consumers = consumerRepository.findAll();
+        Consumer consumer = consumers.get(random.nextInt(consumers.size()));
+
+        // ✅ 서비스 시간 랜덤 지정
         LocalTime serviceStartTime, serviceEndTime;
         int timeSlot = random.nextInt(3);
-        if (timeSlot == 0) { // 오전 9시 ~ 12시
+        if (timeSlot == 0) {
             serviceStartTime = LocalTime.of(9, 0);
             serviceEndTime = LocalTime.of(12, 0);
-        } else if (timeSlot == 1) { // 오후 1시 ~ 4시
+        } else if (timeSlot == 1) {
             serviceStartTime = LocalTime.of(13, 0);
             serviceEndTime = LocalTime.of(16, 0);
-        } else { // 오후 5시 ~ 8시
+        } else {
             serviceStartTime = LocalTime.of(17, 0);
             serviceEndTime = LocalTime.of(20, 0);
         }
 
-        Set<LocalDate> requestedDays = new HashSet<>();
-        int pastDaysCount = random.nextInt(3) + 1; // 1~3일 과거
-        int futureDaysCount = 1; // 기존 1일 이후
-        LocalDate now = LocalDate.now();
+        // ✅ 요청 날짜 → 한 개만 랜덤으로 설정 (미래 날짜)
+        LocalDate requestedDate = LocalDate.now().plusDays(random.nextInt(3) + 1);
 
-        // 과거 날짜 추가 (오늘 기준 6개월 내)
-        for (int i = 0; i < pastDaysCount; i++) {
-            requestedDays.add(now.minusDays(random.nextInt(30 * 6))); // 6개월 내 과거
-        }
+        // 3. Duration 계산 (시간 차)
+        int duration = (int) java.time.Duration.between(serviceStartTime, serviceEndTime).toHours();
 
-        // 미래 날짜 추가
-        for (int i = 0; i < futureDaysCount; i++) {
-            requestedDays.add(now.plusDays(random.nextInt(2) + 1));
-        }
-
+        // ✅ 서비스 요청 생성
         ServiceRequest serviceRequest = ServiceRequest.builder()
-                .address("서울시 강남구 테헤란로 " + index)
-                .location(new Location(37.500 + random.nextDouble() * 0.1, 86.037 + random.nextDouble() * 0.1))
-                .preferred_time_start(serviceStartTime)
-                .preferred_time_end(serviceEndTime)
+                .consumer(consumer)
+                .serviceAddress("서울시 강남구 테헤란로 " + index)
+                .addressType(random.nextBoolean() ? AddressType.ROAD : AddressType.JIBUN) // 랜덤
+                .location(new Location(37.500 + random.nextDouble() * 0.1, 126.970 + random.nextDouble() * 0.1)) // ✅ 위도/경도 수정
+                .requestDate(requestedDate)
+                .preferredStartTime(serviceStartTime)
+                .preferredEndTime(serviceEndTime)
+                .duration(duration)
                 .serviceType(ServiceType.values()[random.nextInt(ServiceType.values().length)])
-                .personalityType("친절한")
                 .additionalInformation("추가 정보" + index)
                 .build();
 
         UUID serviceRequestId = UUID.randomUUID();
-        serviceRequest.setServiceRequest(serviceRequestId, user, ServiceRequestStatus.PENDING, requestedDays);
+        serviceRequest.initializeServiceRequest(serviceRequestId);
         serviceRequestRepository.save(serviceRequest);
 
-        // CaregiverCenter가 ACTIVE인 요양보호사만 DB에서 조회
+        // ✅ ACTIVE 상태 요양보호사 조회
         List<Caregiver> activeCaregivers = caregiverCenterRepository.findByStatus(CaregiverStatus.ACTIVE)
                 .stream()
                 .map(CaregiverCenter::getCaregiver)
@@ -224,54 +254,39 @@ public class DummyDataService {
             Caregiver matchedCaregiver = activeCaregivers.get(random.nextInt(activeCaregivers.size()));
             UUID caregiverId = matchedCaregiver.getCaregiverId();
 
-            // 거리 대충 87~125 사이 랜덤값
+            // 2. 해당 요양보호사의 CaregiverCenter 리스트 가져오기
+            List<CaregiverCenter> caregiverCenters = caregiverCenterRepository.findByCaregiver_CaregiverId(caregiverId);
+
+            if (caregiverCenters.isEmpty()) {
+                return; // 연결된 센터가 없으면 스킵
+            }
+
+
+            // 3. 랜덤으로 하나 선택
+            CaregiverCenter selectedCaregiverCenter = caregiverCenters.get(random.nextInt(caregiverCenters.size()));
+
+            // ✅ 거리 랜덤 생성
             double distanceLog = 87.0 + (random.nextDouble() * 38.0);
 
-            // 서비스 매칭 생성
+            // ✅ 서비스 매칭 생성
             CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(
                     serviceRequestId,
                     caregiverId,
                     serviceStartTime,
                     serviceEndTime,
-                    requestedDays
+                    requestedDate // ✅ 단일 날짜로 변경
             );
-            serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
-            // 근무 매칭 생성
-            CreateWorkLogRequest createWorkMatchRequest = new CreateWorkLogRequest(
-                    caregiverId,
-                    serviceStartTime,
-                    serviceEndTime,
-                    requestedDays,
-                    serviceRequest.getAddress(),
+            // ✅ 매칭 생성 후 반환값에서 serviceMatchId 가져오기
+            UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
+
+            // ✅ 정산 생성
+            CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
+                    selectedCaregiverCenter.getCaregiverCenterId(),
+                    serviceMatchId,
                     distanceLog
             );
-            workMatchCommandService.createWorkMatch(createWorkMatchRequest);
-
-            // WorkLog 상태 설정 (오늘 이후는 ACTIVE만 PLANNED)
-            List<WorkLog> createdMatches = workLogRepository.findByCaregiverAndWorkDateIn(
-                    matchedCaregiver, requestedDays
-            );
-
-            for (WorkLog match : createdMatches) {
-                LocalDate workDate = match.getWorkDate();
-                if (workDate.isBefore(now)) {
-                    int statusChoice = random.nextBoolean() ? 1 : 2;
-                    if (statusChoice == 1) {
-                        workMatchCommandService.changeWorkLogStatus(match.getWorkMatchId(), WorkStatus.COMPLETED);
-//                        List<WorkLog> logs = workLogRepository.findByWorkMatch(match);
-//                        for (WorkLog log : logs) {
-//                            log.changePaidStatus();
-//                        }
-                    } else {
-                        workMatchCommandService.changeWorkLogStatus(match.getWorkMatchId(), WorkStatus.CANCELLED);
-                    }
-                } else {
-                    workMatchCommandService.changeWorkLogStatus(match.getWorkMatchId(), WorkStatus.PLANNED);
-                }
-            }
+            settlementCommandService.createSettlement(createSettlementRequest);
         }
-
-         */
     }
 }
