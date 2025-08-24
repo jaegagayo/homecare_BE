@@ -167,7 +167,7 @@ public class ServiceMatchQueryRepository {
                                         .where(
                                                 caregiverCenter.center.centerId.eq(centerId)
                                                         .and(serviceMatch.serviceDate.eq(date))
-                                                        .and(serviceMatch.matchStatus.in(MatchStatus.PENDING, MatchStatus.COMPLETED))
+                                                        .and(serviceMatch.matchStatus.in(MatchStatus.PENDING, MatchStatus.CONFIRMED))
                                         ), "assignedCaregivers"
                         ),
                         ExpressionUtils.as( // 매칭이 있으나 오늘이 아닌 요양보호사 수 조회
