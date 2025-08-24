@@ -1,0 +1,90 @@
+package jaega.homecare.domain.recurringOffer.entity;
+
+import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.users.entity.ServiceType;
+import jaega.homecare.global.audit.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+@Entity
+@Getter
+@Table(name = "recurring_offer")
+@NoArgsConstructor
+public class RecurringOffer extends BaseTimeEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Column(name = "recurring_offer_id", unique = true)
+    private UUID recurringOfferId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caregiver_id")
+    private Caregiver caregiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "consumer_id")
+    private Consumer consumer;
+
+    // 근무 가능 요일
+    @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
+    @CollectionTable(name = "recurring_offer_day_of_week",
+            joinColumns = @JoinColumn(name = "recurring_offer_id", referencedColumnName = "id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "day_of_week")
+    private Set<DayOfWeek> dayOfWeek = new HashSet<>();
+
+    @JoinColumn(name = "service_start_date")
+    private LocalDate serviceStartDate; // 서비스 시작 날짜
+
+    @JoinColumn(name = "service_end_date")
+    private LocalDate serviceEndDate; // 서비스 종료 날짜
+
+    @JoinColumn(name = "service_start_time")
+    private LocalTime serviceStartTime; // 서비스 시작 날짜
+
+    @JoinColumn(name = "service_end_time")
+    private LocalTime serviceEndTime; // 서비스 종료 날짜
+
+    @Column(name = "duration", nullable = false)
+    private Integer duration;               // 1회 소요 시간
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "service_type", nullable = false)
+    private ServiceType serviceType;        // 서비스 유형
+
+    private RecurringStatus recurringStatus;
+
+    @Builder
+    public RecurringOffer(UUID recurringOfferId, Caregiver caregiver, Consumer consumer,
+                          Set<DayOfWeek> dayOfWeek, LocalDate serviceStartDate, LocalDate serviceEndDate,
+                          LocalTime serviceStartTime, LocalTime serviceEndTime, Integer duration, ServiceType serviceType, RecurringStatus recurringStatus){
+        this.recurringOfferId = recurringOfferId;
+        this.caregiver = caregiver;
+        this.consumer = consumer;
+        this.dayOfWeek = dayOfWeek;
+        this.serviceStartDate = serviceStartDate;
+        this.serviceEndDate = serviceEndDate;
+        this.serviceStartTime = serviceStartTime;
+        this.serviceEndTime = serviceEndTime;
+        this.duration = duration;
+        this.serviceType = serviceType;
+        this.recurringStatus = RecurringStatus.PENDING;
+    }
+
+    public void initializeRecurringOffer(UUID recurringOfferId){
+        this.recurringOfferId = recurringOfferId;
+    }
+
+
+}
