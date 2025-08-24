@@ -38,8 +38,7 @@ public class RecurringOffer extends BaseTimeEntity {
 
     // 근무 가능 요일
     @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "recurring_offer_day_of_week",
-            joinColumns = @JoinColumn(name = "recurring_offer_id", referencedColumnName = "id"))
+    @CollectionTable(name = "recurring_offer_day_of_week", joinColumns = @JoinColumn(name = "recurring_offer_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week")
     private Set<DayOfWeek> dayOfWeek = new HashSet<>();

@@ -12,9 +12,12 @@ import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.consumer.entity.QConsumer;
+import jaega.homecare.domain.recurringOffer.entity.QRecurringOffer;
+import jaega.homecare.domain.review.entity.QReview;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
+import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceRequest.entity.QServiceRequest;
 import jaega.homecare.domain.settlement.dto.res.WorkPlaceDistribution;
 import jaega.homecare.domain.users.entity.QUser;
@@ -304,5 +307,39 @@ public class ServiceMatchQueryRepository {
                         base.matchStatus()
                 ))
                 .toList();
+    }
+
+    /**
+     * 추천 정기 제안용 ServiceMatch 조회
+     *
+     * - RecurringOffer 정기 제안 추천을 위해 사용
+     *
+     * 조회 조건:
+     * - 리뷰 점수 4점 이상
+     * - 매칭 상태가 CONFIRMED
+     * - 아직 정기 제안이 신청되지 않은 일정
+     * - 특정 소비자 기준 필터 적용
+     */
+    public List<ServiceMatch> findRecommendedServiceMatches(UUID consumerId) {
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QReview review = QReview.review;
+        QRecurringOffer recurringOffer = QRecurringOffer.recurringOffer;
+
+        return queryFactory
+                .select(serviceMatch)
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest)
+                .join(serviceMatch.serviceRequest.consumer)
+                .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
+                .leftJoin(recurringOffer)
+                .on(recurringOffer.consumer.eq(serviceMatch.serviceRequest.consumer)
+                        .and(recurringOffer.caregiver.eq(serviceMatch.caregiver)))
+                .where(
+                        serviceMatch.serviceRequest.consumer.consumerId.eq(consumerId), // 특정 소비자
+                        serviceMatch.matchStatus.eq(MatchStatus.COMPLETED),             // 매칭 완료 상태
+                        review.reviewScore.goe(4.0),                                     // 리뷰 점수 4 이상
+                        recurringOffer.id.isNull()                                        // 아직 정기 제안 없음
+                )
+                .fetch();
     }
 }
