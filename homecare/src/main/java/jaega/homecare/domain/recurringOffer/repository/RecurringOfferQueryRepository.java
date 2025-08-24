@@ -14,6 +14,7 @@ import java.util.UUID;
 public class RecurringOfferQueryRepository {
     private final JPAQueryFactory queryFactory;
 
+    // 수요자의 아직 '읽지 않은'(정기 제안의 상세 정보) 정기 제안 알림용 조회
     public List<RecurringOffer> findUnreadRecurringOffersByConsumer(UUID consumerId) {
         QRecurringOffer recurringOffer = QRecurringOffer.recurringOffer;
 
