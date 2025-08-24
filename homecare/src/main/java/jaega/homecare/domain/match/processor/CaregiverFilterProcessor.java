@@ -29,7 +29,7 @@ public class CaregiverFilterProcessor {
     }
 
     private boolean isDayOff(Caregiver caregiver, DayOfWeek day) {
-        return caregiver.getDaysOff() != null && caregiver.getDaysOff().contains(day);
+        return caregiver.getDayOfWeek() != null && caregiver.getDayOfWeek().contains(day);
     }
 
     private boolean isAvailableAtTime(Caregiver caregiver, LocalTime start, LocalTime end) {

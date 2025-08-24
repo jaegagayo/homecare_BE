@@ -53,17 +53,15 @@ public class Caregiver extends BaseTimeEntity {
     @Column(name = "service_type")
     private Set<ServiceType> serviceTypes = new HashSet<>();
 
-    // 휴무일 (다중 선택 가능)
+    // 근무 가능 요일
     @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "days_off", joinColumns = @JoinColumn(name = "caregiver_id"))
+    @CollectionTable(name = "caregiver_day_of_week", joinColumns = @JoinColumn(name = "caregiver_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week")
-    private Set<DayOfWeek> daysOff = new HashSet<>();
-
-    private String personalityType;
+    private Set<DayOfWeek> dayOfWeek = new HashSet<>();
 
     @Builder
-    public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime, String address, Location location, Set<ServiceType> serviceTypes, Set<DayOfWeek> daysOff) {
+    public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime, String address, Location location, Set<ServiceType> serviceTypes, Set<DayOfWeek> dayOfWeek) {
         this.caregiverId = caregiverId;
         this.user = user;
         this.availableStartTime = availableStartTime;
@@ -71,7 +69,7 @@ public class Caregiver extends BaseTimeEntity {
         this.address = address;
         this.location = location;
         this.serviceTypes = serviceTypes;
-        this.daysOff = daysOff;
+        this.dayOfWeek = dayOfWeek;
     }
 
     public void initializeCaregiver(UUID uuid) {
@@ -84,6 +82,6 @@ public class Caregiver extends BaseTimeEntity {
         this.address = request.address();
         this.location = request.location();
         this.serviceTypes = request.serviceTypes();
-        this.daysOff = request.daysOff();
+        this.dayOfWeek = request.dayOfWeek();
     }
 }

@@ -20,6 +20,6 @@ public record CreateCaregiverProfileRequest(
         String address,
         Location location,
         Set<ServiceType> serviceTypes,
-        Set<DayOfWeek> daysOff
+        Set<DayOfWeek> dayOfWeek
 ) {
 }
