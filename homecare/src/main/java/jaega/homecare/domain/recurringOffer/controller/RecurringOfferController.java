@@ -18,17 +18,23 @@ import java.util.UUID;
 @RequestMapping("/api/recurringOffer")
 public interface RecurringOfferController {
 
-    @Operation(summary = "정기 제안 신청 작성 API", description = "입력받은 정보로 수요자와 요양보호사 간의 정기 제안 신청을 생성합니다.")
+    @Operation(summary = "정기 제안 신청 작성 API", description = "입력받은 정보로 수요자와 요양보호사 간의 정기 제안 신청을 생성합니다.<br>" +
+            "정기 신청의 1회 서비스 소요 시간을 시간/분 단위로 입력받으며 다음과 같이 duration 입력하시면 됩니다." +
+            "ex) 3h30m : 3시간 30분, 3h : 3시간")
     @ApiResponse(responseCode = "204", description = "정기 제안 신청 작성 성공")
     @PostMapping
     ResponseEntity<Void> createRecurringOffer(@RequestBody CreateRecurringOfferRequest request);
 
-    @Operation(summary = "정기 제안 상세 조회 API", description = "작성된 정기 제안 신청서를 상세 조회합니다.")
+    @Operation(summary = "정기 제안 상세 조회 API", description = "작성된 정기 제안 신청서를 상세 조회합니다.<br>" +
+            "정기 신청의 1회 서비스 소요 시간이 다음과 같은 형식으로 조회됩니다." +
+            "ex) 3h30m : 3시간 30분, 3h : 3시간")
     @ApiResponse(responseCode = "200", description = "정기 제안 신청 상세 조회 성공")
     @GetMapping("/{recurringOfferId}")
     ResponseEntity<GetRecurringOfferDetailResponse> getRecurringOfferDetail(@PathVariable UUID recurringOfferId);
 
-    @Operation(summary = "수요자의 정기 제안 신청 조회 API", description = "수요자가 작성한 정기 제안 신청서을 조회합니다.")
+    @Operation(summary = "수요자의 정기 제안 신청 조회 API", description = "수요자가 작성한 정기 제안 신청서을 조회합니다." +
+            "정기 신청의 1회 서비스 소요 시간이 다음과 같은 형식으로 조회됩니다." +
+            "ex) 3h30m : 3시간 30분, 3h : 3시간")
     @ApiResponse(responseCode = "200", description = "수요자의 정기 제안 신청 조회 성공")
     @GetMapping("/consumer/{consumerId}")
     ResponseEntity<List<GetRecurringOfferResponse>> getRecurringOfferByConsumer(@PathVariable UUID consumerId);
