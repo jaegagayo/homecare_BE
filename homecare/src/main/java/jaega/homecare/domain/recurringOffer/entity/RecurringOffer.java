@@ -62,12 +62,18 @@ public class RecurringOffer extends BaseTimeEntity {
     @Column(name = "service_type", nullable = false)
     private ServiceType serviceType;        // 서비스 유형
 
-    private RecurringStatus recurringStatus;
+    @Column(name = "recurring_status")
+    private RecurringStatus recurringStatus = RecurringStatus.PENDING;
+
+    // TODO : 알림 확인 여부, 추후 이벤트 큐 구조 혹은 알림 기능 도입 시 해당 속성 삭제될 수 있음
+    @Column(name = "recurring_offer_unread", nullable = false)
+    private boolean recurringOfferUnread = true;
 
     @Builder
     public RecurringOffer(UUID recurringOfferId, Caregiver caregiver, Consumer consumer,
                           Set<DayOfWeek> dayOfWeek, LocalDate serviceStartDate, LocalDate serviceEndDate,
-                          LocalTime serviceStartTime, LocalTime serviceEndTime, Integer duration, ServiceType serviceType, RecurringStatus recurringStatus){
+                          LocalTime serviceStartTime, LocalTime serviceEndTime, Integer duration, ServiceType serviceType,
+                          RecurringStatus recurringStatus, boolean recurringOfferUnread){
         this.recurringOfferId = recurringOfferId;
         this.caregiver = caregiver;
         this.consumer = consumer;
@@ -78,12 +84,14 @@ public class RecurringOffer extends BaseTimeEntity {
         this.serviceEndTime = serviceEndTime;
         this.duration = duration;
         this.serviceType = serviceType;
-        this.recurringStatus = RecurringStatus.PENDING;
     }
 
     public void initializeRecurringOffer(UUID recurringOfferId){
         this.recurringOfferId = recurringOfferId;
     }
 
+    public void readRecurringOfferDetail(){
+        this.recurringOfferUnread = false;
+    }
 
 }

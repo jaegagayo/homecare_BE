@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
-public record RecommendRecurringOfferResponse(
+public record GetRecommendRecurringOfferResponse(
         UUID serviceMatchId,
         UUID caregiverId,
         LocalDate serviceDate,

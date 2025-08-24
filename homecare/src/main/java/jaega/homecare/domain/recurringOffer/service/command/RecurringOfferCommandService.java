@@ -1,11 +1,8 @@
 package jaega.homecare.domain.recurringOffer.service.command;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.consumer.entity.Consumer;
-import jaega.homecare.domain.consumer.repository.ConsumerQueryRepository;
-import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.recurringOffer.dto.req.CreateRecurringOfferRequest;
 import jaega.homecare.domain.recurringOffer.entity.RecurringOffer;
@@ -35,5 +32,9 @@ public class RecurringOfferCommandService {
         recurringOffer.initializeRecurringOffer(UUID.randomUUID());
         recurringOfferRepository.save(recurringOffer);
 
+    }
+
+    public void readRecurringOfferDetail(RecurringOffer recurringOffer){
+        recurringOffer.readRecurringOfferDetail();
     }
 }
