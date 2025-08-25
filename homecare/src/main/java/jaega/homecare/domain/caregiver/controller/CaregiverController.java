@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,11 @@ import java.util.UUID;
 @Tag(name = "Caregiver", description = "Caregiver 서비스 API")
 @RequestMapping("/api/caregiver")
 public interface CaregiverController {
+
+    @Operation(summary = "요양보호사 회원가입 API", description = "입력받은 정보로 요양보호사의 회원가입을 진행합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사의 회원가입 성공")
+    @PostMapping
+    ResponseEntity<Void> signupCaregiver(@RequestBody CaregiverSignupRequest request);
 
     @Operation(
             summary = "활성화된 센터 목록 조회",

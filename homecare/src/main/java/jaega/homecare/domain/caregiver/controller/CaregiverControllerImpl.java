@@ -1,7 +1,9 @@
 package jaega.homecare.domain.caregiver.controller;
 
+import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
+import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -23,6 +25,17 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final SettlementCommandService settlementCommandService;
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final CaregiverCenterQueryService caregiverCenterQueryService;
+    private final CaregiverCommandService caregiverCommandService;
+
+    /**
+     *
+     * 요양보호사 회원가입
+     */
+    @Override
+    public ResponseEntity<Void> signupCaregiver(@RequestBody CaregiverSignupRequest request){
+        caregiverCommandService.signupCaregiver(request);
+        return ResponseEntity.noContent().build();
+    }
 
     /**
      *
