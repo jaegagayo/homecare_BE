@@ -45,6 +45,7 @@ public class CaregiverControllerImpl implements CaregiverController {
      *
      * 요양보호사 승인 상태 조회
      */
+    // TODO : 인증 기능 구현 시 다른 페이지로 이동 못하도록 CORS 도입 고려
     @Override
     public ResponseEntity<GetCaregiverVerifiedStatusResponse> getCaregiverVerifiedStatus(@RequestParam UUID caregiverId){
         GetCaregiverVerifiedStatusResponse response = caregiverQueryService.getCaregiverVerifiedStatus(caregiverId);
