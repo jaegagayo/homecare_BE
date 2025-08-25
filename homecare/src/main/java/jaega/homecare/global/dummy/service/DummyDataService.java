@@ -132,9 +132,9 @@ public class DummyDataService {
             serviceTypes.add(ServiceType.values()[random.nextInt(ServiceType.values().length)]);
         }
 
-        Set<DayOfWeek> daysOff = new HashSet<>();
+        Set<DayOfWeek> dayOfWeek = new HashSet<>();
         if (random.nextBoolean()) {
-            daysOff.add(DayOfWeek.values()[random.nextInt(7)]);
+            dayOfWeek.add(DayOfWeek.values()[random.nextInt(7)]);
         }
 
         Caregiver caregiver = Caregiver.builder()
@@ -145,7 +145,7 @@ public class DummyDataService {
                 .address("서울시 송파구 올림픽로 " + index)
                 .location(new Location(37.514 + random.nextDouble() * 0.1, 86.106 + random.nextDouble() * 0.1))
                 .serviceTypes(serviceTypes)
-                .daysOff(daysOff)
+                .dayOfWeek(dayOfWeek)
                 .build();
         caregiverRepository.save(caregiver);
 

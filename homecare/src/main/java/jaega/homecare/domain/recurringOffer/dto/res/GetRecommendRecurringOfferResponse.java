@@ -1,25 +1,23 @@
-package jaega.homecare.domain.center.dto.req;
+package jaega.homecare.domain.recurringOffer.dto.res;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jaega.homecare.domain.users.entity.ServiceType;
-import jaega.homecare.domain.users.entity.Location;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
-public record CreateCaregiverProfileRequest(
+public record GetRecommendRecurringOfferResponse(
+        UUID serviceMatchId,
         UUID caregiverId,
+        LocalDate serviceDate,
 
         @Schema(type = "string", format = "time", example = "09:00:00")
-        LocalTime availableStartTIme,
+        LocalTime serviceStartTime,
 
         @Schema(type = "string", format = "time", example = "18:00:00")
-        LocalTime availableEndTime,
-        String address,
-        Location location,
-        Set<ServiceType> serviceTypes,
+        LocalTime serviceEndTime,
         Set<DayOfWeek> dayOfWeek
 ) {
 }

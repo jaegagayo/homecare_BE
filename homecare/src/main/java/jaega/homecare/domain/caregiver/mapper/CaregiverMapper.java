@@ -26,7 +26,7 @@ public interface CaregiverMapper {
     @Mapping(target = "availableStartTime", ignore = true)
     @Mapping(target = "availableEndTime", ignore = true)
     @Mapping(target = "serviceTypes", ignore = true)
-    @Mapping(target = "daysOff", ignore = true)
+    @Mapping(target = "dayOfWeek", ignore = true)
     @Mapping(target = "location", ignore = true)
     Caregiver toEntity(String address, User user);
 
