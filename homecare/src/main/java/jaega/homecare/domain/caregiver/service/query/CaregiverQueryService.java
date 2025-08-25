@@ -1,5 +1,6 @@
 package jaega.homecare.domain.caregiver.service.query;
 
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
@@ -30,13 +31,20 @@ public class CaregiverQueryService {
     private final CaregiverRepository caregiverRepository;
     private final CaregiverMapper caregiverMapper;
 
-    public List<GetCaregiverResponse> getAllCaregiversByCenter(UUID centerId) {
-        return caregiverQueryRepository.findAllByCenterId(centerId);
-    }
-
     public Caregiver getCaregiver(UUID caregiverId){
         return caregiverRepository.findByCaregiverId(caregiverId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 요양보호사입니다."));
+    }
+
+    public GetCaregiverVerifiedStatusResponse getCaregiverVerifiedStatus(UUID caregiverId){
+        Caregiver caregiver = getCaregiver(caregiverId);
+        return caregiverMapper.toGetCaregiverVerifiedStatus(caregiver);
+    }
+
+    // 센터(웹 페이지) 조회
+
+    public List<GetCaregiverResponse> getAllCaregiversByCenter(UUID centerId) {
+        return caregiverQueryRepository.findAllByCenterId(centerId);
     }
 
     public List<GetCaregiverByCaregiverStatusResponse> getCaregiverByWorkStatus(UUID centerId, CaregiverStatus status){

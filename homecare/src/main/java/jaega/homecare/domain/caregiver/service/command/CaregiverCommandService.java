@@ -2,6 +2,7 @@ package jaega.homecare.domain.caregiver.service.command;
 
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverCreateRequest;
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
@@ -24,10 +25,11 @@ public class CaregiverCommandService {
     private final CertificationCommandService certificationCommandService;
     private final UserCommandService userCommandService;
 
-    public void signupCaregiver(CaregiverSignupRequest request){
+    public GetCaregiverSignupResponse signupCaregiver(CaregiverSignupRequest request){
         User user = userCommandService.createUser(request.user(), UserRole.ROLE_CAREGIVER);
         Caregiver caregiver = createCaregiver(request.caregiver(), user);
         certificationCommandService.createCertification(request.certification(), caregiver);
+        return caregiverMapper.toGetCaregiverSignup(caregiver);
     }
 
     public Caregiver createCaregiver(CaregiverCreateRequest request, User user) {

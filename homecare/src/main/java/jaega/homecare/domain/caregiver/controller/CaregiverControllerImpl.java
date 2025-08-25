@@ -2,8 +2,11 @@ package jaega.homecare.domain.caregiver.controller;
 
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
+import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -26,16 +29,29 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final CaregiverCenterQueryService caregiverCenterQueryService;
     private final CaregiverCommandService caregiverCommandService;
+    private final CaregiverQueryService caregiverQueryService;
 
     /**
      *
      * 요양보호사 회원가입
      */
     @Override
-    public ResponseEntity<Void> signupCaregiver(@RequestBody CaregiverSignupRequest request){
-        caregiverCommandService.signupCaregiver(request);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<GetCaregiverSignupResponse> signupCaregiver(@RequestBody CaregiverSignupRequest request){
+        GetCaregiverSignupResponse response = caregiverCommandService.signupCaregiver(request);
+        return ResponseEntity.ok(response);
     }
+
+    /**
+     *
+     * 요양보호사 승인 상태 조회
+     */
+    @Override
+    public ResponseEntity<GetCaregiverVerifiedStatusResponse> getCaregiverVerifiedStatus(@RequestParam UUID caregiverId){
+        GetCaregiverVerifiedStatusResponse response = caregiverQueryService.getCaregiverVerifiedStatus(caregiverId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 센터
 
     /**
      *

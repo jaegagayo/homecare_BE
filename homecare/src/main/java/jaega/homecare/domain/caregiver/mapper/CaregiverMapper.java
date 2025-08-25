@@ -1,6 +1,8 @@
 package jaega.homecare.domain.caregiver.mapper;
 
 import jaega.homecare.domain.caregiver.dto.req.CaregiverCreateRequest;
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
 import jaega.homecare.domain.users.entity.User;
@@ -23,6 +25,13 @@ public interface CaregiverMapper {
     @Mapping(target = "serviceTypes", ignore = true)
     @Mapping(target = "dayOfWeek", ignore = true)
     Caregiver toEntity(CaregiverCreateRequest request, User user);
+
+    @Mapping(target = "caregiverId", source = "caregiverId")
+    GetCaregiverSignupResponse toGetCaregiverSignup(Caregiver caregiver);
+
+    @Mapping(target = "caregiverId", source = "caregiverId")
+    @Mapping(target = "verifiedStatus", source = "verifiedStatus")
+    GetCaregiverVerifiedStatusResponse toGetCaregiverVerifiedStatus(Caregiver caregiver);
 
     @Mapping(target = "caregiverName", source = "caregiver.user.name")
     @Mapping(target = "email", source = "caregiver.user.email")
