@@ -1,4 +1,4 @@
-package jaega.homecare.domain.Blacklist.entity;
+package jaega.homecare.domain.blacklist.entity;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.consumer.entity.Consumer;
