@@ -24,9 +24,6 @@ public record CreateRecurringOfferRequest(
         @Schema(type = "string", format = "time", example = "18:00:00")
         LocalTime serviceEndTime,
 
-        @Schema(description = "시간/분을 초 단위로 직렬화합니다. 예: 3시간 30분 → 12600", example = "3h30m")
-        @JsonDeserialize(using = DurationDeserializer.class)
-        Integer duration,
         ServiceType serviceType
 ) {
 }

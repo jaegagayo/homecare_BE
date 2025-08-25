@@ -16,6 +16,8 @@ import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -40,13 +42,29 @@ public class RecurringOfferQueryService {
     public GetRecurringOfferDetailResponse findRecurringOfferDetail(UUID recurringOfferId){
         RecurringOffer recurringOffer = getRecurringOffer(recurringOfferId);
         recurringOfferCommandService.readRecurringOfferDetail(recurringOffer);
-        return recurringOfferMapper.toGetResponseByDetail(recurringOffer);
+
+        int durationInSeconds = calculateDurationInSeconds(
+                recurringOffer.getServiceStartTime(),
+                recurringOffer.getServiceEndTime()
+        );
+
+        return recurringOfferMapper.toGetResponseByDetail(recurringOffer, durationInSeconds);
     }
 
     public List<GetRecurringOfferResponse> findRecurringOfferByConsumer(UUID consumerId){
         Consumer consumer = consumerQueryService.getConsumer(consumerId);
         List<RecurringOffer> recurringOfferList = recurringOfferRepository.findByConsumer(consumer);
-        return recurringOfferMapper.toGetResponseByConsumer(recurringOfferList);
+
+        return recurringOfferList.stream()
+                .map(offer -> {
+                    int durationInSeconds = calculateDurationInSeconds(
+                            offer.getServiceStartTime(),
+                            offer.getServiceEndTime()
+                    );
+
+                    return recurringOfferMapper.toGetResponseByConsumer(offer, durationInSeconds);
+                })
+                .toList();
     }
 
     public List<GetRecommendRecurringOfferResponse> findRecommendedRecurringOffers(UUID consumerId) {
@@ -68,5 +86,12 @@ public class RecurringOfferQueryService {
         List<RecurringOffer> recurringOfferList = recurringOfferQueryRepository.findUnreadRecurringOffersByConsumer(consumerId);
 
         return recurringOfferMapper.toGetResponseByUnreadNotification(recurringOfferList);
+    }
+
+    /**
+     * 공통 duration 계산 메서드
+     */
+    private int calculateDurationInSeconds(LocalTime startTime, LocalTime endTime) {
+        return (int) Duration.between(startTime, endTime).getSeconds();
     }
 }

@@ -55,9 +55,6 @@ public class RecurringOffer extends BaseTimeEntity {
     @JoinColumn(name = "service_end_time")
     private LocalTime serviceEndTime; // 서비스 종료 날짜
 
-    @Column(name = "duration", nullable = false)
-    private Integer duration;               // 1회 소요 시간
-
     @Enumerated(EnumType.STRING)
     @Column(name = "service_type", nullable = false)
     private ServiceType serviceType;        // 서비스 유형
@@ -72,7 +69,7 @@ public class RecurringOffer extends BaseTimeEntity {
     @Builder
     public RecurringOffer(UUID recurringOfferId, Caregiver caregiver, Consumer consumer,
                           Set<DayOfWeek> dayOfWeek, LocalDate serviceStartDate, LocalDate serviceEndDate,
-                          LocalTime serviceStartTime, LocalTime serviceEndTime, Integer duration, ServiceType serviceType,
+                          LocalTime serviceStartTime, LocalTime serviceEndTime, ServiceType serviceType,
                           RecurringStatus recurringStatus, boolean recurringOfferUnread){
         this.recurringOfferId = recurringOfferId;
         this.caregiver = caregiver;
@@ -82,7 +79,6 @@ public class RecurringOffer extends BaseTimeEntity {
         this.serviceEndDate = serviceEndDate;
         this.serviceStartTime = serviceStartTime;
         this.serviceEndTime = serviceEndTime;
-        this.duration = duration;
         this.serviceType = serviceType;
     }
 

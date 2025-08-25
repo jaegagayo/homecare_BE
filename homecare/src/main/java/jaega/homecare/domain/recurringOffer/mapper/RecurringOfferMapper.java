@@ -22,24 +22,23 @@ public interface RecurringOfferMapper {
     @Mapping(target = "serviceEndDate", source = "request.serviceEndDate")
     @Mapping(target = "serviceStartTime", source = "request.serviceStartTime")
     @Mapping(target = "serviceEndTime", source = "request.serviceEndTime")
-    @Mapping(target = "duration", source = "request.duration")
     @Mapping(target = "serviceType", source = "request.serviceType")
     @Mapping(target = "recurringOfferId", ignore = true)
     @Mapping(target = "recurringStatus", ignore = true)
     @Mapping(target = "recurringOfferUnread", ignore = true)
     RecurringOffer toEntity(CreateRecurringOfferRequest request, Caregiver caregiver, Consumer consumer);
 
-    @Mapping(target = "caregiverId", source = "caregiver.caregiverId")
-    @Mapping(target = "consumerId", source = "consumer.consumerId")
-    GetRecurringOfferResponse toGetResponseByConsumer(RecurringOffer recurringOffer);
+    @Mapping(target = "caregiverId", source = "recurringOffer.caregiver.caregiverId")
+    @Mapping(target = "consumerId", source = "recurringOffer.consumer.consumerId")
+    @Mapping(target = "duration", source = "duration")
+    GetRecurringOfferResponse toGetResponseByConsumer(RecurringOffer recurringOffer, int duration);
 
-    List<GetRecurringOfferResponse> toGetResponseByConsumer(List<RecurringOffer> recurringOffers);
+    @Mapping(target = "caregiverName", source = "recurringOffer.caregiver.user.name")
+    @Mapping(target = "consumer", source = "recurringOffer.consumer.user.name")
+    @Mapping(target = "duration", source = "duration")
+    GetRecurringOfferDetailResponse toGetResponseByDetail(RecurringOffer recurringOffer, int duration);
 
-    @Mapping(target = "caregiverName", source = "caregiver.user.name")
-    @Mapping(target = "consumer", source = "consumer.user.name")
-    GetRecurringOfferDetailResponse toGetResponseByDetail(RecurringOffer recurringOffer);
-
-    @Mapping(target = "caregiverName", source = "caregiver.user.name")
+    @Mapping(target = "caregiverName", source = "recurringOffer.caregiver.user.name")
     GetUnreadRecurringOfferResponse toGetResponseByUnreadNotification(RecurringOffer recurringOffer);
 
     List<GetUnreadRecurringOfferResponse> toGetResponseByUnreadNotification(List<RecurringOffer> recurringOffers);
