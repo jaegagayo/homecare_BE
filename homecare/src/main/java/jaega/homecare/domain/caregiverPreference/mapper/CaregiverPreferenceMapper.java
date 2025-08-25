@@ -2,6 +2,7 @@ package jaega.homecare.domain.caregiverPreference.mapper;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiverPreference.dto.req.CreateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,4 +27,6 @@ public interface CaregiverPreferenceMapper {
     @Mapping(target = "preferredGender", source = "request.preferredGender")
     @Mapping(target = "caregiverPreferenceId", ignore = true)
     CaregiverPreference toEntity(CreateCaregiverPreferenceRequest request, Caregiver caregiver);
+
+    GetCaregiverPreferenceResponse toGetResponse(CaregiverPreference caregiverPreference);
 }
