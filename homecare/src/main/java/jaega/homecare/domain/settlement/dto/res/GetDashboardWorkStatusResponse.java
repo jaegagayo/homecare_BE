@@ -1,10 +1,10 @@
 package jaega.homecare.domain.settlement.dto.res;
 
+import jaega.homecare.domain.serviceMatch.repository.DashboardStats;
+
 import java.util.List;
 
 public record GetDashboardWorkStatusResponse(
-        Long workingToday,               // 오늘 근무자
-        Long unassignedCaregivers,       // 미배정 보호사
-        Long waitingApplicants,          // 신청자(배정 대기)
+        DashboardStats dashboardStats,
         List<WorkPlaceDistribution> distribution // 근무지별 분포
 ) {}

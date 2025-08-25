@@ -54,20 +54,13 @@ public class ServiceMatchQueryService {
 
     // 대시보드 매칭 스케줄 조회
     public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
-
         LocalDate today = LocalDate.now();
 
         DashboardStats dashboardStats = serviceMatchQueryRepository.getDashboardStats(centerId, today);
         List<WorkPlaceDistribution> distributions = serviceMatchQueryRepository.getWorkPlaceDistributionByServiceType(centerId);
 
-        Long workingToday = dashboardStats.assignedCaregivers() != null ? dashboardStats.assignedCaregivers() : 0;
-        Long unassignedCaregivers = dashboardStats.totalCaregivers() - workingToday;
-        Long waitingApplicants = dashboardStats.waitingApplicants() != null ? dashboardStats.waitingApplicants() : 0;
-
         return new GetDashboardWorkStatusResponse(
-                workingToday,
-                unassignedCaregivers,
-                waitingApplicants,
+                dashboardStats,
                 distributions
         );
     }
