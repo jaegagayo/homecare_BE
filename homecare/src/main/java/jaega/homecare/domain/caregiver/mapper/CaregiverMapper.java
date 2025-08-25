@@ -23,7 +23,6 @@ public interface CaregiverMapper {
     @Mapping(target = "verifiedStatus", source = "request.verifiedStatus")
     @Mapping(target = "caregiverId", ignore = true)
     @Mapping(target = "serviceTypes", ignore = true)
-    @Mapping(target = "dayOfWeek", ignore = true)
     Caregiver toEntity(CaregiverCreateRequest request, User user);
 
     @Mapping(target = "caregiverId", source = "caregiverId")

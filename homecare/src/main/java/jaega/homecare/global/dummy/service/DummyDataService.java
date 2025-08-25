@@ -145,7 +145,6 @@ public class DummyDataService {
                 .address("서울시 송파구 올림픽로 " + index)
           //      .location(new Location(37.514 + random.nextDouble() * 0.1, 86.106 + random.nextDouble() * 0.1))
                 .serviceTypes(serviceTypes)
-                .dayOfWeek(dayOfWeek)
                 .build();
         caregiverRepository.save(caregiver);
 

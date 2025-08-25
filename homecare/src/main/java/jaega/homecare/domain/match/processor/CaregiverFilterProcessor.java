@@ -7,7 +7,6 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,15 +20,10 @@ public class CaregiverFilterProcessor {
 
     public List<Caregiver> filter(ServiceRequest request, List<Caregiver> candidates, LocalDate applyDate) {
         return candidates.stream()
-                .filter(c -> !isDayOff(c, applyDate.getDayOfWeek()))
                 .filter(c -> isAvailableAtTime(c, request.getPreferredStartTime(), request.getPreferredEndTime()))
                 .filter(c -> supportsServiceType(c, request.getServiceType()))
                 .filter(c -> !hasOverlappingWork(c, applyDate, request.getPreferredStartTime(), request.getPreferredEndTime()))
                 .collect(Collectors.toList());
-    }
-
-    private boolean isDayOff(Caregiver caregiver, DayOfWeek day) {
-        return caregiver.getDayOfWeek() != null && caregiver.getDayOfWeek().contains(day);
     }
 
     private boolean isAvailableAtTime(Caregiver caregiver, LocalTime start, LocalTime end) {

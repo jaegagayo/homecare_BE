@@ -49,13 +49,6 @@ public class Caregiver extends BaseTimeEntity {
     @Column(name = "service_type")
     private Set<ServiceType> serviceTypes = new HashSet<>();
 
-    // 근무 가능 요일
-    @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "caregiver_day_of_week", joinColumns = @JoinColumn(name = "caregiver_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "day_of_week")
-    private Set<DayOfWeek> dayOfWeek = new HashSet<>();
-
     @Column(name = "career")
     private Integer career;
 
@@ -74,16 +67,14 @@ public class Caregiver extends BaseTimeEntity {
 
     @Builder
     public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime,
-                     String address, Set<ServiceType> serviceTypes, Set<DayOfWeek> dayOfWeek,
-                     Integer career, KoreanProficiency koreanProficiency, boolean isAccompanyOuting, String selfIntroduction,
-                     VerifiedStatus verifiedStatus) {
+                     String address, Set<ServiceType> serviceTypes, Integer career,
+                     KoreanProficiency koreanProficiency, boolean isAccompanyOuting, String selfIntroduction, VerifiedStatus verifiedStatus) {
         this.caregiverId = caregiverId;
         this.user = user;
         this.availableStartTime = availableStartTime;
         this.availableEndTime = availableEndTime;
         this.address = address;
         this.serviceTypes = serviceTypes;
-        this.dayOfWeek = dayOfWeek;
         this.career = career;
         this.koreanProficiency = koreanProficiency;
         this.isAccompanyOuting = isAccompanyOuting;
@@ -93,13 +84,5 @@ public class Caregiver extends BaseTimeEntity {
 
     public void initializeCaregiver(UUID uuid) {
         this.caregiverId = uuid;
-    }
-
-    public void setCaregiverProfile(CreateCaregiverProfileRequest request){
-        this.availableStartTime = request.availableStartTIme();
-        this.availableEndTime = request.availableEndTime();
-        this.address = request.address();
-        this.serviceTypes = request.serviceTypes();
-        this.dayOfWeek = request.dayOfWeek();
     }
 }
