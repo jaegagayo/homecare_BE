@@ -110,24 +110,19 @@ public class CaregiverQueryRepository {
 
         return results.stream()
                 .filter(tuple -> {
-                    Caregiver c = tuple.get(caregiver);
                     CaregiverPreference pref = tuple.get(preference);
+                    if (pref == null || pref.getServiceTypes() == null) return false;
 
-                    Set<ServiceType> combined = new HashSet<>();
-                    if (pref.getServiceTypes() != null) combined.addAll(pref.getServiceTypes());
-                    if (pref != null && pref.getServiceTypes() != null) combined.addAll(pref.getServiceTypes());
-
-                    return !Collections.disjoint(combined, serviceTypes);
+                    // Preference 서비스 타입과 요청한 serviceTypes 간 교집합 확인
+                    return !Collections.disjoint(pref.getServiceTypes(), serviceTypes);
                 })
                 .map(tuple -> {
                     Caregiver c = tuple.get(caregiver);
                     CaregiverPreference pref = tuple.get(preference);
-                    Set<ServiceType> combined = new HashSet<>(pref.getServiceTypes());
-                    if (tuple.get(preference) != null) combined.addAll(tuple.get(preference).getServiceTypes());
 
                     return new GetCaregiverByServiceTypeResponse(
                             c.getUser().getName(),
-                            combined
+                            pref.getServiceTypes()
                     );
                 })
                 .toList();
