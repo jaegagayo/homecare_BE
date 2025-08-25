@@ -7,6 +7,9 @@ import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
 import jaega.homecare.domain.caregiver.repository.CaregiverQueryRepository;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
+import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
@@ -27,6 +30,7 @@ import java.util.UUID;
 public class CaregiverQueryService {
 
     private final CenterQueryService centerQueryService;
+    private final CaregiverPreferenceQueryService caregiverPreferenceQueryService;
     private final CaregiverQueryRepository caregiverQueryRepository;
     private final CaregiverRepository caregiverRepository;
     private final CaregiverMapper caregiverMapper;
@@ -57,7 +61,8 @@ public class CaregiverQueryService {
 
     public GetCaregiverProfileResponse getCaregiverProfile(UUID caregiverId){
         Caregiver caregiver = getCaregiver(caregiverId);
-        return caregiverMapper.toGetCaregiverProfile(caregiver);
+        CaregiverPreference caregiverPreference = caregiverPreferenceQueryService.findCaregiverPreferenceByCaregiver(caregiverId);
+        return caregiverMapper.toGetCaregiverProfile(caregiver, caregiverPreference);
     }
 
 

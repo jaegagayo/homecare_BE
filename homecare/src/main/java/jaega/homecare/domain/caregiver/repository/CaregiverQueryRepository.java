@@ -1,11 +1,14 @@
 package jaega.homecare.domain.caregiver.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
+import jaega.homecare.domain.caregiverPreference.entity.QCaregiverPreference;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.ServiceType;
@@ -16,9 +19,7 @@ import jaega.homecare.domain.users.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,24 +31,34 @@ public class CaregiverQueryRepository {
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+        QCaregiverPreference preference = QCaregiverPreference.caregiverPreference;
 
-        List<CaregiverCenter> caregiverCenters = queryFactory
-                .selectFrom(caregiverCenter).distinct()
+        // Caregiver + Preference fetch 조인
+        List<Tuple> results = queryFactory
+                .select(caregiverCenter, caregiver, preference)
+                .from(caregiverCenter)
                 .join(caregiverCenter.caregiver, caregiver).fetchJoin()
                 .join(caregiver.user, user).fetchJoin()
+                .leftJoin(preference).on(preference.caregiver.eq(caregiver))
                 .where(caregiverCenter.center.centerId.eq(centerId))
                 .fetch();
 
-        return caregiverCenters.stream()
-                .distinct()
-                .map(cc -> {
-                    Caregiver c = cc.getCaregiver();
+        return results.stream()
+                .map(tuple -> {
+                    Caregiver c = tuple.get(caregiver);
+                    CaregiverPreference pref = tuple.get(preference);
+
+                    // 선호 서비스 타입만 가져오기
+                    Set<ServiceType> serviceTypes = pref != null && pref.getServiceTypes() != null
+                            ? pref.getServiceTypes()
+                            : Collections.emptySet();
+
                     return new GetCaregiverResponse(
                             c.getCaregiverId(),
                             c.getUser().getName(),
                             c.getUser().getPhone(),
-                            c.getServiceTypes(),
-                            cc.getStatus()
+                            serviceTypes,
+                            tuple.get(caregiverCenter).getStatus()
                     );
                 })
                 .toList();
@@ -65,7 +76,6 @@ public class CaregiverQueryRepository {
                 .selectFrom(caregiverCenter).distinct()
                 .join(caregiverCenter.caregiver, caregiver).fetchJoin()
                 .join(caregiver.user, user).fetchJoin()
-                .leftJoin(caregiver.serviceTypes).fetchJoin()
                 .where(
                         caregiverCenter.center.centerId.eq(centerId)
                                 .and(caregiverCenter.status.eq(status))
@@ -87,22 +97,39 @@ public class CaregiverQueryRepository {
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser user = QUser.user;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+        QCaregiverPreference preference = QCaregiverPreference.caregiverPreference;
 
-        List<CaregiverCenter> caregiverCenters = queryFactory
-                .selectFrom(caregiverCenter).distinct()
-                .join(caregiverCenter.caregiver, caregiver).fetchJoin()
-                .join(caregiver.user, user).fetchJoin()
-                .where(
-                        caregiverCenter.center.centerId.eq(centerId)
-                                .and(caregiver.serviceTypes.any().in(serviceTypes))
-                )
+        List<Tuple> results = queryFactory
+                .select(caregiver, preference)
+                .from(caregiverCenter)
+                .join(caregiverCenter.caregiver, caregiver)
+                .join(caregiver.user, user)
+                .leftJoin(preference).on(preference.caregiver.eq(caregiver))
+                .where(caregiverCenter.center.centerId.eq(centerId))
                 .fetch();
 
-        return caregiverCenters.stream()
-                .map(cc -> new GetCaregiverByServiceTypeResponse(
-                        cc.getCaregiver().getUser().getName(),
-                        cc.getCaregiver().getServiceTypes()
-                ))
+        return results.stream()
+                .filter(tuple -> {
+                    Caregiver c = tuple.get(caregiver);
+                    CaregiverPreference pref = tuple.get(preference);
+
+                    Set<ServiceType> combined = new HashSet<>();
+                    if (pref.getServiceTypes() != null) combined.addAll(pref.getServiceTypes());
+                    if (pref != null && pref.getServiceTypes() != null) combined.addAll(pref.getServiceTypes());
+
+                    return !Collections.disjoint(combined, serviceTypes);
+                })
+                .map(tuple -> {
+                    Caregiver c = tuple.get(caregiver);
+                    CaregiverPreference pref = tuple.get(preference);
+                    Set<ServiceType> combined = new HashSet<>(pref.getServiceTypes());
+                    if (tuple.get(preference) != null) combined.addAll(tuple.get(preference).getServiceTypes());
+
+                    return new GetCaregiverByServiceTypeResponse(
+                            c.getUser().getName(),
+                            combined
+                    );
+                })
                 .toList();
     }
 

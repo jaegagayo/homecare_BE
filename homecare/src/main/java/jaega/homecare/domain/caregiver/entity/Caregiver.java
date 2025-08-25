@@ -1,7 +1,5 @@
 package jaega.homecare.domain.caregiver.entity;
 
-import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
-import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -9,10 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -42,13 +37,6 @@ public class Caregiver extends BaseTimeEntity {
     @Column(name = "address")
     private String address;
 
-    // 서비스 유형 (다중 선택 가능)
-    @ElementCollection(targetClass = ServiceType.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "service_type", joinColumns = @JoinColumn(name = "caregiver_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "service_type")
-    private Set<ServiceType> serviceTypes = new HashSet<>();
-
     @Column(name = "career")
     private Integer career;
 
@@ -67,14 +55,13 @@ public class Caregiver extends BaseTimeEntity {
 
     @Builder
     public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime,
-                     String address, Set<ServiceType> serviceTypes, Integer career,
+                     String address, Integer career,
                      KoreanProficiency koreanProficiency, boolean isAccompanyOuting, String selfIntroduction, VerifiedStatus verifiedStatus) {
         this.caregiverId = caregiverId;
         this.user = user;
         this.availableStartTime = availableStartTime;
         this.availableEndTime = availableEndTime;
         this.address = address;
-        this.serviceTypes = serviceTypes;
         this.career = career;
         this.koreanProficiency = koreanProficiency;
         this.isAccompanyOuting = isAccompanyOuting;

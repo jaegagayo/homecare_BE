@@ -3,6 +3,7 @@ package jaega.homecare.domain.caregiverPreference.dto.res;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jaega.homecare.domain.caregiverPreference.entity.PreferredGender;
 import jaega.homecare.domain.users.entity.Disease;
+import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -44,6 +45,7 @@ public record GetCaregiverPreferenceResponse(
         @Schema(type = "integer", example = "90")
         Integer preferredMaxAge,
 
-        PreferredGender preferredGender
+        PreferredGender preferredGender,
+        Set<ServiceType> serviceTypes
 ) {
 }

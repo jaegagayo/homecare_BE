@@ -25,6 +25,7 @@ public interface CaregiverPreferenceMapper {
     @Mapping(target = "preferredMinAge", source = "request.preferredMinAge")
     @Mapping(target = "preferredMaxAge", source = "request.preferredMaxAge")
     @Mapping(target = "preferredGender", source = "request.preferredGender")
+    @Mapping(target = "serviceTypes", source = "request.serviceTypes")
     @Mapping(target = "caregiverPreferenceId", ignore = true)
     CaregiverPreference toEntity(CreateCaregiverPreferenceRequest request, Caregiver caregiver);
 

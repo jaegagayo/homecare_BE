@@ -2,6 +2,7 @@ package jaega.homecare.domain.caregiverPreference.entity;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.users.entity.Disease;
+import jaega.homecare.domain.users.entity.ServiceType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -67,7 +68,7 @@ public class CaregiverPreference {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "caregiver_supported_conditions", joinColumns = @JoinColumn(name = "caregiver_preference_id"))
     @Enumerated(EnumType.STRING)
-    @Column(name = "disease")
+    @Column(name = "supported_conditions")
     private Set<Disease> supportedConditions = new HashSet<>();
 
     // 선호 연령
@@ -82,11 +83,19 @@ public class CaregiverPreference {
     @Column(name = "preferred_gender")
     private PreferredGender preferredGender;
 
+    // 서비스 유형 (다중 선택 가능)
+    @ElementCollection(targetClass = ServiceType.class, fetch = FetchType.LAZY)
+    @CollectionTable(name = "service_type", joinColumns = @JoinColumn(name = "caregiver_preference_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "caregiver_service_type")
+    private Set<ServiceType> serviceTypes = new HashSet<>();
+
     @Builder
     public CaregiverPreference(UUID caregiverPreferenceId, Caregiver caregiver, Set<DayOfWeek> dayOfWeek,
                                LocalTime workStartTime, LocalTime workEndTime, Integer workMinTime, Integer workMaxTime,
                                Integer availableTime, String workArea, String transportation, Integer lunchBreak, Integer bufferTime,
-                               Set<Disease> supportedConditions, Integer preferredMaxAge, Integer preferredMinAge, PreferredGender preferredGender){
+                               Set<Disease> supportedConditions, Integer preferredMaxAge, Integer preferredMinAge, PreferredGender preferredGender,
+                               Set<ServiceType> serviceTypes){
         this.caregiverPreferenceId = caregiverPreferenceId;
         this.caregiver = caregiver;
         this.dayOfWeek = dayOfWeek;
@@ -103,6 +112,7 @@ public class CaregiverPreference {
         this.preferredMinAge = preferredMinAge;
         this.preferredMaxAge = preferredMaxAge;
         this.preferredGender = preferredGender;
+        this.serviceTypes = serviceTypes;
     }
 
     public void initializeCaregiverPreference(UUID caregiverPreferenceId){

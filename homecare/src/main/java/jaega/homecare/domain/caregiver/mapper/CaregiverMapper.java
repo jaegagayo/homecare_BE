@@ -4,6 +4,7 @@ import jaega.homecare.domain.caregiver.dto.req.CaregiverCreateRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
 import jaega.homecare.domain.users.entity.User;
 import org.mapstruct.Mapper;
@@ -22,7 +23,6 @@ public interface CaregiverMapper {
     @Mapping(target = "selfIntroduction", source = "request.selfIntroduction")
     @Mapping(target = "verifiedStatus", source = "request.verifiedStatus")
     @Mapping(target = "caregiverId", ignore = true)
-    @Mapping(target = "serviceTypes", ignore = true)
     Caregiver toEntity(CaregiverCreateRequest request, User user);
 
     @Mapping(target = "caregiverId", source = "caregiverId")
@@ -36,5 +36,6 @@ public interface CaregiverMapper {
     @Mapping(target = "email", source = "caregiver.user.email")
     @Mapping(target = "birthDate", source = "caregiver.user.birthDate")
     @Mapping(target = "phone", source = "caregiver.user.phone")
-    GetCaregiverProfileResponse toGetCaregiverProfile(Caregiver caregiver);
+    @Mapping(target = "serviceTypes", source = "preference.serviceTypes")
+    GetCaregiverProfileResponse toGetCaregiverProfile(Caregiver caregiver, CaregiverPreference preference);
 }
