@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/workMatch")
+@RequestMapping("/api/workLog")
 public class WorkLogControllerImpl implements WorkLogController {
     private final WorkLogQueryService workLogQueryService;
 

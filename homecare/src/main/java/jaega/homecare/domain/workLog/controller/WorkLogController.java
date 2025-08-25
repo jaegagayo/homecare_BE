@@ -63,8 +63,6 @@ public interface WorkLogController {
             @PathVariable UUID caregiverId
     );
 
-
-
     @Operation(summary = "근무 기록 조회 API", description = "근무 기록의 ID를 기반으로 정보를 조회합니다.")
     @ApiResponse(responseCode = "204", description = "근무 기록 ID 기반 조회 성공")
     @GetMapping
