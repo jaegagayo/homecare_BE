@@ -54,10 +54,10 @@ public class Consumer extends BaseTimeEntity {
     private String livingSituation;
 
     @Column(name = "guardian_name", nullable = false)
-    private String guardianName;
+    private String guardianName;                            // 보호자 이름
 
     @Column(name = "guardian_phone", nullable = false)
-    private String guardianPhone;
+    private String guardianPhone;                           // 보호자 연락처
 
     @Builder
     public Consumer(User user, UUID consumerId, String residentialAddress, String visitAddress, String entranceType,
