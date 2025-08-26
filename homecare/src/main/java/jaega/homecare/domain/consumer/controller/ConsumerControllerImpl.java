@@ -3,8 +3,6 @@ package jaega.homecare.domain.consumer.controller;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
-import jaega.homecare.domain.workLog.dto.req.CreateWorkLogRequest;
-import jaega.homecare.domain.workLog.service.command.WorkLogCommandService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
@@ -34,35 +32,41 @@ public class ConsumerControllerImpl implements ConsumerController {
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final ConsumerQueryService consumerQueryService;
 
+    /**
+     *
+     * 수요자 회원가입 API
+     */
     @Override
     public ResponseEntity<Void> createConsumer(@RequestBody ConsumerSignupRequest request) {
         consumerCommandService.signupConsumer(request);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     *
+     * 요양보호사 확정
+     */
     @Override
     public ResponseEntity<Void> confirmCaregiver(@RequestBody ConfirmCaregiverRequest request){
 
         ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(request.serviceRequestId());
 
-        CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(request.serviceRequestId(),
-                request.caregiverId(),
-                serviceRequest.getPreferredStartTime(),
-                serviceRequest.getPreferredEndTime(),
-                serviceRequest.getRequestDate());
-        serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
-
-        CreateWorkLogRequest createWorkLogRequest = new CreateWorkLogRequest(request.caregiverId(),
-                serviceRequest.getPreferredStartTime(),
-                serviceRequest.getPreferredEndTime(),
-                serviceRequest.getRequestDate(),
-                serviceRequest.getServiceAddress(),
-                request.distanceLog());
-        workLogCommandService.createWorkMatch(createWorkLogRequest);
-
+        serviceMatchCommandService.createServiceMatch(
+                new CreateServiceMatchRequest(
+                        request.serviceRequestId(),
+                        request.caregiverId(),
+                        serviceRequest.getPreferredStartTime(),
+                        serviceRequest.getPreferredEndTime(),
+                        serviceRequest.getRequestDate()
+                )
+        );
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     *
+     * 특정 수요자의 주간 스케줄 조회
+     */
     @Override
     public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@PathVariable UUID consumerId){
         LocalDate today = LocalDate.now();
@@ -70,6 +74,10 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     *
+     * 특정 스케줄 상세 조회
+     */
     @Override
     public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
         ConsumerScheduleDetailResponse response = consumerQueryService.getScheduleDetail(id);

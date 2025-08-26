@@ -35,11 +35,11 @@ public class CaregiverQueryRepository {
                 .selectFrom(caregiverCenter).distinct()
                 .join(caregiverCenter.caregiver, caregiver).fetchJoin()
                 .join(caregiver.user, user).fetchJoin()
-                .leftJoin(caregiver.serviceTypes).fetchJoin()
                 .where(caregiverCenter.center.centerId.eq(centerId))
                 .fetch();
 
         return caregiverCenters.stream()
+                .distinct()
                 .map(cc -> {
                     Caregiver c = cc.getCaregiver();
                     return new GetCaregiverResponse(

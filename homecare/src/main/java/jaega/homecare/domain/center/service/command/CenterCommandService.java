@@ -1,12 +1,10 @@
 package jaega.homecare.domain.center.service.command;
 
-import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
 import jaega.homecare.domain.center.dto.req.CenterLoginRequest;
 import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
-import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
 import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.mapper.CenterMapper;
@@ -16,13 +14,13 @@ import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.users.service.command.UserCommandService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,7 +30,6 @@ public class CenterCommandService {
 
     private final UserRepository userRepository;
     private final CenterMapper centerMapper;
-    private final CaregiverMapper caregiverMapper;
     private final PasswordEncoder passwordEncoder;
     private final CenterQueryService centerQueryService;
     private final UserCommandService userCommandService;
@@ -40,6 +37,7 @@ public class CenterCommandService {
     private final CaregiverCenterCommandService caregiverCenterCommandService;
 
     // 요양보호사 등록
+    @Transactional
     public void registerCaregiver(CreateCaregiverRequest createCaregiverRequest, UserRole role, UUID centerId) {
         Center center = centerQueryService.findCenterByUUID(centerId);
 
@@ -61,12 +59,11 @@ public class CenterCommandService {
 
         User user = userCommandService.createUser(request, UserRole.ROLE_CAREGIVER);
 
-        Caregiver caregiver = caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
-
-        caregiverCenterCommandService.createCaregiverCenter(center, caregiver);
+        caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
     }
 
     // 요양보호사 말소
+    @Transactional
     public void deregisterCaregiver(UUID centerId, UUID caregiverId) {
         CaregiverCenter caregiverCenter = caregiverCenterCommandService.getCaregiverCenterByAllId(centerId, caregiverId);
 

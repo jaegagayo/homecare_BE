@@ -5,7 +5,6 @@ import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
-import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.mapper.ServiceRequestMapper;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
 import jakarta.transaction.Transactional;

@@ -3,17 +3,17 @@ package jaega.homecare.domain.center.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jaega.homecare.domain.workLog.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.workLog.dto.res.GetCaregiverMatchesResponse;
-import jaega.homecare.domain.workLog.dto.res.GetDashboardSettlementResponse;
-import jaega.homecare.domain.workLog.dto.res.GetDashboardWorkStatusResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
+import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
+import jaega.homecare.domain.settlement.dto.res.GetDashboardSettlementResponse;
+import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.center.dto.req.*;
 import jaega.homecare.domain.center.dto.res.*;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.users.entity.ServiceType;
 import org.springframework.http.ResponseEntity;
@@ -53,18 +53,18 @@ public interface CenterController {
     @GetMapping("/{centerId}/caregiver")
     ResponseEntity<List<GetCaregiverResponse>> getAllCaregivers(@PathVariable UUID centerId);
 
-//    @Operation(summary = "배정 내역 전체 조회 API", description = "배정된 신청자-요양보호사 전체 목록을 최신순으로 조회합니다.")
-//    @ApiResponse(responseCode = "200", description = "요양 보호사 전체 조회 성공")
-//    @GetMapping("/{centerId}/assign")
-//    ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId);
+    @Operation(summary = "배정 내역 전체 조회 API", description = "배정된 신청자-요양보호사 전체 목록을 최신순으로 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양 보호사 전체 조회 성공")
+    @GetMapping("/{centerId}/assign")
+    ResponseEntity<List<GetServiceMatchByCenterResponse>> getAllMatchingResult(@PathVariable UUID centerId);
 
     @Operation(summary = "특정 요양 보호사의 매칭 스케줄 조회", description = "특정 요양 보호사의 매칭 스케줄들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 요양 보호사의 매칭 스케줄 조회 성공")
     @GetMapping("/schedule/{caregiverId}")
-    ResponseEntity<List<GetCaregiverMatchesResponse>> getWorkLogByCaregiver(@PathVariable UUID caregiverId);
+    ResponseEntity<List<GetCaregiverMatchesResponse>> getServiceMatchByCaregiver(@PathVariable UUID caregiverId);
 
-    @Operation(summary = "특정 년도, 월의 요양보호사 매칭 스케줄 조회", description = "특정 년도, 월에 해당하는 요양보호사의 스케줄을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "특정 년도, 월의 요양보호사 매칭 스케줄 조회")
+    @Operation(summary = "특정 년도, 월(필수), 일(선택) 의 요양보호사 매칭 스케줄 조회", description = "특정 년도, 월(필수), 일(선택) 의 요양보호사 매칭 스케줄 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 년도, 월, 일의 요양보호사 매칭 스케줄 조회")
     @GetMapping("/schedule/date")
     ResponseEntity<List<GetCaregiverMatchesByMonth>> getMatchesByMonth(
             @RequestParam UUID centerId,

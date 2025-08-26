@@ -7,8 +7,8 @@ import java.time.LocalTime;
 public record GetMatchingResultResponse(
         String consumerName,
         String caregiverName,
-        LocalDate workingDate,
-        LocalTime startTime,
-        LocalTime endTime
+        LocalDate serviceDate,
+        LocalTime serviceStartTime,
+        LocalTime serviceEndTime
 ) {
 }

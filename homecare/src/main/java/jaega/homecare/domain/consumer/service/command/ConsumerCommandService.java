@@ -8,7 +8,6 @@ import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.service.command.UserCommandService;
-import jaega.homecare.domain.users.service.query.UserQueryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
