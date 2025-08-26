@@ -43,16 +43,16 @@ public class RecurringOffer extends BaseTimeEntity {
     @Column(name = "day_of_week")
     private Set<DayOfWeek> dayOfWeek = new HashSet<>();
 
-    @JoinColumn(name = "service_start_date")
+    @Column(name = "service_start_date")
     private LocalDate serviceStartDate; // 서비스 시작 날짜
 
-    @JoinColumn(name = "service_end_date")
+    @Column(name = "service_end_date")
     private LocalDate serviceEndDate; // 서비스 종료 날짜
 
-    @JoinColumn(name = "service_start_time")
+    @Column(name = "service_start_time")
     private LocalTime serviceStartTime; // 서비스 시작 날짜
 
-    @JoinColumn(name = "service_end_time")
+    @Column(name = "service_end_time")
     private LocalTime serviceEndTime; // 서비스 종료 날짜
 
     @Enumerated(EnumType.STRING)

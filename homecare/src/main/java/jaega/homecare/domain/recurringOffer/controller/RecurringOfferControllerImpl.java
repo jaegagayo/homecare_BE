@@ -1,10 +1,7 @@
 package jaega.homecare.domain.recurringOffer.controller;
 
 import jaega.homecare.domain.recurringOffer.dto.req.CreateRecurringOfferRequest;
-import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailResponse;
-import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferResponse;
-import jaega.homecare.domain.recurringOffer.dto.res.GetRecommendRecurringOfferResponse;
-import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.*;
 import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +69,17 @@ public class RecurringOfferControllerImpl implements RecurringOfferController{
     @Override
     public ResponseEntity<List<GetUnreadRecurringOfferResponse>> getUnreadRecurringOffersForConsumer(@RequestParam UUID consumerId){
         List<GetUnreadRecurringOfferResponse> responses = recurringOfferQueryService.findByUnreadRecurringOffers(consumerId);
+        return ResponseEntity.ok(responses);
+    }
+
+    /**
+     *
+     * 요양보호사 ( Caregiver )
+     */
+
+    @Override
+    public ResponseEntity<List<GetRecurringOfferSummaryResponse>> getRecurringOfferSummaryByCaregiver(@RequestParam UUID caregiverId){
+        List<GetRecurringOfferSummaryResponse> responses = recurringOfferQueryService.findByRecurringOfferSummaryByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
     }
 

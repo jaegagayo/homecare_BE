@@ -2,10 +2,7 @@ package jaega.homecare.domain.recurringOffer.service.query;
 
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
-import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailResponse;
-import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferResponse;
-import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferResponse;
-import jaega.homecare.domain.recurringOffer.dto.res.GetRecommendRecurringOfferResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.*;
 import jaega.homecare.domain.recurringOffer.entity.RecurringOffer;
 import jaega.homecare.domain.recurringOffer.mapper.RecurringOfferMapper;
 import jaega.homecare.domain.recurringOffer.repository.RecurringOfferQueryRepository;
@@ -86,6 +83,10 @@ public class RecurringOfferQueryService {
         List<RecurringOffer> recurringOfferList = recurringOfferQueryRepository.findUnreadRecurringOffersByConsumer(consumerId);
 
         return recurringOfferMapper.toGetResponseByUnreadNotification(recurringOfferList);
+    }
+
+    public List<GetRecurringOfferSummaryResponse> findByRecurringOfferSummaryByCaregiver(UUID caregiverId){
+        return recurringOfferQueryRepository.findByRecurringOfferSummaryByCaregiver(caregiverId);
     }
 
     /**
