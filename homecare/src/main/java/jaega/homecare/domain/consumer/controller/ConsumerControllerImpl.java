@@ -9,7 +9,6 @@ import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
-import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
@@ -32,7 +31,6 @@ public class ConsumerControllerImpl implements ConsumerController {
     private final ConsumerCommandService consumerCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final WorkLogCommandService workLogCommandService;
-    private final ServiceMatchQueryService serviceMatchQueryService;
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final ConsumerQueryService consumerQueryService;
 

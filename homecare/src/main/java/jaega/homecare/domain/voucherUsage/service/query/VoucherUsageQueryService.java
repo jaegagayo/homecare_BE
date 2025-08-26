@@ -19,6 +19,7 @@ public class VoucherUsageQueryService {
     private final VoucherUsageQueryRepository voucherUsageQueryRepository;
     private final VoucherUsageMapper voucherUsageMapper;
 
+    // 바우처 사용 안내 조회
     public VoucherUsageGuideResponse getVoucherUsageGuide(UUID voucherId, Long totalVoucherAmount){
         Long usedAmount = voucherUsageQueryRepository.findTotalUsageAmountByVoucherId(voucherId);
         Long remainingAmount = totalVoucherAmount - usedAmount;
