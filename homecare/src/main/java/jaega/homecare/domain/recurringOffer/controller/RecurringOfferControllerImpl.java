@@ -83,4 +83,16 @@ public class RecurringOfferControllerImpl implements RecurringOfferController{
         return ResponseEntity.ok(responses);
     }
 
+    @Override
+    public ResponseEntity<Void> approveRecurringStatus(@RequestBody UUID recurringStatusId){
+        recurringOfferCommandService.approveRecurringStatus(recurringStatusId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> rejectRecurringStatus(@RequestParam UUID recurringStatusId){
+        recurringOfferCommandService.rejectRecurringStatus(recurringStatusId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -69,5 +69,13 @@ public interface RecurringOfferController {
     @GetMapping("/caregiver")
     ResponseEntity<List<GetCaregiverRecurringOfferSummaryResponse>> getRecurringOfferSummaryByCaregiver(@RequestParam UUID caregiverId);
 
+    @Operation(summary = "요양보호사의 정기 제안 승인 API", description = "요양보호사의 해당 정기 제안을 승인하여 일정에 반영합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 해당 정기 제안을 승인하여 일정 반영 성공")
+    @PostMapping("/caregiver/approve")
+    ResponseEntity<Void> approveRecurringStatus(@RequestBody UUID recurringStatusId);
 
+    @Operation(summary = "요양보호사의 정기 제안 거절 API", description = "요양보호사가 해당 정기 제안을 거절합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 해당 정기 제안을 거절 성공")
+    @PostMapping("/caregiver/reject")
+    ResponseEntity<Void> rejectRecurringStatus(@RequestParam UUID recurringStatusId);
 }

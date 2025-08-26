@@ -2,6 +2,8 @@ package jaega.homecare.domain.recurringOffer.entity;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.serviceRequest.entity.AddressType;
+import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -36,6 +38,17 @@ public class RecurringOffer extends BaseTimeEntity {
     @JoinColumn(name = "consumer_id")
     private Consumer consumer;
 
+    @Column(name = "service_address")
+    private String serviceAddress;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "address_type", nullable = false)
+    private AddressType addressType;
+
+    @Embedded
+    @Column(name = "location", nullable = false)
+    private Location location;
+
     // 근무 가능 요일
     @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "recurring_offer_day_of_week", joinColumns = @JoinColumn(name = "recurring_offer_id"))
@@ -68,12 +81,16 @@ public class RecurringOffer extends BaseTimeEntity {
 
     @Builder
     public RecurringOffer(UUID recurringOfferId, Caregiver caregiver, Consumer consumer,
+                          String serviceAddress, AddressType addressType, Location location,
                           Set<DayOfWeek> dayOfWeek, LocalDate serviceStartDate, LocalDate serviceEndDate,
                           LocalTime serviceStartTime, LocalTime serviceEndTime, ServiceType serviceType,
                           RecurringStatus recurringStatus, boolean recurringOfferUnread){
         this.recurringOfferId = recurringOfferId;
         this.caregiver = caregiver;
         this.consumer = consumer;
+        this.serviceAddress = serviceAddress;
+        this.addressType = addressType;
+        this.location = location;
         this.dayOfWeek = dayOfWeek;
         this.serviceStartDate = serviceStartDate;
         this.serviceEndDate = serviceEndDate;
@@ -88,6 +105,10 @@ public class RecurringOffer extends BaseTimeEntity {
 
     public void readRecurringOfferDetail(){
         this.recurringOfferUnread = false;
+    }
+
+    public void changeRecurringStatus(RecurringStatus recurringStatus){
+        this.recurringStatus = recurringStatus;
     }
 
 }

@@ -38,7 +38,7 @@ public class RecurringOfferQueryService {
 
     public GetRecurringOfferDetailResponse findRecurringOfferDetail(UUID recurringOfferId){
         RecurringOffer recurringOffer = getRecurringOffer(recurringOfferId);
-        recurringOfferCommandService.readRecurringOfferDetail(recurringOffer);
+        //recurringOfferCommandService.readRecurringOfferDetail(recurringOffer);
 
         int durationInSeconds = calculateDurationInSeconds(
                 recurringOffer.getServiceStartTime(),

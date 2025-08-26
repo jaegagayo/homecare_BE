@@ -3,6 +3,8 @@ package jaega.homecare.domain.recurringOffer.dto.res;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jaega.homecare.domain.recurringOffer.entity.RecurringStatus;
+import jaega.homecare.domain.serviceRequest.dto.req.LocationDto;
+import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.global.util.DurationSerializer;
 
@@ -16,6 +18,8 @@ public record GetRecurringOfferResponse(
         UUID recurringOfferId,
         UUID caregiverId,
         UUID consumerId,
+        String serviceAddress,
+        AddressType addressType,
         Set<DayOfWeek> dayOfWeek,
         LocalDate serviceStartDate,
         LocalDate serviceEndDate,
