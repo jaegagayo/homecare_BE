@@ -28,7 +28,6 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     private final ConsumerCommandService consumerCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
-    private final WorkLogCommandService workLogCommandService;
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final ConsumerQueryService consumerQueryService;
 
