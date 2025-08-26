@@ -1,13 +1,14 @@
 package jaega.homecare.domain.consumer.repository;
 
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.review.entity.QReview;
+import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.serviceRequest.entity.QServiceRequest;
 import jaega.homecare.domain.users.entity.QUser;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,10 +82,46 @@ public class ConsumerQueryRepository {
                 ))
                 .from(serviceMatch)
                 .join(serviceMatch.serviceRequest, serviceRequest)
-                .join(serviceRequest.consumer, consumer)
                 .join(serviceMatch.caregiver, caregiver)
                 .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
                 .where(serviceRequest.serviceRequestId.eq(serviceRequestId))
                 .fetchOne();
+    }
+
+    // Consumer의 가장 가까운 확정 일정 조회
+    public ConsumerNextScheduleResponse findNextSchedule(UUID consumerId) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser caregiverUser = caregiver.user;
+
+        return queryFactory.
+                select(Projections.constructor(
+                        ConsumerNextScheduleResponse.class,
+                        caregiverUser.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .join(serviceMatch.caregiver, caregiver)
+                .where(
+                        consumer.consumerId.eq(consumerId),
+                        serviceMatch.matchStatus.eq(MatchStatus.CONFIRMED),
+                        serviceMatch.serviceDate.after(LocalDate.now())
+                                .or(
+                                        serviceMatch.serviceDate.eq(LocalDate.now())
+                                            .and(serviceMatch.serviceStartTime.goe(LocalTime.now()))
+                                )
+                )
+                .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
+                .limit(1)
+                .fetchOne();
+
     }
 }

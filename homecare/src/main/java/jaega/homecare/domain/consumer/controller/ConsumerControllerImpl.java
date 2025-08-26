@@ -1,5 +1,6 @@
 package jaega.homecare.domain.consumer.controller;
 
+import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
@@ -82,5 +83,16 @@ public class ConsumerControllerImpl implements ConsumerController {
         ConsumerScheduleDetailResponse response = consumerQueryService.getScheduleDetail(id);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     *
+     * (메인 페이지) 가장 가까운 일정 조회
+     */
+    @Override
+    public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@PathVariable UUID id){
+        ConsumerNextScheduleResponse response = consumerQueryService.getNextSchedule(id);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
+import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import org.springframework.http.ResponseEntity;
@@ -36,4 +37,9 @@ public interface ConsumerController {
     @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")
     @GetMapping("/schedules/{consumerId}/{id}")
     ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id);
+
+    @Operation(summary = "(메인 페이지) 가장 가까운 스케줄 조회", description = "수요자의 메인 페이지에서 가장 가까운 스케줄을 조회합니다..")
+    @ApiResponse(responseCode = "200", description = "가까운 스케줄 조회 성공")
+    @GetMapping("{id}/home/next-schedule")
+    ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@PathVariable UUID id);
 }
