@@ -2,7 +2,6 @@ package jaega.homecare.domain.consumer.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
