@@ -54,15 +54,10 @@ public class RecurringOfferCommandService {
 
     }
 
-    public void readRecurringOfferDetail(RecurringOffer recurringOffer){
-        recurringOffer.readRecurringOfferDetail();
-    }
-
     /**
      * 요양보호사 ( caregiver)
      */
 
-    @Transactional
     public void approveRecurringStatus(UUID recurringOfferId) {
         // 1️⃣ RecurringOffer 조회 및 상태 변경
         RecurringOffer recurringOffer = recurringOfferQueryService.getRecurringOffer(recurringOfferId);
@@ -100,7 +95,6 @@ public class RecurringOfferCommandService {
         }
     }
 
-    @Transactional
     public void rejectRecurringStatus(UUID recurringStatusId){
         RecurringOffer recurringOffer = recurringOfferQueryService.getRecurringOffer(recurringStatusId);
         recurringOffer.changeRecurringStatus(RecurringStatus.REJECTED);

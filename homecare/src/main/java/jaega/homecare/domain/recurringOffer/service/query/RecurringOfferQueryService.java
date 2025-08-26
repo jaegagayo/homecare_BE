@@ -10,6 +10,7 @@ import jaega.homecare.domain.recurringOffer.repository.RecurringOfferRepository;
 import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,6 @@ public class RecurringOfferQueryService {
     private final RecurringOfferRepository recurringOfferRepository;
     private final RecurringOfferQueryRepository recurringOfferQueryRepository;
     private final ServiceMatchQueryRepository serviceMatchQueryRepository;
-    private final RecurringOfferCommandService recurringOfferCommandService;
     private final ConsumerQueryService consumerQueryService;
 
     public RecurringOffer getRecurringOffer(UUID recurringOfferId){
@@ -36,9 +36,15 @@ public class RecurringOfferQueryService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 정기 제안서 입니다"));
     }
 
+    @Transactional
     public GetRecurringOfferDetailResponse findRecurringOfferDetail(UUID recurringOfferId){
         RecurringOffer recurringOffer = getRecurringOffer(recurringOfferId);
-        //recurringOfferCommandService.readRecurringOfferDetail(recurringOffer);
+
+        // 조회 시 읽음 처리
+        if (recurringOffer.markAsReadIfUnread()) {
+            // CommandService 대신 직접 Repository 사용
+            recurringOfferRepository.save(recurringOffer);
+        }
 
         int durationInSeconds = calculateDurationInSeconds(
                 recurringOffer.getServiceStartTime(),

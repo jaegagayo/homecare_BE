@@ -103,8 +103,12 @@ public class RecurringOffer extends BaseTimeEntity {
         this.recurringOfferId = recurringOfferId;
     }
 
-    public void readRecurringOfferDetail(){
-        this.recurringOfferUnread = false;
+    public boolean markAsReadIfUnread() {
+        if (this.recurringOfferUnread) {
+            this.recurringOfferUnread = false;
+            return true;
+        }
+        return false;
     }
 
     public void changeRecurringStatus(RecurringStatus recurringStatus){
