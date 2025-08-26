@@ -10,6 +10,8 @@ import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
+import jaega.homecare.domain.caregiverPreference.entity.QCaregiverPreference;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.recurringOffer.entity.QRecurringOffer;
@@ -157,8 +159,8 @@ public class ServiceMatchQueryRepository {
 
         List<Tuple> result = queryFactory
                 .select(
-                        caregiver.countDistinct(), // 센터의 오늘 매칭이 배정, 완료된 요양보호사 수 조회
-                        ExpressionUtils.as(
+                        caregiver.countDistinct(), // 총 요양보호사 수
+                        ExpressionUtils.as( // 오늘 배정된 요양보호사 수
                                 JPAExpressions
                                         .select(serviceMatch.caregiver.countDistinct())
                                         .from(serviceMatch)
@@ -167,33 +169,47 @@ public class ServiceMatchQueryRepository {
                                         .where(
                                                 caregiverCenter.center.centerId.eq(centerId)
                                                         .and(serviceMatch.serviceDate.eq(date))
-                                                        .and(serviceMatch.matchStatus.in(MatchStatus.PENDING, MatchStatus.CONFIRMED))
-                                        ), "assignedCaregivers"
+                                                        .and(serviceMatch.matchStatus.in(MatchStatus.CONFIRMED))
+                                        ),
+                                "assignedCaregivers"
                         ),
-                        ExpressionUtils.as( // 매칭이 있으나 오늘이 아닌 요양보호사 수 조회
+                        ExpressionUtils.as( // 오늘 이후 배정 대기 중인 요양보호사 수 (PENDING 상태)
                                 JPAExpressions
-                                        .select(serviceMatch.count())
+                                        .select(serviceMatch.caregiver.countDistinct())
                                         .from(serviceMatch)
-                                        .where(serviceMatch.matchStatus.eq(MatchStatus.PENDING)
-                                                .and(serviceMatch.serviceDate.eq(date))), "waitingApplicants"
+                                        .join(serviceMatch.caregiver, caregiver)
+                                        .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                                        .where(
+                                                caregiverCenter.center.centerId.eq(centerId)
+                                                        .and(serviceMatch.matchStatus.eq(MatchStatus.PENDING))
+                                                        .and(serviceMatch.serviceDate.goe(date))
+                                        ),
+                                "waitingApplicants"
+                        ),
+                        ExpressionUtils.as( // 오늘 이후 매칭이 없는 미배정 요양보호사 수
+                                JPAExpressions
+                                        .select(caregiver.countDistinct())
+                                        .from(caregiver)
+                                        .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                                        .where(
+                                                caregiverCenter.center.centerId.eq(centerId)
+                                                        .and(caregiverCenter.status.eq(CaregiverStatus.ACTIVE))
+                                                        .and(
+                                                                JPAExpressions
+                                                                        .selectOne()
+                                                                        .from(serviceMatch)
+                                                                        .where(
+                                                                                serviceMatch.caregiver.eq(caregiver)
+                                                                                        .and(serviceMatch.serviceDate.goe(date)) // Corrected: Use goe for "on or after today"
+                                                                                        .and(serviceMatch.matchStatus.in(MatchStatus.PENDING, MatchStatus.CONFIRMED))
+                                                                        )
+                                                                        .notExists()
+                                                        )
+                                        ),
+                                "unassignedCaregivers"
                         )
                 )
                 .from(caregiver)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(caregiverCenter.center.centerId.eq(centerId))
-                .fetch();
-
-        Tuple row = result.get(0);
-        return new DashboardStats(row.get(0, Long.class), row.get(1, Long.class), row.get(2, Long.class));
-    }
-    // 요양 보호사 대시보드의 근무지 별 분포 통계 조회
-    public List<WorkPlaceDistribution> getWorkPlaceDistributionByServiceType(UUID centerId) {
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-
-        // 센터 소속 활동 중인 요양보호사 조회 (fetch join으로 serviceTypes 포함)
-        List<Caregiver> caregivers = queryFactory
-                .selectFrom(caregiver)
                 .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
                 .where(
                         caregiverCenter.center.centerId.eq(centerId),
@@ -201,18 +217,51 @@ public class ServiceMatchQueryRepository {
                 )
                 .fetch();
 
-        if (caregivers.isEmpty()) {
+        Tuple row = result.get(0);
+        return new DashboardStats(
+                row.get(0, Long.class), // total caregivers
+                row.get(1, Long.class), // assignedCaregivers
+                row.get(2, Long.class), // waitingApplicants
+                row.get(3, Long.class)  // unassignedCaregivers
+        );
+    }
+
+    // 요양 보호사 대시보드의 근무지 별 분포 통계 조회
+    public List<WorkPlaceDistribution> getWorkPlaceDistributionByServiceType(UUID centerId) {
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+        QCaregiverPreference preference = QCaregiverPreference.caregiverPreference;
+
+        // 센터 소속 활동 중인 요양보호사 + Preference 조회
+        List<Tuple> results = queryFactory
+                .select(caregiver, preference)
+                .from(caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .leftJoin(preference).on(preference.caregiver.eq(caregiver))
+                .where(
+                        caregiverCenter.center.centerId.eq(centerId),
+                        caregiverCenter.status.eq(CaregiverStatus.ACTIVE)
+                )
+                .fetch();
+
+        if (results.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // ServiceType별 카운트 계산
         Map<ServiceType, Long> serviceTypeCount = new HashMap<>();
-        for (Caregiver cg : caregivers) {
-            Set<ServiceType> serviceTypes = cg.getServiceTypes(); // 이미 Set<ServiceType>
-            if (serviceTypes != null) {
-                for (ServiceType st : serviceTypes) {
-                    serviceTypeCount.put(st, serviceTypeCount.getOrDefault(st, 0L) + 1);
-                }
+
+        for (Tuple tuple : results) {
+            Caregiver cg = tuple.get(caregiver);
+            CaregiverPreference pref = tuple.get(preference);
+
+            // Caregiver + Preference 서비스 타입 합집합
+            Set<ServiceType> combined = new HashSet<>();
+            if (pref.getServiceTypes() != null) combined.addAll(pref.getServiceTypes());
+            if (pref != null && pref.getServiceTypes() != null) combined.addAll(pref.getServiceTypes());
+
+            // 카운트 증가
+            for (ServiceType st : combined) {
+                serviceTypeCount.put(st, serviceTypeCount.getOrDefault(st, 0L) + 1);
             }
         }
 

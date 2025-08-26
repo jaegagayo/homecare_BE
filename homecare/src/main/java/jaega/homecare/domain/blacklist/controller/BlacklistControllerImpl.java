@@ -1,9 +1,9 @@
-package jaega.homecare.domain.Blacklist.controller;
+package jaega.homecare.domain.blacklist.controller;
 
-import jaega.homecare.domain.Blacklist.dto.req.CreateBlacklistByConsumerRequest;
-import jaega.homecare.domain.Blacklist.dto.res.GetBlacklistByConsumerResponse;
-import jaega.homecare.domain.Blacklist.service.command.BlacklistCommandService;
-import jaega.homecare.domain.Blacklist.service.query.BlacklistQueryService;
+import jaega.homecare.domain.blacklist.dto.req.CreateBlacklistByConsumerRequest;
+import jaega.homecare.domain.blacklist.dto.res.GetBlacklistByConsumerResponse;
+import jaega.homecare.domain.blacklist.service.command.BlacklistCommandService;
+import jaega.homecare.domain.blacklist.service.query.BlacklistQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

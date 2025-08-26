@@ -1,10 +1,10 @@
-package jaega.homecare.domain.Blacklist.controller;
+package jaega.homecare.domain.blacklist.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jaega.homecare.domain.Blacklist.dto.req.CreateBlacklistByConsumerRequest;
-import jaega.homecare.domain.Blacklist.dto.res.GetBlacklistByConsumerResponse;
+import jaega.homecare.domain.blacklist.dto.req.CreateBlacklistByConsumerRequest;
+import jaega.homecare.domain.blacklist.dto.res.GetBlacklistByConsumerResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

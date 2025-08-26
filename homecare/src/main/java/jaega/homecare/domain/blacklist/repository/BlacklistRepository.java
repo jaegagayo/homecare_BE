@@ -1,6 +1,6 @@
-package jaega.homecare.domain.Blacklist.repository;
+package jaega.homecare.domain.blacklist.repository;
 
-import jaega.homecare.domain.Blacklist.entity.Blacklist;
+import jaega.homecare.domain.blacklist.entity.Blacklist;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

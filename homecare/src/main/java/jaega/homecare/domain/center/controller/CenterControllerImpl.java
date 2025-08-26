@@ -6,7 +6,6 @@ import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterRespons
 import jaega.homecare.domain.settlement.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
-import jaega.homecare.domain.caregiver.dto.req.CreateCertificationRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
@@ -20,7 +19,6 @@ import jaega.homecare.domain.center.service.command.CenterCommandService;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.users.entity.ServiceType;
-import jaega.homecare.domain.users.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,15 +51,19 @@ public class CenterControllerImpl implements CenterController{
         return ResponseEntity.ok(response);
     }
 
+
     /**
      *
      * 요양보호사 등록 API
      */
+    /*
     @Override
     public ResponseEntity<Void> registerCaregiver(@RequestBody CreateCaregiverRequest createCaregiverRequest, @PathVariable UUID centerId){
-        centerCommandService.registerCaregiver(createCaregiverRequest, UserRole.ROLE_CAREGIVER, centerId);
+        centerCommandService.registerCaregiver(createCaregiverRequest7, UserRole.ROLE_CAREGIVER, centerId);
         return ResponseEntity.noContent().build();
     }
+
+     */
 
     /**
      *
@@ -70,16 +72,6 @@ public class CenterControllerImpl implements CenterController{
     @Override
     public ResponseEntity<Void> deregisterCaregiver(UUID centerId, UUID caregiverId) {
         centerCommandService.deregisterCaregiver(centerId, caregiverId);
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
-     *
-     * 보호사 상세 정보 등록 API
-     */
-    @Override
-    public ResponseEntity<Void> createCaregiverProfile(@RequestBody CreateCaregiverProfileRequest request){
-        caregiverCommandService.createCaregiverProfile(request);
         return ResponseEntity.noContent().build();
     }
 
@@ -158,16 +150,6 @@ public class CenterControllerImpl implements CenterController{
                                                                                              @RequestParam Set<ServiceType> serviceTypes){
         List<GetCaregiverByServiceTypeResponse> responses = caregiverQueryService.getCaregiverByServiceType(centerId, serviceTypes);
         return ResponseEntity.ok(responses);
-    }
-
-    /**
-     *
-     * 요양보호사의 자격증 생성 API
-     */
-    @Override
-    public ResponseEntity<Void> createCertification(@RequestBody CreateCertificationRequest request){
-        certificationCommandService.createCertification(request);
-        return ResponseEntity.noContent().build();
     }
 
     /**

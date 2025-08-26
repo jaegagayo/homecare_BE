@@ -1,4 +1,4 @@
-package jaega.homecare.domain.Blacklist.dto.res;
+package jaega.homecare.domain.blacklist.dto.res;
 
 import java.util.UUID;
 

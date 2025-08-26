@@ -1,12 +1,12 @@
-package jaega.homecare.domain.Blacklist.service.command;
+package jaega.homecare.domain.blacklist.service.command;
 
-import jaega.homecare.domain.Blacklist.dto.req.CreateBlacklistByConsumerRequest;
-import jaega.homecare.domain.Blacklist.entity.Blacklist;
-import jaega.homecare.domain.Blacklist.mapper.BlacklistMapper;
-import jaega.homecare.domain.Blacklist.repository.BlacklistRepository;
+import jaega.homecare.domain.blacklist.dto.req.CreateBlacklistByConsumerRequest;
+import jaega.homecare.domain.blacklist.entity.Blacklist;
+import jaega.homecare.domain.blacklist.mapper.BlacklistMapper;
+import jaega.homecare.domain.blacklist.repository.BlacklistRepository;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
-import jaega.homecare.domain.Blacklist.service.query.BlacklistQueryService;
+import jaega.homecare.domain.blacklist.service.query.BlacklistQueryService;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jakarta.transaction.Transactional;

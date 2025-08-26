@@ -1,17 +1,14 @@
 package jaega.homecare.domain.caregiver.service.command;
 
+import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
+import jaega.homecare.domain.caregiver.dto.req.CaregiverCreateRequest;
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiver.entity.Certification;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
-import jaega.homecare.domain.caregiver.repository.CertificationRepository;
-import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
-import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
-import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
-import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
-import jaega.homecare.domain.center.entity.Center;
-import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.users.entity.User;
+import jaega.homecare.domain.users.entity.UserRole;
+import jaega.homecare.domain.users.service.command.UserCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,39 +22,21 @@ public class CaregiverCommandService {
 
     private final CaregiverMapper caregiverMapper;
     private final CaregiverRepository caregiverRepository;
-    private final CaregiverQueryService caregiverQueryService;
-    private final CertificationRepository certificationRepository;
-    private final CenterQueryService centerQueryService;
-    private final CaregiverCenterCommandService caregiverCenterCommandService;
+    private final CertificationCommandService certificationCommandService;
+    private final UserCommandService userCommandService;
 
-    // TODO: 기존 : 센터에서 요양보호사 생성, 변경 필요 : 요양보호사가 직접 회원가입 후 센터 선택
-    // TODO: 자격증 데이터만 생성하고 후에, 변경하는 것으로 되어있으나 자격증도 같이 등록하면 될듯 합니다!
-    public Caregiver createCaregiver(CreateCaregiverRequest createCaregiverRequest, User user, UUID centerId) {
-        String address = createCaregiverRequest.address();
-        Center center = centerQueryService.findCenterByUUID(centerId);
-        Caregiver caregiver = caregiverMapper.toEntity(address, user);
-        caregiver.initializeCaregiver(UUID.randomUUID());
-
-        // 자격증 기본 정보 없이 생성
-        Certification certification = Certification.builder()
-                .certificationId(UUID.randomUUID())
-                .caregiver(caregiver)
-                .certificationNumber(null)
-                .certificationDate(null)
-                .trainStatus(false)
-                .build();
-
-        certificationRepository.save(certification);
-        caregiverCenterCommandService.createCaregiverCenter(center, caregiver);
-
-        return caregiverRepository.save(caregiver);
+    public GetCaregiverSignupResponse signupCaregiver(CaregiverSignupRequest request){
+        User user = userCommandService.createUser(request.user(), UserRole.ROLE_CAREGIVER);
+        Caregiver caregiver = createCaregiver(request.caregiver(), user);
+        certificationCommandService.createCertification(request.certification(), caregiver);
+        return caregiverMapper.toGetCaregiverSignup(caregiver);
     }
 
-    public void createCaregiverProfile(CreateCaregiverProfileRequest request){
-        Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
-        caregiver.setCaregiverProfile(request);
+    public Caregiver createCaregiver(CaregiverCreateRequest request, User user) {
+        Caregiver caregiver = caregiverMapper.toEntity(request, user);
+        caregiver.initializeCaregiver(UUID.randomUUID());
 
-        caregiverRepository.save(caregiver);
+        return caregiverRepository.save(caregiver);
     }
 
 }

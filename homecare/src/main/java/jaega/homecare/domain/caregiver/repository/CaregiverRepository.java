@@ -13,6 +13,10 @@ import java.util.UUID;
 public interface CaregiverRepository extends JpaRepository<Caregiver, Long>{
     Optional<Caregiver> findByCaregiverId(UUID caregiverId);
 
-    @Query("select c.caregiverId, st from Caregiver c join c.serviceTypes st where c.caregiverId in :caregiverIds")
+    @Query("select c.caregiverId, st " +
+            "from Caregiver c " +
+            "left join CaregiverPreference pref on pref.caregiver = c " +
+            "join pref.serviceTypes st " +
+            "where c.caregiverId in :caregiverIds")
     List<Object[]> findServiceTypesByCaregiverIds(@Param("caregiverIds") Set<UUID> caregiverIds);
 }

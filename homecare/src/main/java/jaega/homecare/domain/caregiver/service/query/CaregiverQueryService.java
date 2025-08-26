@@ -1,11 +1,15 @@
 package jaega.homecare.domain.caregiver.service.query;
 
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.mapper.CaregiverMapper;
 import jaega.homecare.domain.caregiver.repository.CaregiverQueryRepository;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
+import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
@@ -26,17 +30,25 @@ import java.util.UUID;
 public class CaregiverQueryService {
 
     private final CenterQueryService centerQueryService;
+    private final CaregiverPreferenceQueryService caregiverPreferenceQueryService;
     private final CaregiverQueryRepository caregiverQueryRepository;
     private final CaregiverRepository caregiverRepository;
     private final CaregiverMapper caregiverMapper;
 
-    public List<GetCaregiverResponse> getAllCaregiversByCenter(UUID centerId) {
-        return caregiverQueryRepository.findAllByCenterId(centerId);
-    }
-
     public Caregiver getCaregiver(UUID caregiverId){
         return caregiverRepository.findByCaregiverId(caregiverId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 요양보호사입니다."));
+    }
+
+    public GetCaregiverVerifiedStatusResponse getCaregiverVerifiedStatus(UUID caregiverId){
+        Caregiver caregiver = getCaregiver(caregiverId);
+        return caregiverMapper.toGetCaregiverVerifiedStatus(caregiver);
+    }
+
+    // 센터(웹 페이지) 조회
+
+    public List<GetCaregiverResponse> getAllCaregiversByCenter(UUID centerId) {
+        return caregiverQueryRepository.findAllByCenterId(centerId);
     }
 
     public List<GetCaregiverByCaregiverStatusResponse> getCaregiverByWorkStatus(UUID centerId, CaregiverStatus status){
@@ -49,7 +61,8 @@ public class CaregiverQueryService {
 
     public GetCaregiverProfileResponse getCaregiverProfile(UUID caregiverId){
         Caregiver caregiver = getCaregiver(caregiverId);
-        return caregiverMapper.toGetCaregiverProfile(caregiver);
+        CaregiverPreference caregiverPreference = caregiverPreferenceQueryService.findCaregiverPreferenceByCaregiver(caregiverId);
+        return caregiverMapper.toGetCaregiverProfile(caregiver, caregiverPreference);
     }
 
 

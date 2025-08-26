@@ -1,8 +1,5 @@
 package jaega.homecare.domain.caregiver.entity;
 
-import jaega.homecare.domain.center.dto.req.CreateCaregiverProfileRequest;
-import jaega.homecare.domain.users.entity.Location;
-import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -10,10 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -43,45 +37,39 @@ public class Caregiver extends BaseTimeEntity {
     @Column(name = "address")
     private String address;
 
-    @Embedded
-    private Location location;
+    @Column(name = "career")
+    private Integer career;
 
-    // 서비스 유형 (다중 선택 가능)
-    @ElementCollection(targetClass = ServiceType.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "service_type", joinColumns = @JoinColumn(name = "caregiver_id"))
     @Enumerated(EnumType.STRING)
-    @Column(name = "service_type")
-    private Set<ServiceType> serviceTypes = new HashSet<>();
+    @Column(name = "korean_proficiency")
+    private KoreanProficiency koreanProficiency;
 
-    // 근무 가능 요일
-    @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "caregiver_day_of_week", joinColumns = @JoinColumn(name = "caregiver_id"))
+    @Column(name = "is_accompany_outing")
+    private boolean isAccompanyOuting;
+
+    @Column(name = "self_introduction", length = 1000)
+    private String selfIntroduction;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "day_of_week")
-    private Set<DayOfWeek> dayOfWeek = new HashSet<>();
+    private VerifiedStatus verifiedStatus;
 
     @Builder
-    public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime, String address, Location location, Set<ServiceType> serviceTypes, Set<DayOfWeek> dayOfWeek) {
+    public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime,
+                     String address, Integer career,
+                     KoreanProficiency koreanProficiency, boolean isAccompanyOuting, String selfIntroduction, VerifiedStatus verifiedStatus) {
         this.caregiverId = caregiverId;
         this.user = user;
         this.availableStartTime = availableStartTime;
         this.availableEndTime = availableEndTime;
         this.address = address;
-        this.location = location;
-        this.serviceTypes = serviceTypes;
-        this.dayOfWeek = dayOfWeek;
+        this.career = career;
+        this.koreanProficiency = koreanProficiency;
+        this.isAccompanyOuting = isAccompanyOuting;
+        this.selfIntroduction = selfIntroduction;
+        this.verifiedStatus = VerifiedStatus.PENDING;
     }
 
     public void initializeCaregiver(UUID uuid) {
         this.caregiverId = uuid;
-    }
-
-    public void setCaregiverProfile(CreateCaregiverProfileRequest request){
-        this.availableStartTime = request.availableStartTIme();
-        this.availableEndTime = request.availableEndTime();
-        this.address = request.address();
-        this.location = request.location();
-        this.serviceTypes = request.serviceTypes();
-        this.dayOfWeek = request.dayOfWeek();
     }
 }

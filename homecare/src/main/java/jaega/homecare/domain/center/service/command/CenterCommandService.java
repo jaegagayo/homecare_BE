@@ -4,14 +4,11 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
 import jaega.homecare.domain.center.dto.req.CenterLoginRequest;
-import jaega.homecare.domain.center.dto.req.CreateCaregiverRequest;
 import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.mapper.CenterMapper;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
-import jaega.homecare.domain.users.dto.req.UserCreateRequest;
 import jaega.homecare.domain.users.entity.User;
-import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.users.service.command.UserCommandService;
 import jakarta.transaction.Transactional;
@@ -36,6 +33,8 @@ public class CenterCommandService {
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverCenterCommandService caregiverCenterCommandService;
 
+    // TODO : 추후, 기능 재검토 시 요양보호사 등록이 필요없을 수 있음!
+    /*
     // 요양보호사 등록
     @Transactional
     public void registerCaregiver(CreateCaregiverRequest createCaregiverRequest, UserRole role, UUID centerId) {
@@ -61,6 +60,8 @@ public class CenterCommandService {
 
         caregiverCommandService.createCaregiver(createCaregiverRequest, user, centerId);
     }
+
+     */
 
     // 요양보호사 말소
     @Transactional

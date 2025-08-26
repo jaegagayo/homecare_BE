@@ -1,8 +1,8 @@
-package jaega.homecare.domain.Blacklist.mapper;
+package jaega.homecare.domain.blacklist.mapper;
 
-import jaega.homecare.domain.Blacklist.dto.req.CreateBlacklistByConsumerRequest;
-import jaega.homecare.domain.Blacklist.dto.res.GetBlacklistByConsumerResponse;
-import jaega.homecare.domain.Blacklist.entity.Blacklist;
+import jaega.homecare.domain.blacklist.dto.req.CreateBlacklistByConsumerRequest;
+import jaega.homecare.domain.blacklist.dto.res.GetBlacklistByConsumerResponse;
+import jaega.homecare.domain.blacklist.entity.Blacklist;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import org.mapstruct.Mapper;

@@ -2,11 +2,16 @@ package jaega.homecare.global.dummy.service;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.Certification;
+import jaega.homecare.domain.caregiver.entity.KoreanProficiency;
+import jaega.homecare.domain.caregiver.entity.VerifiedStatus;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiver.repository.CertificationRepository;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
+import jaega.homecare.domain.caregiverPreference.entity.PreferredGender;
+import jaega.homecare.domain.caregiverPreference.repository.CaregiverPreferenceRepository;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.repository.CenterRepository;
 import jaega.homecare.domain.consumer.entity.CognitiveStatus;
@@ -42,6 +47,7 @@ public class DummyDataService {
     private final CaregiverCenterRepository caregiverCenterRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
+    private final CaregiverPreferenceRepository caregiverPreferenceRepository;
 
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final SettlementCommandService settlementCommandService;
@@ -106,13 +112,11 @@ public class DummyDataService {
         centerRepository.save(center);
     }
 
-    private void createDummyCaregiver(int index, List<User> caregivers) {
-        // 인덱스 13 예외 해결:
-        // 파라미터로 넘어온 caregivers 리스트를 사용
-        User user = caregivers.get(index);
-
+    private void createDummyCaregiver(int index, List<User> users) {
+        User user = users.get(index);
         Center center = centerRepository.findAll().get(0);
 
+        // 근무 시간 랜덤 생성
         LocalTime startTime, endTime;
         int timeSlot = random.nextInt(3);
         if (timeSlot == 0) {
@@ -126,40 +130,23 @@ public class DummyDataService {
             endTime = LocalTime.of(20, 0);
         }
 
-        Set<ServiceType> serviceTypes = new HashSet<>();
-        serviceTypes.add(ServiceType.values()[random.nextInt(ServiceType.values().length)]);
-        if (random.nextBoolean()) {
-            serviceTypes.add(ServiceType.values()[random.nextInt(ServiceType.values().length)]);
-        }
-
-        Set<DayOfWeek> dayOfWeek = new HashSet<>();
-        if (random.nextBoolean()) {
-            dayOfWeek.add(DayOfWeek.values()[random.nextInt(7)]);
-        }
-
+        // Caregiver 생성
         Caregiver caregiver = Caregiver.builder()
                 .caregiverId(UUID.randomUUID())
                 .user(user)
                 .availableStartTime(startTime)
                 .availableEndTime(endTime)
                 .address("서울시 송파구 올림픽로 " + index)
-                .location(new Location(37.514 + random.nextDouble() * 0.1, 86.106 + random.nextDouble() * 0.1))
-                .serviceTypes(serviceTypes)
-                .dayOfWeek(dayOfWeek)
+                .career(1 + random.nextInt(20)) // 경력 1~20년
+                .koreanProficiency(KoreanProficiency.values()[random.nextInt(KoreanProficiency.values().length)])
+                .isAccompanyOuting(random.nextBoolean())
+                .selfIntroduction("안녕하세요! 요양보호사 " + user.getName() + "입니다.")
+                .verifiedStatus(VerifiedStatus.PENDING)
                 .build();
         caregiverRepository.save(caregiver);
 
-        // 상태 랜덤 생성
-        CaregiverStatus status;
-        int statusRandom = random.nextInt(3);
-        if (statusRandom == 0) {
-            status = CaregiverStatus.ACTIVE;
-        } else if (statusRandom == 1) {
-            status = CaregiverStatus.INACTIVE;
-        } else {
-            status = CaregiverStatus.RESIGNED;
-        }
-
+        // CaregiverCenter 생성 (상태 랜덤)
+        CaregiverStatus status = CaregiverStatus.values()[random.nextInt(CaregiverStatus.values().length)];
         CaregiverCenter caregiverCenter = CaregiverCenter.builder()
                 .caregiverCenterId(UUID.randomUUID())
                 .caregiver(caregiver)
@@ -168,11 +155,56 @@ public class DummyDataService {
                 .build();
         caregiverCenterRepository.save(caregiverCenter);
 
+        // 서비스 타입 랜덤
+        Set<ServiceType> serviceTypes = new HashSet<>();
+        serviceTypes.add(ServiceType.values()[random.nextInt(ServiceType.values().length)]);
+        if (random.nextBoolean()) {
+            serviceTypes.add(ServiceType.values()[random.nextInt(ServiceType.values().length)]);
+        }
+
+        // 근무 가능 요일 랜덤
+        Set<DayOfWeek> dayOfWeek = new HashSet<>();
+        int numDays = 1 + random.nextInt(5); // 1~5일 랜덤
+        while (dayOfWeek.size() < numDays) {
+            dayOfWeek.add(DayOfWeek.values()[random.nextInt(7)]);
+        }
+
+        // 지원 가능 질환 랜덤
+        Set<Disease> supportedConditions = new HashSet<>();
+        if (random.nextBoolean()) supportedConditions.add(Disease.DEMENTIA); // 치매
+        if (random.nextBoolean()) supportedConditions.add(Disease.BEDRIDDEN); // 와상
+
+        // CaregiverPreference 생성
+        CaregiverPreference preference = CaregiverPreference.builder()
+                .caregiverPreferenceId(UUID.randomUUID())
+                .caregiver(caregiver)
+                .serviceTypes(serviceTypes)
+                .dayOfWeek(dayOfWeek)
+                .workStartTime(startTime)
+                .workEndTime(endTime)
+                .workMinTime(2 + random.nextInt(2))      // 최소 근무시간 2~3시간
+                .workMaxTime(4 + random.nextInt(4))      // 최대 근무시간 4~7시간
+                .availableTime(30 + random.nextInt(91))  // 이동 가능 시간 30~120분
+                .workArea("서울시 송파구")                // 근무 가능 지역
+                .transportation(random.nextBoolean() ? "자가차량" : "대중교통")
+                .lunchBreak(30)                           // 점심시간 30분
+                .bufferTime(15)                           // 이동 시간 제외 버퍼 15분
+                .supportedConditions(supportedConditions)
+                .preferredMinAge(40 + random.nextInt(20))  // 선호 최소 연령 40~59
+                .preferredMaxAge(60 + random.nextInt(20))  // 선호 최대 연령 60~79
+                .preferredGender(PreferredGender.values()[random.nextInt(PreferredGender.values().length)])
+                .build();
+
+        caregiverPreferenceRepository.save(preference);
+
+        // Certification 생성 (기존 유지)
         Certification certification = Certification.builder()
                 .certificationId(UUID.randomUUID())
                 .caregiver(caregiver)
                 .certificationNumber("CERT-2025-" + String.format("%04d", index))
-                .certificationDate(LocalDate.of(2020 + random.nextInt(5), random.nextInt(12) + 1, random.nextInt(28) + 1))
+                .certificationDate(LocalDate.of(2020 + random.nextInt(5),
+                        1 + random.nextInt(12),
+                        1 + random.nextInt(28)))
                 .trainStatus(random.nextBoolean())
                 .build();
         certificationRepository.save(certification);
