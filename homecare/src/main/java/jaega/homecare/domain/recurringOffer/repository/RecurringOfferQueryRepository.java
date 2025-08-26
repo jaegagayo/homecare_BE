@@ -1,7 +1,7 @@
 package jaega.homecare.domain.recurringOffer.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferSummaryResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.GetCaregiverRecurringOfferSummaryResponse;
 import jaega.homecare.domain.recurringOffer.entity.QRecurringOffer;
 import jaega.homecare.domain.recurringOffer.entity.RecurringOffer;
 import jaega.homecare.domain.recurringOffer.entity.RecurringStatus;
@@ -42,7 +42,7 @@ public class RecurringOfferQueryRepository {
      */
 
 
-    public List<GetRecurringOfferSummaryResponse> findByRecurringOfferSummaryByCaregiver(UUID caregiverId) {
+    public List<GetCaregiverRecurringOfferSummaryResponse> findByRecurringOfferSummaryByCaregiver(UUID caregiverId) {
         QRecurringOffer recurringOffer = QRecurringOffer.recurringOffer;
 
         List<RecurringOffer> offers = queryFactory
@@ -59,7 +59,7 @@ public class RecurringOfferQueryRepository {
                     long weeks = ChronoUnit.WEEKS.between(offer.getServiceStartDate(), offer.getServiceEndDate()) + 1;
                     int occurrences = (int) (weeks * offer.getDayOfWeek().size());
 
-                    return new GetRecurringOfferSummaryResponse(
+                    return new GetCaregiverRecurringOfferSummaryResponse(
                             offer.getRecurringOfferId(),
                             offer.getConsumer().getUser().getName(),
                             offer.getServiceStartDate(),

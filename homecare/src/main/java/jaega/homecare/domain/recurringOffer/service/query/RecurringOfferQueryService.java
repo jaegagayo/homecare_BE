@@ -85,7 +85,7 @@ public class RecurringOfferQueryService {
         return recurringOfferMapper.toGetResponseByUnreadNotification(recurringOfferList);
     }
 
-    public List<GetRecurringOfferSummaryResponse> findByRecurringOfferSummaryByCaregiver(UUID caregiverId){
+    public List<GetCaregiverRecurringOfferSummaryResponse> findByRecurringOfferSummaryByCaregiver(UUID caregiverId){
         return recurringOfferQueryRepository.findByRecurringOfferSummaryByCaregiver(caregiverId);
     }
 

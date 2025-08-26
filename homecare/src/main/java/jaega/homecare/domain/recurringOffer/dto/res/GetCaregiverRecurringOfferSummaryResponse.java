@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
-public record GetRecurringOfferSummaryResponse(
+public record GetCaregiverRecurringOfferSummaryResponse(
         UUID recurringOfferId,
         String consumerName,
         LocalDate serviceStartDate,
