@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
+import jaega.homecare.domain.serviceRequest.dto.req.UpdateServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
@@ -38,4 +39,10 @@ public interface ServiceRequestController {
     @ApiResponse(responseCode = "200", description = "수요자가 신청한 서비스 내역 상세 조회 성공")
     @GetMapping("/{serviceRequestId}")
     ResponseEntity<GetServiceRequestById> getServiceRequestById(@PathVariable UUID serviceRequestId);
+
+    @Operation(summary = "수요자가 신청한 서비스 신청 정보 수정 API", description = "입력받은 정보로 서비스 신청 정보를 수정합니다.")
+    @ApiResponse(responseCode = "204", description = "서비스 신청 정보 수정 성공")
+    @PutMapping("/request")
+    ResponseEntity<Void> updateServiceRequest(@RequestParam UUID serviceRequestId,
+                                              @RequestBody UpdateServiceRequest request);
 }

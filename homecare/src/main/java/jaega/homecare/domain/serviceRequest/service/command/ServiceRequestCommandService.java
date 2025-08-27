@@ -3,6 +3,7 @@ package jaega.homecare.domain.serviceRequest.service.command;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
+import jaega.homecare.domain.serviceRequest.dto.req.UpdateServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.mapper.ServiceRequestMapper;
@@ -15,13 +16,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ServiceRequestCommandService {
 
     private final ServiceRequestRepository serviceRequestRepository;
     private final ConsumerQueryService consumerQueryService;
     private final ServiceRequestMapper serviceRequestMapper;
 
-    @Transactional
     public GetCreateServiceResponse createServiceRequest(ConsumerServiceRequest request){
         Consumer consumer = consumerQueryService.getConsumer(request.consumerId());
 
@@ -31,5 +32,10 @@ public class ServiceRequestCommandService {
         serviceRequestRepository.save(serviceRequest);
 
         return serviceRequestMapper.toGetCreateResponse(serviceRequest);
+    }
+
+    public void updateServiceRequest(UpdateServiceRequest request, ServiceRequest serviceRequest){
+        serviceRequest.updateServiceRequest(request);
+        serviceRequestRepository.save(serviceRequest);
     }
 }

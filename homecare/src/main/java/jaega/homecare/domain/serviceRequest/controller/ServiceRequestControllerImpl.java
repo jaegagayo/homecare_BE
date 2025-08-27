@@ -1,9 +1,11 @@
 package jaega.homecare.domain.serviceRequest.controller;
 
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
+import jaega.homecare.domain.serviceRequest.dto.req.UpdateServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
+import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.service.command.ServiceRequestCommandService;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
@@ -62,6 +64,14 @@ public class ServiceRequestControllerImpl implements ServiceRequestController{
     public ResponseEntity<GetServiceRequestById> getServiceRequestById(UUID serviceRequestId) {
         GetServiceRequestById response = serviceRequestQueryService.findServiceRequestById(serviceRequestId);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> updateServiceRequest(@RequestParam UUID serviceRequestId,
+                                                     @RequestBody UpdateServiceRequest request){
+        ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(serviceRequestId);
+        serviceRequestCommandService.updateServiceRequest(request, serviceRequest);
+        return ResponseEntity.noContent().build();
     }
 
 }
