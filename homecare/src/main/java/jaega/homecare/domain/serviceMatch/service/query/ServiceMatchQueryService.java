@@ -1,6 +1,7 @@
 package jaega.homecare.domain.serviceMatch.service.query;
 
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
+import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -63,5 +64,11 @@ public class ServiceMatchQueryService {
                 dashboardStats,
                 distributions
         );
+    }
+
+    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
+    public List<ConsumerPendingReviewResponse> getPendingReviews(UUID consumerId) {
+        List<ServiceMatch> reviews = serviceMatchQueryRepository.findPendingReviews(consumerId);
+        return serviceMatchMapper.toConsumerPendingReviewResponse(reviews);
     }
 }
