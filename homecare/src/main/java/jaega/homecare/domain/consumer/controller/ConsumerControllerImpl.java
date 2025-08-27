@@ -19,6 +19,7 @@ import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferComman
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
 import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
+import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.review.service.command.ReviewCommandService;
@@ -76,14 +77,14 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.noContent().build();
     }
 
-    // (내 정보) 수요자의 프로필 정보 조회 API
+    // (마이페이지) 수요자의 프로필 정보 조회 API
     @Override
     public ResponseEntity<ConsumerDetailResponse> getDetail(@RequestParam UUID consumerId){
         ConsumerDetailResponse response = consumerQueryService.getDetail(consumerId);
         return ResponseEntity.ok(response);
     }
 
-    // (내 정보) 수요자의 프로필 정보 수저
+    // (마이페이지) 수요자의 프로필 정보 수정
     @Override
     public ResponseEntity<Void> updateProfile(@RequestParam UUID consumerId,
                                               @RequestBody ConsumerProfileUpdateRequest request){
@@ -193,7 +194,7 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.noContent().build();
     }
 
-    // 수요자의 정기 제안 신청 조회 API
+    // (마이페이지) 정기 제안 신청 조회 API
     @Override
     public ResponseEntity<List<GetRecurringOfferResponse>> getRecurringOfferByConsumer(@RequestParam UUID consumerId){
         List<GetRecurringOfferResponse> responses = recurringOfferQueryService.findRecurringOfferByConsumer(consumerId);
@@ -256,7 +257,7 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.noContent().build();
     }
 
-    // 신고자별 블랙리스트 조회 API
+    // (마이페이지) 블랙리스트 조회 API
     @Override
     public ResponseEntity<List<GetBlacklistByConsumerResponse>> getBlacklistByConsumer(@RequestParam UUID consumerId) {
         List<GetBlacklistByConsumerResponse> responses = blacklistQueryService.getBlacklistByConsumer(consumerId);
@@ -281,17 +282,24 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.ok(response);
     }
 
-    // 수요자 리뷰 조회 API
+    // (마이페이지) 수요자 리뷰 조회 API
     @Override
     public ResponseEntity<List<ConsumerReviewResponse>> getWrittenReviews(@RequestParam UUID consumerId) {
         List<ConsumerReviewResponse> reviews = reviewQueryService.getWrittenReviews(consumerId);
         return ResponseEntity.ok(reviews);
     }
 
+    @Override
+    public ResponseEntity<List<ConsumerPendingReviewResponse>> getPendingReviews(@PathVariable UUID consumerId) {
+        List<ConsumerPendingReviewResponse> pending = serviceMatchQueryService.getPendingReviews(consumerId);
+        return ResponseEntity.ok(pending);
+    }
+
+
     // (메인 페이지) 리뷰 요청
     @Override
-    public ResponseEntity<List<ConsumerPendingReviewResponse>> getReviewRequest(@RequestParam UUID consumerId){
-        List<ConsumerPendingReviewResponse> responses = consumerQueryService.getReviewRequest(consumerId);
+    public ResponseEntity<List<ReviewRequestResponse>> getReviewRequest(@RequestParam UUID consumerId){
+        List<ReviewRequestResponse> responses = consumerQueryService.getReviewRequest(consumerId);
         return ResponseEntity.ok(responses);
     }
 }

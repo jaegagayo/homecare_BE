@@ -5,7 +5,8 @@ import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
 import jaega.homecare.domain.consumer.repository.ConsumerQueryRepository;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
-import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
+import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.review.repository.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class ConsumerQueryService {
         return consumerQueryRepository.findNextSchedule(consumerId);
     }
 
-    public List<ConsumerPendingReviewResponse> getReviewRequest(UUID consumerId){
+    public List<ReviewRequestResponse> getReviewRequest(UUID consumerId){
         return reviewQueryRepository.findCompletedSchedulesWithoutReview(consumerId);
     }
 

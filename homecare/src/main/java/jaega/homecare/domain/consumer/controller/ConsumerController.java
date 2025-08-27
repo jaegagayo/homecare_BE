@@ -16,6 +16,7 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferResponse;
 import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferResponse;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
 import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
+import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
@@ -41,12 +42,12 @@ public interface ConsumerController {
     @PostMapping("/register")
     ResponseEntity<Void> createConsumer(@RequestBody ConsumerSignupRequest request);
 
-    @Operation(summary = "수요자의 프로필 정보 조회 API", description = "수요자의 ID로 수요자의 프로필 정보를 조회합니다.")
+    @Operation(summary = "(마이페이지) 수요자의 프로필 정보 조회 API", description = "수요자의 ID로 수요자의 프로필 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자의 프로필 정보 조회 성공")
     @GetMapping("/my-page")
     ResponseEntity<ConsumerDetailResponse> getDetail(@RequestParam UUID consumerId);
 
-    @Operation(summary = "수요자의 프로필 정보 수정 API", description = "입력받은 정보로 수요자의 프로필 정보를 수정합니다.")
+    @Operation(summary = "(마이페이지) 수요자의 프로필 정보 수정 API", description = "입력받은 정보로 수요자의 프로필 정보를 수정합니다.")
     @ApiResponse(responseCode = "204", description = "수요자의 프로필 정보 수정 완료")
     @PutMapping("/my-page")
     ResponseEntity<Void> updateProfile(@RequestParam UUID consumerId,
@@ -124,7 +125,7 @@ public interface ConsumerController {
     @PostMapping("/recurring")
     ResponseEntity<Void> createRecurringOffer(@RequestBody CreateRecurringOfferRequest request);
 
-    @Operation(summary = "수요자의 정기 제안 신청 조회 API", description = "수요자가 작성한 정기 제안 신청서을 조회합니다." +
+    @Operation(summary = "(마이페이지) 정기 제안 신청 조회 API", description = "수요자가 작성한 정기 제안 신청서을 조회합니다." +
             "정기 신청의 1회 서비스 소요 시간이 다음과 같은 형식으로 조회됩니다." +
             "ex) 3h30m : 3시간 30분, 3h : 3시간")
     @ApiResponse(responseCode = "200", description = "수요자의 정기 제안 신청 조회 성공")
@@ -183,7 +184,7 @@ public interface ConsumerController {
     @DeleteMapping("/blacklist")
     ResponseEntity<Void> deleteBlacklistByConsumer(@RequestParam UUID caregiverBlacklistId);
 
-    @Operation(summary = "신고자별 블랙리스트 조회 API", description = "특정 신고자가 신고한 블랙리스트를 조회합니다.")
+    @Operation(summary = "(마이페이지) 블랙리스트 조회 API", description = "특정 신고자가 신고한 블랙리스트를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "블랙리스트 조회 성공")
     @GetMapping("/my-page/blacklist")
     ResponseEntity<List<GetBlacklistByConsumerResponse>> getBlacklistByConsumer(@RequestParam UUID consumerId);
@@ -204,14 +205,20 @@ public interface ConsumerController {
     @GetMapping("/serviceMatch/{serviceMatchId}")
     ResponseEntity<GetReviewResponse> getReviewByServiceMatch(@RequestParam UUID serviceMatchId);
 
-    @Operation(summary = "수요자 리뷰 조회 API", description = "수요자가 작성한 리뷰를 조회합니다.")
+    @Operation(summary = "(마이페이지) 수요자 리뷰 조회 API", description = "수요자가 작성한 리뷰를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 작성한 리뷰 조회 성공")
     @GetMapping("/my-page/review")
     ResponseEntity<List<ConsumerReviewResponse>> getWrittenReviews(@RequestParam UUID consumerId);
 
+
+    @Operation(summary = "(마이페이지) 수요자가 작성해야할 리뷰 조회 API", description = "수요자가 아직 리뷰를 작성하지 않은 매칭들을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "수요자가 아직 리뷰를 작성하지 않은 매칭 일정 조회 성공")
+    @GetMapping("/my-page/review/pending")
+    ResponseEntity<List<ConsumerPendingReviewResponse>> getPendingReviews(@RequestParam UUID consumerId);
+
     @Operation(summary = "(메인 페이지) 리뷰 요청", description = "완료된 일정 중 리뷰가 아직 등록되지 않은 일정에 대해 리뷰를 요청합니다.")
     @ApiResponse(responseCode = "200", description = "리뷰 요청 성공")
     @GetMapping("/home/notification/review")
-    ResponseEntity<List<ConsumerPendingReviewResponse>> getReviewRequest(@RequestParam UUID consumerId);
+    ResponseEntity<List<ReviewRequestResponse>> getReviewRequest(@RequestParam UUID consumerId);
 
 }

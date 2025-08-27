@@ -392,4 +392,19 @@ public class ServiceMatchQueryRepository {
                 )
                 .fetch();
     }
+
+    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
+    public List<ServiceMatch> findPendingReviews(UUID consumerId) {
+        QServiceMatch sm = QServiceMatch.serviceMatch;
+        QReview r = QReview.review;
+
+        return queryFactory
+                .selectFrom(sm)
+                .leftJoin(r).on(r.serviceMatch.eq(sm))
+                .where(
+                        sm.serviceRequest.consumer.consumerId.eq(consumerId),
+                        r.id.isNull() // Review 없는 ServiceMatch
+                )
+                .fetch();
+    }
 }
