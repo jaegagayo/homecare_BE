@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerProfileUpdateRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerUpdateRequest;
 import jaega.homecare.domain.consumer.dto.res.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,4 +52,10 @@ public interface ConsumerController {
     @ApiResponse(responseCode = "200", description = "수요자의 프로필 정보 조회 성공")
     @GetMapping("/{consumerId}")
     ResponseEntity<ConsumerDetailResponse> getDetail(@PathVariable UUID consumerId);
+
+    @Operation(summary = "수요자의 프로필 정보 수정 API", description = "입력받은 정보로 수요자의 프로필 정보를 수정합니다.")
+    @ApiResponse(responseCode = "204", description = "수요자의 프로필 정보 수정 완료")
+    @PutMapping
+    ResponseEntity<Void> updateProfile(@RequestParam UUID consumerId,
+                                       @RequestBody ConsumerProfileUpdateRequest request);
 }

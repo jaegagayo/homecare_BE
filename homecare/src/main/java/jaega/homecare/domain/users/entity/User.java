@@ -1,5 +1,6 @@
 package jaega.homecare.domain.users.entity;
 
+import jaega.homecare.domain.users.dto.req.UserUpdateRequest;
 import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,5 +50,12 @@ public class User extends BaseTimeEntity {
     public void setUser(UUID userId, UserRole userRole, LocalDateTime createdAt){
         this.userId = userId;
         this.userRole = userRole;
+    }
+
+    public void updateUser(UserUpdateRequest request){
+        this.name = request.name();
+        this.birthDate = request.birthDate();
+        this.gender = request.gender();
+        this.phone = request.phone();
     }
 }

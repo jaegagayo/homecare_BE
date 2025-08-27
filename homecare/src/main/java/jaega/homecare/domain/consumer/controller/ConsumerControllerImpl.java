@@ -1,6 +1,9 @@
 package jaega.homecare.domain.consumer.controller;
 
+import jaega.homecare.domain.consumer.dto.req.ConsumerProfileUpdateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerUpdateRequest;
 import jaega.homecare.domain.consumer.dto.res.*;
+import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
@@ -108,4 +111,13 @@ public class ConsumerControllerImpl implements ConsumerController {
         ConsumerDetailResponse response = consumerQueryService.getDetail(consumerId);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<Void> updateProfile(@RequestParam UUID consumerId,
+                                              @RequestBody ConsumerProfileUpdateRequest request){
+        Consumer consumer = consumerQueryService.getConsumer(consumerId);
+        consumerCommandService.updateConsumer(request, consumer);
+        return ResponseEntity.noContent().build();
+    }
+
 }
