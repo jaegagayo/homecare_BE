@@ -2,11 +2,14 @@ package jaega.homecare.domain.consumer.service.query;
 
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.repository.ConsumerQueryRepository;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -17,6 +20,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ConsumerQueryService {
 
     private final ConsumerRepository consumerRepository;
@@ -35,5 +39,13 @@ public class ConsumerQueryService {
 
     public ConsumerScheduleDetailResponse getScheduleDetail(UUID serviceRequestId){
         return consumerQueryRepository.findScheduleDetail(serviceRequestId);
+    }
+
+    public ConsumerNextScheduleResponse getNextSchedule(UUID consumerId){
+        return consumerQueryRepository.findNextSchedule(consumerId);
+    }
+
+    public List<ReviewRequestResponse> getReviewRequest(UUID consumerId){
+        return consumerQueryRepository.findCompletedSchedulesWithoutReview(consumerId);
     }
 }
