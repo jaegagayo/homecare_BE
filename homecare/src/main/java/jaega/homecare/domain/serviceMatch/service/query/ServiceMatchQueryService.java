@@ -65,10 +65,4 @@ public class ServiceMatchQueryService {
                 distributions
         );
     }
-
-    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
-    public List<ConsumerPendingReviewResponse> getPendingReviews(UUID consumerId) {
-        List<ServiceMatch> reviews = serviceMatchQueryRepository.findPendingReviews(consumerId);
-        return serviceMatchMapper.toConsumerPendingReviewResponse(reviews);
-    }
 }

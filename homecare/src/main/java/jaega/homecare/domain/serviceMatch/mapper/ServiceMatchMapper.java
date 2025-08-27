@@ -30,6 +30,7 @@ public interface ServiceMatchMapper {
     GetServiceMatchByUUID toGetResponseByUUID(ServiceMatch serviceMatch);
 
     @Mapping(target = "caregiverName", source = "caregiver.user.name")
+    @Mapping(target = "serviceType", source = "serviceRequest.serviceType")
     ConsumerPendingReviewResponse toConsumerPendingReviewResponse(ServiceMatch serviceMatch);
 
     List<ConsumerPendingReviewResponse> toConsumerPendingReviewResponse(List<ServiceMatch> serviceMatches);
