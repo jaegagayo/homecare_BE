@@ -16,6 +16,7 @@ import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandSer
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
+import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.service.command.ServiceRequestCommandService;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import jakarta.transaction.Transactional;
@@ -77,6 +78,7 @@ public class RecurringOfferCommandService {
 
         // 생성된 ServiceRequest 조회
         ServiceRequest serviceRequest = serviceRequestQueryService.getServiceRequest(createServiceResponse.serviceRequestId());
+        serviceRequest.changeRequestStatus(ServiceRequestStatus.RECURRING);
 
         // 3️⃣ ServiceMatch 반복 생성 (요일별)
         LocalDate currentDate = recurringOffer.getServiceStartDate();

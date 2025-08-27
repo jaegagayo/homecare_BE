@@ -72,6 +72,7 @@ public class RecurringOffer extends BaseTimeEntity {
     @Column(name = "service_type", nullable = false)
     private ServiceType serviceType;        // 서비스 유형
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "recurring_status")
     private RecurringStatus recurringStatus = RecurringStatus.PENDING;
 
