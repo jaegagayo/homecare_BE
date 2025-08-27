@@ -7,7 +7,6 @@ import jaega.homecare.domain.recurringOffer.entity.RecurringOffer;
 import jaega.homecare.domain.recurringOffer.mapper.RecurringOfferMapper;
 import jaega.homecare.domain.recurringOffer.repository.RecurringOfferQueryRepository;
 import jaega.homecare.domain.recurringOffer.repository.RecurringOfferRepository;
-import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
 import jakarta.transaction.Transactional;

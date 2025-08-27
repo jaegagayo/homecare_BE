@@ -135,8 +135,6 @@ public class DummyDataService {
         Caregiver caregiver = Caregiver.builder()
                 .caregiverId(UUID.randomUUID())
                 .user(user)
-                .availableStartTime(startTime)
-                .availableEndTime(endTime)
                 .address("서울시 송파구 올림픽로 " + index)
                 .career(1 + random.nextInt(20)) // 경력 1~20년
                 .koreanProficiency(KoreanProficiency.values()[random.nextInt(KoreanProficiency.values().length)])

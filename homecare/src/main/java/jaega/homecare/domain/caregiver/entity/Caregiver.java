@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -25,14 +24,6 @@ public class Caregiver extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    // 근무 시작 시간
-    @Column(name = "available_start_time")
-    private LocalTime availableStartTime;
-
-    // 근무 종료 시간
-    @Column(name = "available_end_time")
-    private LocalTime availableEndTime;
 
     @Column(name = "address")
     private String address;
@@ -54,13 +45,10 @@ public class Caregiver extends BaseTimeEntity {
     private VerifiedStatus verifiedStatus;
 
     @Builder
-    public Caregiver(UUID caregiverId, User user, LocalTime availableStartTime, LocalTime availableEndTime,
-                     String address, Integer career,
+    public Caregiver(UUID caregiverId, User user, String address, Integer career,
                      KoreanProficiency koreanProficiency, boolean isAccompanyOuting, String selfIntroduction, VerifiedStatus verifiedStatus) {
         this.caregiverId = caregiverId;
         this.user = user;
-        this.availableStartTime = availableStartTime;
-        this.availableEndTime = availableEndTime;
         this.address = address;
         this.career = career;
         this.koreanProficiency = koreanProficiency;
