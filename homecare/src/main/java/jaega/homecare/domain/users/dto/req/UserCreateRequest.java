@@ -1,6 +1,8 @@
 package jaega.homecare.domain.users.dto.req;
 
 
+import jaega.homecare.domain.users.entity.Gender;
+
 import java.time.LocalDate;
 
 public record UserCreateRequest(
@@ -9,6 +11,7 @@ public record UserCreateRequest(
         String email,
         String password,
         String phone,
-        LocalDate birthDate
+        LocalDate birthDate,
+        Gender gender
 ) {
 }

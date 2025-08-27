@@ -5,10 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
-import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.consumer.dto.res.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,4 +45,9 @@ public interface ConsumerController {
     @ApiResponse(responseCode = "200", description = "리뷰 요청 성공")
     @GetMapping("{id}/home/review-request")
     ResponseEntity<List<ReviewRequestResponse>> getReviewRequest(@PathVariable UUID id);
+
+    @Operation(summary = "수요자의 프로필 정보 조회 API", description = "수요자의 ID로 수요자의 프로필 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "수요자의 프로필 정보 조회 성공")
+    @GetMapping("/{consumerId}")
+    ResponseEntity<ConsumerDetailResponse> getDetail(@PathVariable UUID consumerId);
 }

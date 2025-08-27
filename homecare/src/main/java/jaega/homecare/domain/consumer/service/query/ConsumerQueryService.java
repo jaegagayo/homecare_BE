@@ -1,10 +1,8 @@
 package jaega.homecare.domain.consumer.service.query;
 
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.consumer.dto.res.*;
 import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
 import jaega.homecare.domain.consumer.repository.ConsumerQueryRepository;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +23,7 @@ public class ConsumerQueryService {
 
     private final ConsumerRepository consumerRepository;
     private final ConsumerQueryRepository consumerQueryRepository;
+    private final ConsumerMapper consumerMapper;
 
     public Consumer getConsumer(UUID consumerId){
         return consumerRepository.findByConsumerId(consumerId)
@@ -47,5 +46,10 @@ public class ConsumerQueryService {
 
     public List<ReviewRequestResponse> getReviewRequest(UUID consumerId){
         return consumerQueryRepository.findCompletedSchedulesWithoutReview(consumerId);
+    }
+
+    public ConsumerDetailResponse getDetail(UUID consumerId){
+        Consumer consumer = getConsumer(consumerId);
+        return consumerMapper.toDetailResponse(consumer);
     }
 }

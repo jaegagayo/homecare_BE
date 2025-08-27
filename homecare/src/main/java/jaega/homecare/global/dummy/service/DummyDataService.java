@@ -99,6 +99,7 @@ public class DummyDataService {
                 .password("$2a$10$vvUzhakZH7BQ0fpo8RfS/u3Ip54VLNHAQSoBCnCIYKSxVBmAhxaVG")
                 .phone("010-1234-" + String.format("%04d", index))
                 .birthDate(LocalDate.of(1970 + random.nextInt(30), random.nextInt(12) + 1, random.nextInt(28) + 1))
+                .gender(Gender.values()[random.nextInt(Gender.values().length)])
                 .build();
 
         user.setUser(UUID.randomUUID(), role, LocalDateTime.now());

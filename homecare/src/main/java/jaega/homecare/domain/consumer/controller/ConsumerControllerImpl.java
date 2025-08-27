@@ -1,9 +1,6 @@
 package jaega.homecare.domain.consumer.controller;
 
-import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.consumer.dto.res.*;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
@@ -14,10 +11,7 @@ import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQuerySer
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -105,5 +99,13 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * (내 정보) 프로필 정보 조회
+     */
 
+    @Override
+    public ResponseEntity<ConsumerDetailResponse> getDetail(@PathVariable UUID consumerId){
+        ConsumerDetailResponse response = consumerQueryService.getDetail(consumerId);
+        return ResponseEntity.ok(response);
+    }
 }
