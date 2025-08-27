@@ -3,6 +3,7 @@ package jaega.homecare.domain.consumer.service.query;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.repository.ConsumerQueryRepository;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
@@ -42,5 +43,9 @@ public class ConsumerQueryService {
 
     public ConsumerNextScheduleResponse getNextSchedule(UUID consumerId){
         return consumerQueryRepository.findNextSchedule(consumerId);
+    }
+
+    public List<ReviewRequestResponse> getReviewRequest(UUID consumerId){
+        return consumerQueryRepository.findCompletedSchedulesWithoutReview(consumerId);
     }
 }

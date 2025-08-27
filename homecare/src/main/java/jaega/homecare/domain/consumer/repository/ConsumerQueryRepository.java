@@ -6,6 +6,7 @@ import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.review.entity.QReview;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
@@ -61,7 +62,6 @@ public class ConsumerQueryRepository {
     public ConsumerScheduleDetailResponse findScheduleDetail(UUID serviceRequestId) {
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
-        QConsumer consumer = QConsumer.consumer;
         QCaregiver caregiver = QCaregiver.caregiver;
         QUser caregiverUser = caregiver.user;
         QReview review = QReview.review;
@@ -122,6 +122,38 @@ public class ConsumerQueryRepository {
                 .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
                 .limit(1)
                 .fetchOne();
+
+    }
+
+    // 완료된 일정 중 리뷰가 없는 일정 조회
+    public List<ReviewRequestResponse> findCompletedSchedulesWithoutReview(UUID consumerId) {
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser caregiverUser = caregiver.user;
+        QReview review = QReview.review;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        ReviewRequestResponse.class,
+                        caregiverUser.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceType
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(caregiver.user, caregiverUser)
+                .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
+                .where(
+                        serviceRequest.consumer.consumerId.eq(consumerId),
+                        serviceMatch.matchStatus.eq(MatchStatus.COMPLETED),
+                        review.id.isNull()
+                )
+                .orderBy(serviceMatch.serviceDate.desc(), serviceMatch.serviceStartTime.desc())
+                .fetch();
 
     }
 }

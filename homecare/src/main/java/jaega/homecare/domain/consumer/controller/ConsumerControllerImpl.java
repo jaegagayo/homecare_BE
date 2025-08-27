@@ -3,6 +3,7 @@ package jaega.homecare.domain.consumer.controller;
 import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
@@ -92,6 +93,16 @@ public class ConsumerControllerImpl implements ConsumerController {
     public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@PathVariable UUID id){
         ConsumerNextScheduleResponse response = consumerQueryService.getNextSchedule(id);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     *
+     * (메인 페이지) 리뷰 요청
+     */
+    @Override
+    public ResponseEntity<List<ReviewRequestResponse>> getReviewRequest(@PathVariable UUID id){
+        List<ReviewRequestResponse> responses = consumerQueryService.getReviewRequest(id);
+        return ResponseEntity.ok(responses);
     }
 
 
