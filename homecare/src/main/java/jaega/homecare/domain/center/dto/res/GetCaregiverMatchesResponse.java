@@ -18,7 +18,7 @@ public record GetCaregiverMatchesResponse(
         LocalTime serviceStartTime,
         LocalTime serviceEndTime,
 
-        Set<ServiceType> workType,
+        Set<ServiceType> serviceTypes,
         String serviceAddress,
         int hourlyWage,
         MatchStatus status,
