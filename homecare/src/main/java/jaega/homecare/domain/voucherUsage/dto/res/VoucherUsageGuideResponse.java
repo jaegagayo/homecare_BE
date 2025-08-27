@@ -14,5 +14,4 @@ public record VoucherUsageGuideResponse(
 
         @Schema(description = "본인 부담률 15% 초과 여부")
         boolean isHighCopayRate
-) {
-}
+) { }
