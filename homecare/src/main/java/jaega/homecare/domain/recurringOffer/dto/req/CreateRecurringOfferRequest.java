@@ -1,9 +1,9 @@
 package jaega.homecare.domain.recurringOffer.dto.req;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jaega.homecare.domain.serviceRequest.dto.req.LocationDto;
+import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.users.entity.ServiceType;
-import jaega.homecare.global.util.DurationDeserializer;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -14,6 +14,9 @@ import java.util.UUID;
 public record CreateRecurringOfferRequest(
         UUID caregiverId,
         UUID consumerId,
+        String serviceAddress,
+        AddressType addressType,
+        LocationDto location,
         Set<DayOfWeek> dayOfWeek,
         LocalDate serviceStartDate,
         LocalDate serviceEndDate,

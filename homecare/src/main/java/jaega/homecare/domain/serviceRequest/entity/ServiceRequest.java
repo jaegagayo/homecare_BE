@@ -80,4 +80,8 @@ public class ServiceRequest {
     public void initializeServiceRequest(UUID serviceRequestId){
         this.serviceRequestId = serviceRequestId;
     }
+
+    public void changeRequestStatus(ServiceRequestStatus requestStatus){
+        this.requestStatus = requestStatus;
+    }
 }
