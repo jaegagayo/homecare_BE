@@ -8,6 +8,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.caregiver.repository.CaregiverQueryRepository;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 public class ServiceMatchQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final CaregiverRepository caregiverRepository;
+    private final CaregiverQueryRepository caregiverQueryRepository;
 
     /**
      *
@@ -129,14 +130,14 @@ public class ServiceMatchQueryRepository {
             return baseList; // 결과 없으면 바로 반환
         }
 
-        // 3. serviceTypes 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
+        // 3. serviceTypes 조회 (QueryDSL)
+        List<Tuple> rows = caregiverQueryRepository.findServiceTypesByCaregiverIds(caregiverIds);
 
-        // 4. Map<Long, Set<ServiceType>> 변환
+        // 4. Map<UUID, Set<ServiceType>> 변환
         Map<UUID, Set<ServiceType>> serviceTypeMap = rows.stream()
                 .collect(Collectors.groupingBy(
-                        row -> (UUID) row[0],
-                        Collectors.mapping(row -> (ServiceType) row[1], Collectors.toSet())
+                        tuple -> tuple.get(0, UUID.class),
+                        Collectors.mapping(tuple -> tuple.get(1, ServiceType.class), Collectors.toSet())
                 ));
 
         // 5. serviceTypes 채워서 새 DTO 생성
@@ -338,14 +339,14 @@ public class ServiceMatchQueryRepository {
             return baseList;
         }
 
-        // 3. serviceTypes 별도 조회
-        List<Object[]> rows = caregiverRepository.findServiceTypesByCaregiverIds(caregiverIds);
+        // 3. serviceTypes 조회 (QueryDSL)
+        List<Tuple> rows = caregiverQueryRepository.findServiceTypesByCaregiverIds(caregiverIds);
 
-        // 4. Map<Long, Set<ServiceType>> 변환
+        // 4. Map<UUID, Set<ServiceType>> 변환
         Map<UUID, Set<ServiceType>> serviceTypeMap = rows.stream()
                 .collect(Collectors.groupingBy(
-                        row -> (UUID) row[0],
-                        Collectors.mapping(row -> (ServiceType) row[1], Collectors.toSet())
+                        tuple -> tuple.get(0, UUID.class),
+                        Collectors.mapping(tuple -> tuple.get(1, ServiceType.class), Collectors.toSet())
                 ));
 
         // 5. DTO 재생성
@@ -542,4 +543,18 @@ public class ServiceMatchQueryRepository {
      *
      */
 
+    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
+    public List<ServiceMatch> findPendingReviews(UUID consumerId) {
+        QServiceMatch sm = QServiceMatch.serviceMatch;
+        QReview r = QReview.review;
+
+        return queryFactory
+                .selectFrom(sm)
+                .leftJoin(r).on(r.serviceMatch.eq(sm))
+                .where(
+                        sm.serviceRequest.consumer.consumerId.eq(consumerId),
+                        r.id.isNull() // Review 없는 ServiceMatch
+                )
+                .fetch();
+    }
 }

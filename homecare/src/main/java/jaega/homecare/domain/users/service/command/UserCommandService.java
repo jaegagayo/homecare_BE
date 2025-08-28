@@ -2,6 +2,7 @@ package jaega.homecare.domain.users.service.command;
 
 import jaega.homecare.domain.users.dto.req.UserCreateRequest;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
+import jaega.homecare.domain.users.dto.req.UserUpdateRequest;
 import jaega.homecare.domain.users.dto.res.UserLoginResponse;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
@@ -46,5 +47,10 @@ public class UserCommandService {
         userRepository.save(user);
 
         return user;
+    }
+
+    public void updateUser(UserUpdateRequest request, User user){
+        user.updateUser(request);
+        userRepository.save(user);
     }
 }

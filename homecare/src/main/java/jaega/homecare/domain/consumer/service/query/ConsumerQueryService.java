@@ -2,6 +2,9 @@ package jaega.homecare.domain.consumer.service.query;
 
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
+import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.review.entity.Review;
+import jaega.homecare.domain.review.repository.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

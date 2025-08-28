@@ -17,9 +17,9 @@ public interface UserMapper {
     @Mapping(target = "password", source = "password")
     @Mapping(target = "phone", source = "request.phone")
     @Mapping(target = "birthDate", source = "request.birthDate")
+    @Mapping(target = "gender", source = "request.gender")
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "userRole", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     User toEntity(UserCreateRequest request, String password);
 
     UserLoginResponse toLoginResponse(UUID userId);

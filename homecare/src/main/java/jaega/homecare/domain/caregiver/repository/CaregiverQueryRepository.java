@@ -173,4 +173,15 @@ public class CaregiverQueryRepository {
     }
 
 
+    public List<Tuple> findServiceTypesByCaregiverIds(Set<UUID> caregiverIds) {
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverPreference pref = QCaregiverPreference.caregiverPreference;
+
+        return queryFactory
+                .select(caregiver.caregiverId, pref.serviceTypes)
+                .from(caregiver)
+                .leftJoin(pref).on(pref.caregiver.eq(caregiver))
+                .where(caregiver.caregiverId.in(caregiverIds))
+                .fetch();
+    }
 }

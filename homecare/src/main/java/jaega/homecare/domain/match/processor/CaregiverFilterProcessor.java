@@ -20,14 +20,8 @@ public class CaregiverFilterProcessor {
 
     public List<Caregiver> filter(ServiceRequest request, List<Caregiver> candidates, LocalDate applyDate) {
         return candidates.stream()
-                .filter(c -> isAvailableAtTime(c, request.getPreferredStartTime(), request.getPreferredEndTime()))
                 .filter(c -> !hasOverlappingWork(c, applyDate, request.getPreferredStartTime(), request.getPreferredEndTime()))
                 .collect(Collectors.toList());
-    }
-
-    private boolean isAvailableAtTime(Caregiver caregiver, LocalTime start, LocalTime end) {
-        return !caregiver.getAvailableStartTime().isAfter(start) &&
-                !caregiver.getAvailableEndTime().isBefore(end);
     }
 
 
