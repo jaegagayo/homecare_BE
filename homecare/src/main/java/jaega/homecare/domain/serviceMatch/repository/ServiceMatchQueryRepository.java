@@ -17,9 +17,10 @@ import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
+
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.recurringOffer.entity.QRecurringOffer;
+import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.review.entity.QReview;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
@@ -30,7 +31,6 @@ import jaega.homecare.domain.settlement.dto.res.WorkPlaceDistribution;
 import jaega.homecare.domain.users.entity.QUser;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
-import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -506,7 +506,7 @@ public class ServiceMatchQueryRepository {
     }
 
     // 완료된 일정 중 리뷰가 없는 일정 조회
-    public List<ReviewRequestResponse> findCompletedScheduleWithoutReview(UUID consumerId) {
+    public List<GetScheduleWithoutReviewResponse> findCompletedScheduleWithoutReview(UUID consumerId) {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -515,7 +515,7 @@ public class ServiceMatchQueryRepository {
 
         return queryFactory
                 .select(Projections.constructor(
-                        ReviewRequestResponse.class,
+                        GetScheduleWithoutReviewResponse.class,
                         caregiverUser.name,
                         serviceMatch.serviceDate,
                         serviceMatch.serviceStartTime,
@@ -537,24 +537,10 @@ public class ServiceMatchQueryRepository {
 
     }
 
+
     /**
      *
      * Caregiver
      *
      */
-
-    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
-    public List<ServiceMatch> findPendingReviews(UUID consumerId) {
-        QServiceMatch sm = QServiceMatch.serviceMatch;
-        QReview r = QReview.review;
-
-        return queryFactory
-                .selectFrom(sm)
-                .leftJoin(r).on(r.serviceMatch.eq(sm))
-                .where(
-                        sm.serviceRequest.consumer.consumerId.eq(consumerId),
-                        r.id.isNull() // Review 없는 ServiceMatch
-                )
-                .fetch();
-    }
 }

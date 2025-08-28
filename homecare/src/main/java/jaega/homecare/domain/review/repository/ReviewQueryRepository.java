@@ -3,7 +3,7 @@ package jaega.homecare.domain.review.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
-import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.review.entity.QReview;
 import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
@@ -34,7 +34,7 @@ public class ReviewQueryRepository {
     }
 
     // 완료된 일정 중 리뷰가 없는 일정 조회
-    public List<ReviewRequestResponse> findCompletedSchedulesWithoutReview(UUID consumerId) {
+    public List<GetScheduleWithoutReviewResponse> findCompletedSchedulesWithoutReview(UUID consumerId) {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -42,7 +42,7 @@ public class ReviewQueryRepository {
 
         return queryFactory
                 .select(Projections.constructor(
-                        ReviewRequestResponse.class,
+                        GetScheduleWithoutReviewResponse.class,
                         serviceMatch.serviceMatchId,
                         caregiver.user.name,
                         serviceMatch.serviceDate,

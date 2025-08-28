@@ -4,8 +4,7 @@ import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
-import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -98,9 +97,10 @@ public class ServiceMatchQueryService {
         return serviceMatchQueryRepository.findNextSchedule(consumerId);
     }
 
-    public List<ReviewRequestResponse> getScheduleWithoutReview(UUID consumerId){
+    public List<GetScheduleWithoutReviewResponse> getScheduleWithoutReview(UUID consumerId){
         return serviceMatchQueryRepository.findCompletedScheduleWithoutReview(consumerId);
     }
+
 
     /**
      *
@@ -108,10 +108,5 @@ public class ServiceMatchQueryService {
      *
      */
 
-    
-    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
-    public List<ConsumerPendingReviewResponse> getPendingReviews(UUID consumerId) {
-        List<ServiceMatch> reviews = serviceMatchQueryRepository.findPendingReviews(consumerId);
-        return serviceMatchMapper.toConsumerPendingReviewResponse(reviews);
-    }
+
 }
