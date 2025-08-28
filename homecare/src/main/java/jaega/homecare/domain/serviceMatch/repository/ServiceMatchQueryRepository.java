@@ -402,7 +402,7 @@ public class ServiceMatchQueryRepository {
      *
      */
 
-    // Consumer의 주간 스케줄 조회
+    // Consumer의 주간 일정 조회 (월 ~ 일)
     public List<ConsumerScheduleResponse> findConsumerWeeklySchedule(UUID consumerId, LocalDate weekStart, LocalDate weekEnd) {
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
@@ -427,7 +427,8 @@ public class ServiceMatchQueryRepository {
                 .join(serviceRequest.consumer, consumer)
                 .where(
                         consumer.consumerId.eq(consumerId),
-                        serviceMatch.serviceDate.between(weekStart, weekEnd)
+                        serviceMatch.serviceDate.between(weekStart, weekEnd),
+                        serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED)
                 )
                 .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
                 .fetch();
@@ -460,6 +461,7 @@ public class ServiceMatchQueryRepository {
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceMatch.caregiver, caregiver)
                 .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
+                .where(serviceMatch.serviceMatchId.eq(serviceMatchId))
                 .fetchOne();
     }
 
@@ -539,6 +541,7 @@ public class ServiceMatchQueryRepository {
      *
      */
 
+    // Caregiver의 주간 일정 조회 (월 ~ 일)
     public List<CaregiverScheduleResponse> findCaregiverWeeklySchedule(UUID caregiverId, LocalDate weekStart, LocalDate weekEnd) {
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
@@ -564,12 +567,14 @@ public class ServiceMatchQueryRepository {
                 .join(serviceRequest.consumer, consumer)
                 .where(
                         caregiver.caregiverId.eq(caregiverId),
-                        serviceMatch.serviceDate.between(weekStart, weekEnd)
+                        serviceMatch.serviceDate.between(weekStart, weekEnd),
+                        serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED)
                 )
                 .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
                 .fetch();
     }
 
+    // Caregiver의 일정 상세 조회
     public CaregiverScheduleDetailResponse findCaregiverScheduleDetail(UUID serviceMatchId) {
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
@@ -601,6 +606,7 @@ public class ServiceMatchQueryRepository {
                 .from(serviceMatch)
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceRequest.consumer, consumer)
+                .where(serviceMatch.serviceMatchId.eq(serviceMatchId))
                 .fetchOne();
     }
 }
