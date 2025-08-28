@@ -9,6 +9,8 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
+import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,6 +90,18 @@ public class CaregiverControllerImpl implements CaregiverController {
      * 일정 조회 API
      */
 
+    @Override
+    public ResponseEntity<List<CaregiverScheduleResponse>> getConsumerSchedule(@RequestParam UUID caregiverId){
+        LocalDate today = LocalDate.now();
+        List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverSchedule(caregiverId, today);
+        return ResponseEntity.ok(responses);
+    }
+
+    @Override
+    public ResponseEntity<CaregiverScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
+        CaregiverScheduleDetailResponse response = serviceMatchQueryService.getCaregiverScheduleDetail(id);
+        return ResponseEntity.ok(response);
+    }
 
 
 }

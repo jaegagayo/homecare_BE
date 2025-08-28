@@ -69,7 +69,7 @@ public interface ConsumerController {
     @Operation(summary = "특정 수요자의 주간 스케줄 조회", description = "특정 수요자의 매칭된 결과를 토대로 주간 스케줄을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 수요자의 주간 스케줄 조회 성공")
     @GetMapping("/schedule")
-    ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID id);
+    ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID consumerId);
 
     @Operation(summary = "특정 스케줄 상세 조회", description = "수요자가 선택한 특정 스케줄의 상세 정보를 불러옵니다.")
     @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")
@@ -79,12 +79,13 @@ public interface ConsumerController {
     @Operation(summary = "(메인 페이지) 가장 가까운 일정 조회", description = "수요자의 메인 페이지에서 가장 가까운 스케줄을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "가까운 스케줄 조회 성공")
     @GetMapping("/home/next-schedule")
-    ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID id);
+    ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID consumerId);
 
     @Operation(summary = "(메인 페이지) 리뷰를 작성하지 않은 일정 조회", description = "완료된 일정 중 리뷰가 아직 등록되지 않은 일정에 대해 리뷰를 요청합니다.")
     @ApiResponse(responseCode = "200", description = "리뷰 요청 성공")
     @GetMapping("/home/notification/review")
     ResponseEntity<List<GetScheduleWithoutReviewResponse>> getScheduleWithoutReview(@RequestParam UUID consumerId);
+
 
     /**
      *

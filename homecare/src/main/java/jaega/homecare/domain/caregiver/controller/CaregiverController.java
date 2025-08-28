@@ -9,6 +9,8 @@ import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
+import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +33,11 @@ public interface CaregiverController {
     @GetMapping("/verified")
     ResponseEntity<GetCaregiverVerifiedStatusResponse> getCaregiverVerifiedStatus(@RequestParam UUID caregiverId);
 
+    /**
+     *
+     * 센터 관련 API
+     */
+
     @Operation(
             summary = "소속 중인 센터 목록 조회",
             description = "해당 요양보호사가 소속된 활성화된 센터 목록을 조회합니다. "
@@ -48,4 +55,20 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "204", description = "선택한 센터 기반으로 Settlement 생성 완료")
     @PostMapping("/center")
     ResponseEntity<Void> chooseCaregiverCenter(@RequestBody ChoiceCaregiverCenterRequest request);
+
+    /**
+     *
+     * 일정 조회 API
+     */
+
+    @Operation(summary = "특정 요양보호사의 주간 스케줄 조회", description = "특정 요양보호사의 주간 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 수요자의 주간 스케줄 조회 성공")
+    @GetMapping("/schedule")
+    ResponseEntity<List<CaregiverScheduleResponse>> getConsumerSchedule(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "특정 스케줄 상세 조회", description = "요양보호사가 선택한 특정 스케줄의 상세 정보를 불러옵니다.")
+    @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")
+    @GetMapping("/schedule/{id}")
+    ResponseEntity<CaregiverScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id);
+
 }
