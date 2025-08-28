@@ -1,12 +1,7 @@
 package jaega.homecare.domain.serviceMatch.service.query;
 
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.mapper.ServiceMatchMapper;
 import jaega.homecare.domain.serviceMatch.repository.DashboardStats;
@@ -86,15 +81,15 @@ public class ServiceMatchQueryService {
     public List<ConsumerScheduleResponse> getConsumerSchedule(UUID consumerId, LocalDate today){
         LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate weekEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-        return serviceMatchQueryRepository.findWeeklySchedule(consumerId, weekStart, weekEnd);
+        return serviceMatchQueryRepository.findConsumerWeeklySchedule(consumerId, weekStart, weekEnd);
     }
 
-    public ConsumerScheduleDetailResponse getScheduleDetail(UUID serviceRequestId){
-        return serviceMatchQueryRepository.findScheduleDetail(serviceRequestId);
+    public ConsumerScheduleDetailResponse getConsumerScheduleDetail(UUID serviceMatchId){
+        return serviceMatchQueryRepository.findConsumerScheduleDetail(serviceMatchId);
     }
 
-    public ConsumerNextScheduleResponse getNextSchedule(UUID consumerId){
-        return serviceMatchQueryRepository.findNextSchedule(consumerId);
+    public ConsumerNextScheduleResponse getConsumerNextSchedule(UUID consumerId){
+        return serviceMatchQueryRepository.findConsumerNextSchedule(consumerId);
     }
 
     public List<GetScheduleWithoutReviewResponse> getScheduleWithoutReview(UUID consumerId){
@@ -107,6 +102,16 @@ public class ServiceMatchQueryService {
      * Caregiver
      *
      */
+
+    public List<CaregiverScheduleResponse> getCaregiverSchedule(UUID caregiverId, LocalDate today){
+        LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate weekEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        return serviceMatchQueryRepository.findCaregiverWeeklySchedule(caregiverId, weekStart, weekEnd);
+    }
+
+    public CaregiverScheduleDetailResponse getCaregiverScheduleDetail(UUID serviceMatchId){
+        return serviceMatchQueryRepository.findCaregiverScheduleDetail(serviceMatchId);
+    }
 
 
 }

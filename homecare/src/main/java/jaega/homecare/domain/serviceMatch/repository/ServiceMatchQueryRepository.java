@@ -14,15 +14,11 @@ import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.entity.QCaregiverPreference;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
 
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.recurringOffer.entity.QRecurringOffer;
-import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.review.entity.QReview;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -542,4 +538,69 @@ public class ServiceMatchQueryRepository {
      * Caregiver
      *
      */
+
+    public List<CaregiverScheduleResponse> findCaregiverWeeklySchedule(UUID caregiverId, LocalDate weekStart, LocalDate weekEnd) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        CaregiverScheduleResponse.class,
+                        serviceMatch.serviceMatchId,
+                        consumer.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus,
+                        serviceRequest.requestStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .where(
+                        caregiver.caregiverId.eq(caregiverId),
+                        serviceMatch.serviceDate.between(weekStart, weekEnd)
+                )
+                .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
+                .fetch();
+    }
+
+    public CaregiverScheduleDetailResponse findCaregiverScheduleDetail(UUID serviceMatchId) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QUser consumerUser = consumer.user;
+
+        return queryFactory.
+                select(Projections.constructor(
+                        CaregiverScheduleDetailResponse.class,
+                        consumerUser.name,
+                        consumerUser.phone,
+                        consumer.guardianName,
+                        consumer.guardianPhone,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.duration,
+                        consumer.careGrade,
+                        consumer.disease,
+                        consumer.weight,
+                        consumer.cognitiveStatus,
+                        consumer.livingSituation,
+                        serviceRequest.serviceAddress,
+                        consumer.entranceType,
+                        serviceRequest.additionalInformation,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .fetchOne();
+    }
 }
