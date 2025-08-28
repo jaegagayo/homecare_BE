@@ -1,6 +1,10 @@
 package jaega.homecare.domain.serviceMatch.service.query;
 
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
+import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
+import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -15,7 +19,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @Service
@@ -38,6 +44,12 @@ public class ServiceMatchQueryService {
         return serviceMatchMapper.toGetResponseByUUID(serviceMatch);
     }
 
+    /**
+     *
+     * Center
+     *
+     */
+
     // Center 기반 매칭 결과 조회, CaregiverCenter
     public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
         return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
@@ -56,7 +68,7 @@ public class ServiceMatchQueryService {
     public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
         LocalDate today = LocalDate.now();
 
-        DashboardStats dashboardStats = serviceMatchQueryRepository.getDashboardStats(centerId, today);
+        DashboardStats dashboardStats = serviceMatchQueryRepository.getDashboardStatus(centerId, today);
         List<WorkPlaceDistribution> distributions = serviceMatchQueryRepository.getWorkPlaceDistributionByServiceType(centerId);
 
         return new GetDashboardWorkStatusResponse(
@@ -64,4 +76,36 @@ public class ServiceMatchQueryService {
                 distributions
         );
     }
+
+    /**
+     *
+     * Consumer
+     *
+     */
+
+    public List<ConsumerScheduleResponse> getConsumerSchedule(UUID consumerId, LocalDate today){
+        LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate weekEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        return serviceMatchQueryRepository.findWeeklySchedule(consumerId, weekStart, weekEnd);
+    }
+
+    public ConsumerScheduleDetailResponse getScheduleDetail(UUID serviceRequestId){
+        return serviceMatchQueryRepository.findScheduleDetail(serviceRequestId);
+    }
+
+    public ConsumerNextScheduleResponse getNextSchedule(UUID consumerId){
+        return serviceMatchQueryRepository.findNextSchedule(consumerId);
+    }
+
+    public List<ReviewRequestResponse> getScheduleWithoutReview(UUID consumerId){
+        return serviceMatchQueryRepository.findCompletedScheduleWithoutReview(consumerId);
+    }
+
+    /**
+     *
+     * Caregiver
+     *
+     */
+
+    
 }

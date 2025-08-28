@@ -4,11 +4,11 @@ import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
 import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
-import jaega.homecare.domain.consumer.service.query.ConsumerQueryService;
 import jaega.homecare.domain.consumer.dto.req.ConfirmCaregiverRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
+import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
@@ -31,7 +31,7 @@ public class ConsumerControllerImpl implements ConsumerController {
     private final ConsumerCommandService consumerCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final ServiceRequestQueryService serviceRequestQueryService;
-    private final ConsumerQueryService consumerQueryService;
+    private final ServiceMatchQueryService serviceMatchQueryService;
 
     /**
      *
@@ -71,7 +71,7 @@ public class ConsumerControllerImpl implements ConsumerController {
     @Override
     public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@PathVariable UUID consumerId){
         LocalDate today = LocalDate.now();
-        List<ConsumerScheduleResponse> responses = consumerQueryService.getConsumerSchedule(consumerId, today);
+        List<ConsumerScheduleResponse> responses = serviceMatchQueryService.getConsumerSchedule(consumerId, today);
         return ResponseEntity.ok(responses);
     }
 
@@ -81,7 +81,7 @@ public class ConsumerControllerImpl implements ConsumerController {
      */
     @Override
     public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
-        ConsumerScheduleDetailResponse response = consumerQueryService.getScheduleDetail(id);
+        ConsumerScheduleDetailResponse response = serviceMatchQueryService.getScheduleDetail(id);
         return ResponseEntity.ok(response);
     }
 
@@ -91,7 +91,7 @@ public class ConsumerControllerImpl implements ConsumerController {
      */
     @Override
     public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@PathVariable UUID id){
-        ConsumerNextScheduleResponse response = consumerQueryService.getNextSchedule(id);
+        ConsumerNextScheduleResponse response = serviceMatchQueryService.getNextSchedule(id);
         return ResponseEntity.ok(response);
     }
 
@@ -101,7 +101,7 @@ public class ConsumerControllerImpl implements ConsumerController {
      */
     @Override
     public ResponseEntity<List<ReviewRequestResponse>> getReviewRequest(@PathVariable UUID id){
-        List<ReviewRequestResponse> responses = consumerQueryService.getReviewRequest(id);
+        List<ReviewRequestResponse> responses = serviceMatchQueryService.getScheduleWithoutReview(id);
         return ResponseEntity.ok(responses);
     }
 

@@ -128,6 +128,7 @@ public class CaregiverQueryRepository {
                 .toList();
     }
 
+    //  이번 달 신규 요양보호사 카운트
     public Long countNewCaregiversThisMonth(Center center) {
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
@@ -146,6 +147,7 @@ public class CaregiverQueryRepository {
                 .fetchOne();
     }
 
+    // 특정 센터에 소속한 모든 요양보호사 카운트
     public Long countByCenterId(UUID centerId) {
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
@@ -156,6 +158,7 @@ public class CaregiverQueryRepository {
                 .fetchOne();
     }
 
+    // 특정 센터에 소속한 요양보호사를 상태 별로 카운트
     public Long countByCenterAndStatus(UUID centerId, CaregiverStatus status) {
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
 
@@ -168,4 +171,6 @@ public class CaregiverQueryRepository {
                 )
                 .fetchOne();
     }
+
+
 }

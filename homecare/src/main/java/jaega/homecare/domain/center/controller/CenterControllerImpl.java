@@ -190,7 +190,7 @@ public class CenterControllerImpl implements CenterController{
      */
     @Override
     public ResponseEntity<GetDashboardPopularResponse> getDashboardPopular(@RequestParam UUID centerId){
-        GetDashboardPopularResponse response = caregiverQueryService.getCaregiverStats(centerId);
+        GetDashboardPopularResponse response = caregiverQueryService.getCaregiverStatus(centerId);
         return ResponseEntity.ok(response);
     }
 
