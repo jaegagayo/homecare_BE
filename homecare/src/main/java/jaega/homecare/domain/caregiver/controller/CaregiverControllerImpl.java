@@ -31,20 +31,14 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
 
-    /**
-     *
-     * 요양보호사 회원가입
-     */
+    // 요양보호사 회원가입
     @Override
     public ResponseEntity<GetCaregiverSignupResponse> signupCaregiver(@RequestBody CaregiverSignupRequest request){
         GetCaregiverSignupResponse response = caregiverCommandService.signupCaregiver(request);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     *
-     * 요양보호사 승인 상태 조회
-     */
+    // 요양 보호사 승인 상태 조회
     // TODO : 인증 기능 구현 시 다른 페이지로 이동 못하도록 CORS 도입 고려
     @Override
     public ResponseEntity<GetCaregiverVerifiedStatusResponse> getCaregiverVerifiedStatus(@RequestParam UUID caregiverId){
@@ -52,12 +46,11 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(response);
     }
 
-    // 센터
-
     /**
-     *
-     * 활성화된 센터 목록 조회
+     * 센터 관련 API
      */
+
+    // 소속 중인 센터 목록 조회
     @Override
     public ResponseEntity<List<SelectableCaregiverCenter>> getMyActiveCenters(@RequestParam UUID caregiverId) {
         List<CaregiverCenter> centers = caregiverCenterQueryService.getActiveCaregiverCenters(caregiverId);
@@ -73,10 +66,7 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     *
-     * 요양보호사 센터 선택
-     */
+    // 요양보호사의 명시적 센터 선택
     @Override
     public ResponseEntity<Void> chooseCaregiverCenter(@RequestBody ChoiceCaregiverCenterRequest request) {
         ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
@@ -92,5 +82,11 @@ public class CaregiverControllerImpl implements CaregiverController {
 
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * 일정 조회 API
+     */
+
+
 
 }

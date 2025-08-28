@@ -15,6 +15,9 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailRespo
 import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferResponse;
 import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferResponse;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;

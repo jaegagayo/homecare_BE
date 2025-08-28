@@ -18,6 +18,9 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferRespo
 import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
@@ -126,15 +129,15 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     // 특정 스케줄 상세 조회
     @Override
-    public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
-        ConsumerScheduleDetailResponse response = serviceMatchQueryService.getScheduleDetail(id);
+    public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID serviceMatchId){
+        ConsumerScheduleDetailResponse response = serviceMatchQueryService.getConsumerScheduleDetail(serviceMatchId);
         return ResponseEntity.ok(response);
     }
 
     // (메인 페이지) 가장 가까운 일 조회
     @Override
-    public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID id){
-        ConsumerNextScheduleResponse response = serviceMatchQueryService.getNextSchedule(id);
+    public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID consumerId){
+        ConsumerNextScheduleResponse response = serviceMatchQueryService.getConsumerNextSchedule(consumerId);
         return ResponseEntity.ok(response);
     }
 

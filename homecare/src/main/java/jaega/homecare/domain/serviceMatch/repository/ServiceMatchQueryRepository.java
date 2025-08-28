@@ -14,9 +14,9 @@ import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.entity.QCaregiverPreference;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
 
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.recurringOffer.entity.QRecurringOffer;
@@ -407,7 +407,7 @@ public class ServiceMatchQueryRepository {
      */
 
     // Consumer의 주간 스케줄 조회
-    public List<ConsumerScheduleResponse> findWeeklySchedule(UUID consumerId, LocalDate weekStart, LocalDate weekEnd) {
+    public List<ConsumerScheduleResponse> findConsumerWeeklySchedule(UUID consumerId, LocalDate weekStart, LocalDate weekEnd) {
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QConsumer consumer = QConsumer.consumer;
@@ -416,7 +416,7 @@ public class ServiceMatchQueryRepository {
         return queryFactory
                 .select(Projections.constructor(
                         ConsumerScheduleResponse.class,
-                        serviceRequest.serviceRequestId,
+                        serviceMatch.serviceMatchId,
                         caregiver.user.name,
                         serviceMatch.serviceDate,
                         serviceMatch.serviceStartTime,
@@ -426,9 +426,9 @@ public class ServiceMatchQueryRepository {
                         serviceMatch.matchStatus
                 ))
                 .from(serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceRequest.consumer, consumer)
-                .join(serviceMatch.caregiver, caregiver)
                 .where(
                         consumer.consumerId.eq(consumerId),
                         serviceMatch.serviceDate.between(weekStart, weekEnd)
@@ -439,7 +439,7 @@ public class ServiceMatchQueryRepository {
     }
 
     // Consumer의 일정 상세 조회
-    public ConsumerScheduleDetailResponse findScheduleDetail(UUID serviceRequestId) {
+    public ConsumerScheduleDetailResponse findConsumerScheduleDetail(UUID serviceMatchId) {
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -458,18 +458,17 @@ public class ServiceMatchQueryRepository {
                         serviceRequest.serviceAddress,
                         serviceRequest.serviceType,
                         serviceMatch.matchStatus,
-                        review.id.isNotNull() // 리뷰 존재 여부
+                        review.id.isNull()
                 ))
                 .from(serviceMatch)
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceMatch.caregiver, caregiver)
                 .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
-                .where(serviceRequest.serviceRequestId.eq(serviceRequestId))
                 .fetchOne();
     }
 
     // Consumer의 가장 가까운 확정 일정 조회
-    public ConsumerNextScheduleResponse findNextSchedule(UUID consumerId) {
+    public ConsumerNextScheduleResponse findConsumerNextSchedule(UUID consumerId) {
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QConsumer consumer = QConsumer.consumer;
