@@ -64,11 +64,21 @@ public interface CaregiverController {
     @Operation(summary = "특정 요양보호사의 주간 스케줄 조회", description = "특정 요양보호사의 주간 스케줄을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 수요자의 주간 스케줄 조회 성공")
     @GetMapping("/schedule")
-    ResponseEntity<List<CaregiverScheduleResponse>> getConsumerSchedule(@RequestParam UUID caregiverId);
+    ResponseEntity<List<CaregiverScheduleResponse>> getCaregiverSchedule(@RequestParam UUID caregiverId);
 
     @Operation(summary = "특정 스케줄 상세 조회", description = "요양보호사가 선택한 특정 스케줄의 상세 정보를 불러옵니다.")
     @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")
     @GetMapping("/schedule/{id}")
     ResponseEntity<CaregiverScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id);
+
+    @Operation(summary = "(메인 페이지) 요양보호사의 당일 스케줄 조회", description = "요양보호사의 당일 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사의 당일 스케줄 조회 성공")
+    @GetMapping("/home/today-schedule")
+    ResponseEntity<List<CaregiverScheduleResponse>> getTodaySchedule(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "(메인 페이지) 요양보호사의 내일 예정 스케줄 조회", description = "요양보호사의 내일 예정인 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사의 당일 스케줄 조회 성공")
+    @GetMapping("/home/next-schedule")
+    ResponseEntity<List<CaregiverScheduleResponse>> getTomorrowSchedule(@RequestParam UUID caregiverId);
 
 }

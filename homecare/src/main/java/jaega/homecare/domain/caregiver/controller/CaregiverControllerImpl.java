@@ -1,5 +1,7 @@
 package jaega.homecare.domain.caregiver.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
@@ -90,17 +92,35 @@ public class CaregiverControllerImpl implements CaregiverController {
      * 일정 조회 API
      */
 
+    // 특정 요양 보호사의 주간 일정 조회
     @Override
-    public ResponseEntity<List<CaregiverScheduleResponse>> getConsumerSchedule(@RequestParam UUID caregiverId){
+    public ResponseEntity<List<CaregiverScheduleResponse>> getCaregiverSchedule(@RequestParam UUID caregiverId){
         LocalDate today = LocalDate.now();
         List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverSchedule(caregiverId, today);
         return ResponseEntity.ok(responses);
     }
 
+    // 특정 스케줄 상세 조회
     @Override
     public ResponseEntity<CaregiverScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
         CaregiverScheduleDetailResponse response = serviceMatchQueryService.getCaregiverScheduleDetail(id);
         return ResponseEntity.ok(response);
+    }
+
+    // (메인 페이지) 요양 보호사의 당일 스케줄 조회
+    @Override
+    public ResponseEntity<List<CaregiverScheduleResponse>> getTodaySchedule(@RequestParam UUID caregiverId){
+        LocalDate today = LocalDate.now();
+        List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverScheduleByDate(caregiverId, today);
+        return ResponseEntity.ok(responses);
+    }
+
+    // (메인 페이지) 요양 보호사의 내일 예정 스케줄 조회
+    @Override
+    public ResponseEntity<List<CaregiverScheduleResponse>> getTomorrowSchedule(@RequestParam UUID caregiverId){
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverScheduleByDate(caregiverId, tomorrow);
+        return ResponseEntity.ok(responses);
     }
 
 

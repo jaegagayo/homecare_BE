@@ -113,12 +113,8 @@ public class ServiceMatchQueryService {
         return serviceMatchQueryRepository.findCaregiverScheduleDetail(serviceMatchId);
     }
 
-    public List<CaregiverScheduleResponse> getCaregiverTodaySchedule(UUID caregiverId, LocalDate today){
-        return serviceMatchQueryRepository.findCaregiverScheduleByDate(caregiverId, today);
-    }
-
-    public List<CaregiverScheduleResponse> getCaregiverTomorrowSchedule(UUID caregiverId, LocalDate tomorrow){
-        return serviceMatchQueryRepository.findCaregiverScheduleByDate(caregiverId, tomorrow);
+    public List<CaregiverScheduleResponse> getCaregiverScheduleByDate(UUID caregiverId, LocalDate date){
+        return serviceMatchQueryRepository.findCaregiverScheduleByDate(caregiverId, date);
     }
 
 

@@ -134,7 +134,7 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.ok(response);
     }
 
-    // (메인 페이지) 가장 가까운 일 조회
+    // (메인 페이지) 가장 가까운 일정 조회
     @Override
     public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID consumerId){
         ConsumerNextScheduleResponse response = serviceMatchQueryService.getConsumerNextSchedule(consumerId);
