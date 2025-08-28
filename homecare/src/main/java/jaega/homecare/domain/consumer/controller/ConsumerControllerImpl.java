@@ -129,8 +129,8 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     // 특정 스케줄 상세 조회
     @Override
-    public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID serviceMatchId){
-        ConsumerScheduleDetailResponse response = serviceMatchQueryService.getConsumerScheduleDetail(serviceMatchId);
+    public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
+        ConsumerScheduleDetailResponse response = serviceMatchQueryService.getConsumerScheduleDetail(id);
         return ResponseEntity.ok(response);
     }
 

@@ -609,4 +609,37 @@ public class ServiceMatchQueryRepository {
                 .where(serviceMatch.serviceMatchId.eq(serviceMatchId))
                 .fetchOne();
     }
+
+    // 특정 날짜의 Caregiver 일정 조회
+    public List<CaregiverScheduleResponse> findCaregiverScheduleByDate(UUID caregiverId, LocalDate date) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        CaregiverScheduleResponse.class,
+                        serviceMatch.serviceMatchId,
+                        consumer.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus,
+                        serviceRequest.requestStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .where(
+                        caregiver.caregiverId.eq(caregiverId),
+                        serviceMatch.serviceDate.eq(date),
+                        serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED)
+                )
+                .orderBy(serviceMatch.serviceStartTime.asc())
+                .fetch();
+    }
 }
