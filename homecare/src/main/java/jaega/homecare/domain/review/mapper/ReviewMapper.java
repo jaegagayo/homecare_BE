@@ -1,11 +1,14 @@
 package jaega.homecare.domain.review.mapper;
 
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 
 @Mapper(componentModel = "spring")
@@ -22,4 +25,10 @@ public interface ReviewMapper {
     @Mapping(target = "reviewScore", source = "reviewScore")
     @Mapping(target = "reviewContent", source = "reviewContent")
     GetReviewResponse toGetResponse(Review review);
+
+    @Mapping(target = "serviceDate", source = "serviceMatch.serviceDate")
+    @Mapping(target = "caregiverName", source = "serviceMatch.caregiver.user.name")
+    ConsumerReviewResponse toConsumerReviewResponse(Review review);
+
+    List<ConsumerReviewResponse> toConsumerReviewResponse(List<Review> reviews);
 }

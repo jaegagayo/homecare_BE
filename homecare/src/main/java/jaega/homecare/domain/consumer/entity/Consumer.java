@@ -1,5 +1,6 @@
 package jaega.homecare.domain.consumer.entity;
 
+import jaega.homecare.domain.consumer.dto.req.ConsumerUpdateRequest;
 import jaega.homecare.domain.users.entity.Disease;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.global.audit.BaseTimeEntity;
@@ -80,6 +81,20 @@ public class Consumer extends BaseTimeEntity {
 
     public void initializeConsumer(UUID consumerId){
         this.consumerId = consumerId;
+    }
+
+    public void updateConsumer(ConsumerUpdateRequest request){
+        this.residentialAddress = request.residentialAddress();
+        this.visitAddress = request.visitAddress();
+        this.entranceType = request.entranceType();
+        this.careGrade = request.careGrade();
+        this.isMedicalAid = request.medicalAid();
+        this.weight = request.weight();
+        this.disease = request.disease();
+        this.cognitiveStatus = request.cognitiveStatus();
+        this.livingSituation = request.livingSituation();
+        this.guardianName = request.guardianName();
+        this.guardianPhone = request.guardianPhone();
     }
 
 }

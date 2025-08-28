@@ -1,6 +1,7 @@
 package jaega.homecare.domain.serviceRequest.entity;
 
 import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.serviceRequest.dto.req.UpdateServiceRequest;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.users.entity.Location;
 import jakarta.persistence.*;
@@ -83,5 +84,17 @@ public class ServiceRequest {
 
     public void changeRequestStatus(ServiceRequestStatus requestStatus){
         this.requestStatus = requestStatus;
+    }
+
+    public void updateServiceRequest(UpdateServiceRequest request){
+        this.serviceAddress = request.serviceAddress();
+        this.addressType = request.addressType();
+        this.location = new Location(request.location().latitude(), request.location().longitude());
+        this.requestDate = request.requestDate();
+        this.preferredStartTime = request.preferredStartTime();
+        this.preferredEndTime = request.preferredEndTime();
+        this.duration = request.duration();
+        this.serviceType = request.serviceType();
+        this.additionalInformation = request.additionalInformation();
     }
 }

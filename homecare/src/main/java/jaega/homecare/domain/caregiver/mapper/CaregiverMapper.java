@@ -14,8 +14,6 @@ import org.mapstruct.Mapping;
 public interface CaregiverMapper {
 
     @Mapping(target = "user", source = "user")
-    @Mapping(target = "availableStartTime", source = "request.availableStartTime")
-    @Mapping(target = "availableEndTime", source = "request.availableEndTime")
     @Mapping(target = "address", source = "request.address")
     @Mapping(target = "career", source = "request.career")
     @Mapping(target = "koreanProficiency", source = "request.koreanProficiency")

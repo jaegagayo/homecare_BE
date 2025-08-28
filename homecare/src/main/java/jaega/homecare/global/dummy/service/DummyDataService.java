@@ -99,6 +99,7 @@ public class DummyDataService {
                 .password("$2a$10$vvUzhakZH7BQ0fpo8RfS/u3Ip54VLNHAQSoBCnCIYKSxVBmAhxaVG")
                 .phone("010-1234-" + String.format("%04d", index))
                 .birthDate(LocalDate.of(1970 + random.nextInt(30), random.nextInt(12) + 1, random.nextInt(28) + 1))
+                .gender(Gender.values()[random.nextInt(Gender.values().length)])
                 .build();
 
         user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
@@ -134,8 +135,6 @@ public class DummyDataService {
         Caregiver caregiver = Caregiver.builder()
                 .caregiverId(UUID.randomUUID())
                 .user(user)
-                .availableStartTime(startTime)
-                .availableEndTime(endTime)
                 .address("서울시 송파구 올림픽로 " + index)
                 .career(1 + random.nextInt(20)) // 경력 1~20년
                 .koreanProficiency(KoreanProficiency.values()[random.nextInt(KoreanProficiency.values().length)])

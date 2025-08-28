@@ -1,5 +1,7 @@
 package jaega.homecare.domain.users.entity;
 
+import jaega.homecare.domain.users.dto.req.UserUpdateRequest;
+import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,21 +33,29 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Builder
     public User(String name, String email, String password, String phone, LocalDate birthDate,
-                UUID userId, UserRole userRole, LocalDateTime createdAt){
+                UUID userId, UserRole userRole, Gender gender){
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.birthDate = birthDate;
+        this.gender = gender;
     }
 
     public void setUser(UUID userId, UserRole userRole, LocalDateTime createdAt){
         this.userId = userId;
         this.userRole = userRole;
-        this.createdAt = createdAt;
+    }
+
+    public void updateUser(UserUpdateRequest request){
+        this.name = request.name();
+        this.birthDate = request.birthDate();
+        this.gender = request.gender();
+        this.phone = request.phone();
     }
 }

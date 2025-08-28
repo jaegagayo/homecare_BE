@@ -1,6 +1,7 @@
 package jaega.homecare.domain.consumer.service.command;
 
 import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
+import jaega.homecare.domain.consumer.dto.req.ConsumerProfileUpdateRequest;
 import jaega.homecare.domain.consumer.dto.req.ConsumerSignupRequest;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
@@ -31,6 +32,13 @@ public class ConsumerCommandService {
     public void createConsumer(ConsumerCreateRequest request, User user){
         Consumer consumer = consumerMapper.toConsumer(request, user);
         consumer.initializeConsumer(UUID.randomUUID());
+        consumerRepository.save(consumer);
+    }
+
+    public void updateConsumer(ConsumerProfileUpdateRequest request, Consumer consumer){
+        userCommandService.updateUser(request.userRequest(), consumer.getUser());
+        consumer.updateConsumer(request.consumerRequest());
+
         consumerRepository.save(consumer);
     }
 }

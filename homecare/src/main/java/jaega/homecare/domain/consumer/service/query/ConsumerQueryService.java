@@ -1,12 +1,13 @@
 package jaega.homecare.domain.consumer.service.query;
 
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.consumer.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.consumer.dto.res.*;
 import jaega.homecare.domain.consumer.entity.Consumer;
+import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
 import jaega.homecare.domain.consumer.repository.ConsumerQueryRepository;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
+import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.review.entity.Review;
+import jaega.homecare.domain.review.repository.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,8 @@ public class ConsumerQueryService {
 
     private final ConsumerRepository consumerRepository;
     private final ConsumerQueryRepository consumerQueryRepository;
+    private final ReviewQueryRepository reviewQueryRepository;
+    private final ConsumerMapper consumerMapper;
 
     public Consumer getConsumer(UUID consumerId){
         return consumerRepository.findByConsumerId(consumerId)
@@ -46,6 +49,11 @@ public class ConsumerQueryService {
     }
 
     public List<ReviewRequestResponse> getReviewRequest(UUID consumerId){
-        return consumerQueryRepository.findCompletedSchedulesWithoutReview(consumerId);
+        return reviewQueryRepository.findCompletedSchedulesWithoutReview(consumerId);
+    }
+
+    public ConsumerDetailResponse getDetail(UUID consumerId){
+        Consumer consumer = getConsumer(consumerId);
+        return consumerMapper.toDetailResponse(consumer);
     }
 }
