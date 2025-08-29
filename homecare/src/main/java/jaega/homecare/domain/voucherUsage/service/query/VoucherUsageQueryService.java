@@ -5,6 +5,7 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.domain.voucher.repository.VoucherQueryRepository;
 import jaega.homecare.domain.voucher.repository.VoucherRepository;
+import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageCost;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageDetail;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
@@ -52,57 +53,27 @@ public class VoucherUsageQueryService {
     }
 
     // 바우처 상세 내역 조회
-    public VoucherUsageResponse getVoucherUsageSummary(UUID consumerId, int year, int month){
+    public VoucherUsageResponse getVoucherUsageSummary(UUID consumerId, int year, int month) {
         YearMonth targetMonth = YearMonth.of(year, month);
         Voucher voucher = voucherQueryRepository.findByConsumerIdAndMonth(consumerId, targetMonth);
 
-        // 두 상태를 한 번에 조회
+        // 금액 합계 조회
+        VoucherUsageCost cost = voucherUsageQueryRepository.findVoucherUsageSummary(voucher);
+
+        // 상태별 사용 내역 조회 (정렬 포함)
         List<VoucherUsage> allUsage = voucherUsageQueryRepository.findByVoucherAndStatusIn(
                 voucher, List.of(MatchStatus.COMPLETED, MatchStatus.CONFIRMED)
         );
 
-        // 금액 계산
-        long usedAmount = allUsage.stream()
-                .filter(u -> u.getServiceMatch().getMatchStatus() == MatchStatus.COMPLETED)
-                .mapToLong(VoucherUsage::getAmount)
-                .sum();
-
-        long expectedAmount = allUsage.stream()
-                .filter(u -> u.getServiceMatch().getMatchStatus() == MatchStatus.CONFIRMED)
-                .mapToLong(VoucherUsage::getAmount)
-                .sum();
-
-        long remainingAmount = voucher.getTotalAmount() - (usedAmount + expectedAmount);
-
-        long totalCopay = allUsage.stream().mapToLong(VoucherUsage::getCopay).sum();
-        long confirmedCopay = allUsage.stream()
-                .filter(u -> u.getServiceMatch().getMatchStatus() == MatchStatus.COMPLETED)
-                .mapToLong(VoucherUsage::getCopay)
-                .sum();
-
-        // 날짜 기준 정렬 (최신순)
         allUsage.sort(Comparator.comparing(u -> u.getServiceMatch().getServiceRequest().getRequestDate(), Comparator.reverseOrder()));
 
-        // 응답 DTO 변환
         List<VoucherUsageDetail> usageList = allUsage.stream()
-                .map(u -> new VoucherUsageDetail(
-                        u.getServiceMatch().getServiceRequest().getRequestDate(),
-                        u.getAmount(),
-                        u.getCopay(),
-                        u.getServiceMatch().getServiceRequest().getServiceType().name(),
-                        u.getServiceMatch().getMatchStatus()
-                ))
+                .map(voucherUsageMapper::toVoucherUsageDetail)
                 .toList();
 
-        return new VoucherUsageResponse(
-                voucher.getTotalAmount(),
-                usedAmount,
-                expectedAmount,
-                remainingAmount,
-                confirmedCopay,
-                totalCopay,
-                usageList
-        );
+        long remainingAmount = voucher.getTotalAmount() - (cost.usedAmount() + cost.expectedAmount());
+
+        return voucherUsageMapper.toVoucherUsageResponse(voucher, cost, remainingAmount, usageList);
     }
 
 }
