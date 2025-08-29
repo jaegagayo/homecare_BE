@@ -28,37 +28,37 @@ public class Consumer extends BaseTimeEntity {
     private UUID consumerId;
 
     @Column(name = "residential_address", nullable = false)
-    private String residentialAddress;
+    private String residentialAddress;          // 거주지 주소
 
     @Column(name = "visit_address", nullable = false)
-    private String visitAddress;
+    private String visitAddress;                // 방문지 주소
 
     @Column(name = "entranceType", columnDefinition = "TEXT")
-    private String entranceType;
+    private String entranceType;                // 출입 방법
 
     @Column(name = "care_grade", nullable = false)
-    private Integer careGrade;
+    private Integer careGrade;                  // 장기요양 인정 등급
 
     @Column(name = "is_medical_aid", nullable = false)
-    private boolean isMedicalAid;
+    private boolean isMedicalAid;               // 의료급여 수급자 여부
 
     @Column(name = "weight", nullable = false)
     private Integer weight;
 
     @Enumerated(EnumType.STRING)
-    private Disease disease;
+    private Disease disease;                    // 질병 여부
 
     @Enumerated(EnumType.STRING)
-    private CognitiveStatus cognitiveStatus;
+    private CognitiveStatus cognitiveStatus;    // 인지 상태
 
     @Column(name ="livingSituation", columnDefinition = "TEXT")
-    private String livingSituation;
+    private String livingSituation;             // 동거 여부
 
     @Column(name = "guardian_name", nullable = false)
-    private String guardianName;                            // 보호자 이름
+    private String guardianName;                // 보호자 이름
 
     @Column(name = "guardian_phone", nullable = false)
-    private String guardianPhone;                           // 보호자 연락처
+    private String guardianPhone;               // 보호자 연락처
 
     @Builder
     public Consumer(User user, UUID consumerId, String residentialAddress, String visitAddress, String entranceType,

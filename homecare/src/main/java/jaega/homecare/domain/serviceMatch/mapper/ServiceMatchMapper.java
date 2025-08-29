@@ -1,16 +1,12 @@
 package jaega.homecare.domain.serviceMatch.mapper;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
-import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ServiceMatchMapper {
@@ -30,8 +26,4 @@ public interface ServiceMatchMapper {
     @Mapping(target = "matchStatus", source = "matchStatus")
     GetServiceMatchByUUID toGetResponseByUUID(ServiceMatch serviceMatch);
 
-    @Mapping(target = "caregiverName", source = "caregiver.user.name")
-    ConsumerPendingReviewResponse toConsumerPendingReviewResponse(ServiceMatch serviceMatch);
-
-    List<ConsumerPendingReviewResponse> toConsumerPendingReviewResponse(List<ServiceMatch> serviceMatches);
 }

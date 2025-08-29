@@ -1,21 +1,13 @@
 package jaega.homecare.domain.consumer.service.query;
 
-import jaega.homecare.domain.consumer.dto.res.*;
+import jaega.homecare.domain.consumer.dto.res.ConsumerDetailResponse;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.mapper.ConsumerMapper;
-import jaega.homecare.domain.consumer.repository.ConsumerQueryRepository;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
-import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
-import jaega.homecare.domain.review.entity.Review;
-import jaega.homecare.domain.review.repository.ReviewQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -25,31 +17,11 @@ import java.util.UUID;
 public class ConsumerQueryService {
 
     private final ConsumerRepository consumerRepository;
-    private final ConsumerQueryRepository consumerQueryRepository;
-    private final ReviewQueryRepository reviewQueryRepository;
     private final ConsumerMapper consumerMapper;
 
     public Consumer getConsumer(UUID consumerId){
         return consumerRepository.findByConsumerId(consumerId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 고객입니다."));
-    }
-
-    public List<ConsumerScheduleResponse> getConsumerSchedule(UUID consumerId, LocalDate today){
-        LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDate weekEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-        return consumerQueryRepository.findWeeklySchedule(consumerId, weekStart, weekEnd);
-    }
-
-    public ConsumerScheduleDetailResponse getScheduleDetail(UUID serviceRequestId){
-        return consumerQueryRepository.findScheduleDetail(serviceRequestId);
-    }
-
-    public ConsumerNextScheduleResponse getNextSchedule(UUID consumerId){
-        return consumerQueryRepository.findNextSchedule(consumerId);
-    }
-
-    public List<ReviewRequestResponse> getReviewRequest(UUID consumerId){
-        return reviewQueryRepository.findCompletedSchedulesWithoutReview(consumerId);
     }
 
     public ConsumerDetailResponse getDetail(UUID consumerId){

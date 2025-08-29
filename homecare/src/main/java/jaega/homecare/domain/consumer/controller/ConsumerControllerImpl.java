@@ -18,8 +18,10 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferRespo
 import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
-import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.review.service.command.ReviewCommandService;
@@ -114,29 +116,43 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     /**
      *
-     * 스케줄 조회 API
+     * 일정 조회 API
      */
 
     // 특정 수요자의 주간 스케줄 조회
     @Override
     public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID consumerId){
         LocalDate today = LocalDate.now();
-        List<ConsumerScheduleResponse> responses = consumerQueryService.getConsumerSchedule(consumerId, today);
+        List<ConsumerScheduleResponse> responses = serviceMatchQueryService.getConsumerSchedule(consumerId, today);
         return ResponseEntity.ok(responses);
     }
 
     // 특정 스케줄 상세 조회
     @Override
     public ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
-        ConsumerScheduleDetailResponse response = consumerQueryService.getScheduleDetail(id);
+        ConsumerScheduleDetailResponse response = serviceMatchQueryService.getConsumerScheduleDetail(id);
         return ResponseEntity.ok(response);
     }
 
-    // (메인 페이지) 가장 가까운 스케줄 조회
+    // (메인 페이지) 가장 가까운 일정 조회
     @Override
-    public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID id){
-        ConsumerNextScheduleResponse response = consumerQueryService.getNextSchedule(id);
+    public ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID consumerId){
+        ConsumerNextScheduleResponse response = serviceMatchQueryService.getConsumerNextSchedule(consumerId);
         return ResponseEntity.ok(response);
+    }
+
+    // (메인 페이지) 리뷰를 작성하지 않은 일정 조회
+    @Override
+    public ResponseEntity<List<GetScheduleWithoutReviewResponse>> getScheduleWithoutReview(@RequestParam UUID consumerId){
+        List<GetScheduleWithoutReviewResponse> responses = serviceMatchQueryService.getScheduleWithoutReview(consumerId);
+        return ResponseEntity.ok(responses);
+    }
+
+    // (마이 페이지) 리뷰를 작성해야 할 일정 조회
+    @Override
+    public ResponseEntity<List<GetScheduleWithoutReviewResponse>> getPendingReviews(@PathVariable UUID consumerId) {
+        List<GetScheduleWithoutReviewResponse> pending = serviceMatchQueryService.getScheduleWithoutReview(consumerId);
+        return ResponseEntity.ok(pending);
     }
 
     /**
@@ -289,17 +305,4 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.ok(reviews);
     }
 
-    @Override
-    public ResponseEntity<List<ConsumerPendingReviewResponse>> getPendingReviews(@PathVariable UUID consumerId) {
-        List<ConsumerPendingReviewResponse> pending = serviceMatchQueryService.getPendingReviews(consumerId);
-        return ResponseEntity.ok(pending);
-    }
-
-
-    // (메인 페이지) 리뷰 요청
-    @Override
-    public ResponseEntity<List<ReviewRequestResponse>> getReviewRequest(@RequestParam UUID consumerId){
-        List<ReviewRequestResponse> responses = consumerQueryService.getReviewRequest(consumerId);
-        return ResponseEntity.ok(responses);
-    }
 }

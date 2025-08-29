@@ -15,8 +15,10 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailRespo
 import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferResponse;
 import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferResponse;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
-import jaega.homecare.domain.review.dto.res.ReviewRequestResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
@@ -67,17 +69,23 @@ public interface ConsumerController {
     @Operation(summary = "특정 수요자의 주간 스케줄 조회", description = "특정 수요자의 매칭된 결과를 토대로 주간 스케줄을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "특정 수요자의 주간 스케줄 조회 성공")
     @GetMapping("/schedule")
-    ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID id);
+    ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID consumerId);
 
     @Operation(summary = "특정 스케줄 상세 조회", description = "수요자가 선택한 특정 스케줄의 상세 정보를 불러옵니다.")
     @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")
     @GetMapping("/schedule/{id}")
     ResponseEntity<ConsumerScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id);
 
-    @Operation(summary = "(메인 페이지) 가장 가까운 스케줄 조회", description = "수요자의 메인 페이지에서 가장 가까운 스케줄을 조회합니다.")
+    @Operation(summary = "(메인 페이지) 가장 가까운 일정 조회", description = "수요자의 메인 페이지에서 가장 가까운 스케줄을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "가까운 스케줄 조회 성공")
     @GetMapping("/home/next-schedule")
-    ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID id);
+    ResponseEntity<ConsumerNextScheduleResponse> getNextSchedule(@RequestParam UUID consumerId);
+
+    @Operation(summary = "(메인 페이지) 리뷰를 작성하지 않은 일정 조회", description = "완료된 일정 중 리뷰가 아직 등록되지 않은 일정에 대해 리뷰를 요청합니다.")
+    @ApiResponse(responseCode = "200", description = "리뷰 요청 성공")
+    @GetMapping("/home/notification/review")
+    ResponseEntity<List<GetScheduleWithoutReviewResponse>> getScheduleWithoutReview(@RequestParam UUID consumerId);
+
 
     /**
      *
@@ -211,14 +219,11 @@ public interface ConsumerController {
     ResponseEntity<List<ConsumerReviewResponse>> getWrittenReviews(@RequestParam UUID consumerId);
 
 
-    @Operation(summary = "(마이페이지) 수요자가 작성해야할 리뷰 조회 API", description = "수요자가 아직 리뷰를 작성하지 않은 매칭들을 조회합니다.")
+    @Operation(summary = "(마이페이지) 수요자가 작성해야 할 리뷰 조회 API", description = "수요자가 아직 리뷰를 작성하지 않은 매칭들을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자가 아직 리뷰를 작성하지 않은 매칭 일정 조회 성공")
     @GetMapping("/my-page/review/pending")
-    ResponseEntity<List<ConsumerPendingReviewResponse>> getPendingReviews(@RequestParam UUID consumerId);
+    ResponseEntity<List<GetScheduleWithoutReviewResponse>> getPendingReviews(@RequestParam UUID consumerId);
 
-    @Operation(summary = "(메인 페이지) 리뷰 요청", description = "완료된 일정 중 리뷰가 아직 등록되지 않은 일정에 대해 리뷰를 요청합니다.")
-    @ApiResponse(responseCode = "200", description = "리뷰 요청 성공")
-    @GetMapping("/home/notification/review")
-    ResponseEntity<List<ReviewRequestResponse>> getReviewRequest(@RequestParam UUID consumerId);
+
 
 }

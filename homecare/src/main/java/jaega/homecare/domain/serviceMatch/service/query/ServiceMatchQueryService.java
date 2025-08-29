@@ -1,9 +1,7 @@
 package jaega.homecare.domain.serviceMatch.service.query;
 
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
-import jaega.homecare.domain.review.dto.res.ConsumerPendingReviewResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.mapper.ServiceMatchMapper;
 import jaega.homecare.domain.serviceMatch.repository.DashboardStats;
@@ -16,7 +14,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @Service
@@ -39,6 +39,12 @@ public class ServiceMatchQueryService {
         return serviceMatchMapper.toGetResponseByUUID(serviceMatch);
     }
 
+    /**
+     *
+     * Center
+     *
+     */
+
     // Center 기반 매칭 결과 조회, CaregiverCenter
     public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
         return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
@@ -57,7 +63,7 @@ public class ServiceMatchQueryService {
     public GetDashboardWorkStatusResponse getDashboardWorkStatus(UUID centerId) {
         LocalDate today = LocalDate.now();
 
-        DashboardStats dashboardStats = serviceMatchQueryRepository.getDashboardStats(centerId, today);
+        DashboardStats dashboardStats = serviceMatchQueryRepository.getDashboardStatus(centerId, today);
         List<WorkPlaceDistribution> distributions = serviceMatchQueryRepository.getWorkPlaceDistributionByServiceType(centerId);
 
         return new GetDashboardWorkStatusResponse(
@@ -66,9 +72,50 @@ public class ServiceMatchQueryService {
         );
     }
 
-    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
-    public List<ConsumerPendingReviewResponse> getPendingReviews(UUID consumerId) {
-        List<ServiceMatch> reviews = serviceMatchQueryRepository.findPendingReviews(consumerId);
-        return serviceMatchMapper.toConsumerPendingReviewResponse(reviews);
+    /**
+     *
+     * Consumer
+     *
+     */
+
+    public List<ConsumerScheduleResponse> getConsumerSchedule(UUID consumerId, LocalDate today){
+        LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate weekEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        return serviceMatchQueryRepository.findConsumerWeeklySchedule(consumerId, weekStart, weekEnd);
     }
+
+    public ConsumerScheduleDetailResponse getConsumerScheduleDetail(UUID serviceMatchId){
+        return serviceMatchQueryRepository.findConsumerScheduleDetail(serviceMatchId);
+    }
+
+    public ConsumerNextScheduleResponse getConsumerNextSchedule(UUID consumerId){
+        return serviceMatchQueryRepository.findConsumerNextSchedule(consumerId);
+    }
+
+    public List<GetScheduleWithoutReviewResponse> getScheduleWithoutReview(UUID consumerId){
+        return serviceMatchQueryRepository.findCompletedScheduleWithoutReview(consumerId);
+    }
+
+
+    /**
+     *
+     * Caregiver
+     *
+     */
+
+    public List<CaregiverScheduleResponse> getCaregiverSchedule(UUID caregiverId, LocalDate today){
+        LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate weekEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        return serviceMatchQueryRepository.findCaregiverWeeklySchedule(caregiverId, weekStart, weekEnd);
+    }
+
+    public CaregiverScheduleDetailResponse getCaregiverScheduleDetail(UUID serviceMatchId){
+        return serviceMatchQueryRepository.findCaregiverScheduleDetail(serviceMatchId);
+    }
+
+    public List<CaregiverScheduleResponse> getCaregiverScheduleByDate(UUID caregiverId, LocalDate date){
+        return serviceMatchQueryRepository.findCaregiverScheduleByDate(caregiverId, date);
+    }
+
+
 }

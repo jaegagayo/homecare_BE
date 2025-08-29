@@ -1,5 +1,7 @@
 package jaega.homecare.domain.caregiver.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
@@ -9,6 +11,8 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
+import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
@@ -17,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,20 +36,14 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
 
-    /**
-     *
-     * 요양보호사 회원가입
-     */
+    // 요양보호사 회원가입
     @Override
     public ResponseEntity<GetCaregiverSignupResponse> signupCaregiver(@RequestBody CaregiverSignupRequest request){
         GetCaregiverSignupResponse response = caregiverCommandService.signupCaregiver(request);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     *
-     * 요양보호사 승인 상태 조회
-     */
+    // 요양 보호사 승인 상태 조회
     // TODO : 인증 기능 구현 시 다른 페이지로 이동 못하도록 CORS 도입 고려
     @Override
     public ResponseEntity<GetCaregiverVerifiedStatusResponse> getCaregiverVerifiedStatus(@RequestParam UUID caregiverId){
@@ -52,12 +51,11 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(response);
     }
 
-    // 센터
-
     /**
-     *
-     * 활성화된 센터 목록 조회
+     * 센터 관련 API
      */
+
+    // 소속 중인 센터 목록 조회
     @Override
     public ResponseEntity<List<SelectableCaregiverCenter>> getMyActiveCenters(@RequestParam UUID caregiverId) {
         List<CaregiverCenter> centers = caregiverCenterQueryService.getActiveCaregiverCenters(caregiverId);
@@ -73,10 +71,7 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     *
-     * 요양보호사 센터 선택
-     */
+    // 요양보호사의 명시적 센터 선택
     @Override
     public ResponseEntity<Void> chooseCaregiverCenter(@RequestBody ChoiceCaregiverCenterRequest request) {
         ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
@@ -92,5 +87,41 @@ public class CaregiverControllerImpl implements CaregiverController {
 
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * 일정 조회 API
+     */
+
+    // 특정 요양 보호사의 주간 일정 조회
+    @Override
+    public ResponseEntity<List<CaregiverScheduleResponse>> getCaregiverSchedule(@RequestParam UUID caregiverId){
+        LocalDate today = LocalDate.now();
+        List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverSchedule(caregiverId, today);
+        return ResponseEntity.ok(responses);
+    }
+
+    // 특정 스케줄 상세 조회
+    @Override
+    public ResponseEntity<CaregiverScheduleDetailResponse> getScheduleDetail(@PathVariable UUID id){
+        CaregiverScheduleDetailResponse response = serviceMatchQueryService.getCaregiverScheduleDetail(id);
+        return ResponseEntity.ok(response);
+    }
+
+    // (메인 페이지) 요양 보호사의 당일 스케줄 조회
+    @Override
+    public ResponseEntity<List<CaregiverScheduleResponse>> getTodaySchedule(@RequestParam UUID caregiverId){
+        LocalDate today = LocalDate.now();
+        List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverScheduleByDate(caregiverId, today);
+        return ResponseEntity.ok(responses);
+    }
+
+    // (메인 페이지) 요양 보호사의 내일 예정 스케줄 조회
+    @Override
+    public ResponseEntity<List<CaregiverScheduleResponse>> getTomorrowSchedule(@RequestParam UUID caregiverId){
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverScheduleByDate(caregiverId, tomorrow);
+        return ResponseEntity.ok(responses);
+    }
+
 
 }

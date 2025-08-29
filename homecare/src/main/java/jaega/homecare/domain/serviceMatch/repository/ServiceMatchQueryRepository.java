@@ -14,10 +14,11 @@ import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.entity.QCaregiverPreference;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
+
 import jaega.homecare.domain.consumer.entity.QConsumer;
 import jaega.homecare.domain.recurringOffer.entity.QRecurringOffer;
 import jaega.homecare.domain.review.entity.QReview;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
@@ -26,11 +27,11 @@ import jaega.homecare.domain.settlement.dto.res.WorkPlaceDistribution;
 import jaega.homecare.domain.users.entity.QUser;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
-import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,12 @@ public class ServiceMatchQueryRepository {
 
     private final JPAQueryFactory queryFactory;
     private final CaregiverQueryRepository caregiverQueryRepository;
+
+    /**
+     *
+     * Center
+     *
+     */
 
     // Center의 배정된 내역 조회
     public List<GetServiceMatchByCenterResponse> findMatchesByCenterId(UUID centerId) {
@@ -148,12 +155,7 @@ public class ServiceMatchQueryRepository {
                 .toList();
     }
 
-    /**
-     *  대시보드
-     */
-
-
-    public DashboardStats getDashboardStats(UUID centerId, LocalDate date) {
+    public DashboardStats getDashboardStatus(UUID centerId, LocalDate date) {
         QCaregiver caregiver = QCaregiver.caregiver;
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
@@ -393,18 +395,251 @@ public class ServiceMatchQueryRepository {
                 .fetch();
     }
 
-    // 수요자가 리뷰를 작성하지 않은 매칭 일정 조회
-    public List<ServiceMatch> findPendingReviews(UUID consumerId) {
-        QServiceMatch sm = QServiceMatch.serviceMatch;
-        QReview r = QReview.review;
+
+    /**
+     *
+     * Consumer
+     *
+     */
+
+    // Consumer의 주간 일정 조회 (월 ~ 일)
+    public List<ConsumerScheduleResponse> findConsumerWeeklySchedule(UUID consumerId, LocalDate weekStart, LocalDate weekEnd) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QCaregiver caregiver = QCaregiver.caregiver;
 
         return queryFactory
-                .selectFrom(sm)
-                .leftJoin(r).on(r.serviceMatch.eq(sm))
+                .select(Projections.constructor(
+                        ConsumerScheduleResponse.class,
+                        serviceMatch.serviceMatchId,
+                        caregiver.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
                 .where(
-                        sm.serviceRequest.consumer.consumerId.eq(consumerId),
-                        r.id.isNull() // Review 없는 ServiceMatch
+                        consumer.consumerId.eq(consumerId),
+                        serviceMatch.serviceDate.between(weekStart, weekEnd),
+                        serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED)
                 )
+                .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
+                .fetch();
+
+    }
+
+    // Consumer의 일정 상세 조회
+    public ConsumerScheduleDetailResponse findConsumerScheduleDetail(UUID serviceMatchId) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser caregiverUser = caregiver.user;
+        QReview review = QReview.review;
+
+        return queryFactory.
+                select(Projections.constructor(
+                        ConsumerScheduleDetailResponse.class,
+                        caregiverUser.name,
+                        caregiverUser.phone,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.duration,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus,
+                        review.id.isNull()
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceMatch.caregiver, caregiver)
+                .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
+                .where(serviceMatch.serviceMatchId.eq(serviceMatchId))
+                .fetchOne();
+    }
+
+    // Consumer의 가장 가까운 확정 일정 조회
+    public ConsumerNextScheduleResponse findConsumerNextSchedule(UUID consumerId) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser caregiverUser = caregiver.user;
+
+        return queryFactory.
+                select(Projections.constructor(
+                        ConsumerNextScheduleResponse.class,
+                        caregiverUser.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .join(serviceMatch.caregiver, caregiver)
+                .where(
+                        consumer.consumerId.eq(consumerId),
+                        serviceMatch.matchStatus.eq(MatchStatus.CONFIRMED),
+                        serviceMatch.serviceDate.after(LocalDate.now())
+                                .or(
+                                        serviceMatch.serviceDate.eq(LocalDate.now())
+                                                .and(serviceMatch.serviceStartTime.goe(LocalTime.now()))
+                                )
+                )
+                .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
+                .limit(1)
+                .fetchOne();
+
+    }
+
+    // 완료된 일정 중 리뷰가 없는 일정 조회
+    public List<GetScheduleWithoutReviewResponse> findCompletedScheduleWithoutReview(UUID consumerId) {
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser caregiverUser = caregiver.user;
+        QReview review = QReview.review;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetScheduleWithoutReviewResponse.class,
+                        caregiverUser.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceType
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(caregiver.user, caregiverUser)
+                .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
+                .where(
+                        serviceRequest.consumer.consumerId.eq(consumerId),
+                        serviceMatch.matchStatus.eq(MatchStatus.COMPLETED),
+                        review.id.isNull()
+                )
+                .orderBy(serviceMatch.serviceDate.desc(), serviceMatch.serviceStartTime.desc())
+                .fetch();
+
+    }
+
+
+    /**
+     *
+     * Caregiver
+     *
+     */
+
+    // Caregiver의 주간 일정 조회 (월 ~ 일)
+    public List<CaregiverScheduleResponse> findCaregiverWeeklySchedule(UUID caregiverId, LocalDate weekStart, LocalDate weekEnd) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        CaregiverScheduleResponse.class,
+                        serviceMatch.serviceMatchId,
+                        consumer.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus,
+                        serviceRequest.requestStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .where(
+                        caregiver.caregiverId.eq(caregiverId),
+                        serviceMatch.serviceDate.between(weekStart, weekEnd),
+                        serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED)
+                )
+                .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
+                .fetch();
+    }
+
+    // Caregiver의 일정 상세 조회
+    public CaregiverScheduleDetailResponse findCaregiverScheduleDetail(UUID serviceMatchId) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QUser consumerUser = consumer.user;
+
+        return queryFactory.
+                select(Projections.constructor(
+                        CaregiverScheduleDetailResponse.class,
+                        consumerUser.name,
+                        consumerUser.phone,
+                        consumer.guardianName,
+                        consumer.guardianPhone,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.duration,
+                        consumer.careGrade,
+                        consumer.disease,
+                        consumer.weight,
+                        consumer.cognitiveStatus,
+                        consumer.livingSituation,
+                        serviceRequest.serviceAddress,
+                        consumer.entranceType,
+                        serviceRequest.additionalInformation,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .where(serviceMatch.serviceMatchId.eq(serviceMatchId))
+                .fetchOne();
+    }
+
+    // 특정 날짜의 Caregiver 일정 조회
+    public List<CaregiverScheduleResponse> findCaregiverScheduleByDate(UUID caregiverId, LocalDate date) {
+        QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QConsumer consumer = QConsumer.consumer;
+        QCaregiver caregiver = QCaregiver.caregiver;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        CaregiverScheduleResponse.class,
+                        serviceMatch.serviceMatchId,
+                        consumer.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceRequest.serviceAddress,
+                        serviceRequest.serviceType,
+                        serviceMatch.matchStatus,
+                        serviceRequest.requestStatus
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .join(serviceRequest.consumer, consumer)
+                .where(
+                        caregiver.caregiverId.eq(caregiverId),
+                        serviceMatch.serviceDate.eq(date),
+                        serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED)
+                )
+                .orderBy(serviceMatch.serviceStartTime.asc())
                 .fetch();
     }
 }
