@@ -40,6 +40,12 @@ public interface CenterController {
 
      */
 
+    @Operation(summary = "요양 보호사 검색 API", description = "센터에 등록하기 위해 이름, 전화번호 중 하나로 요양보호사를 검색합니다.")
+    @ApiResponse(responseCode = "200", description = "요양 보호사 검색 성공")
+    @GetMapping("/caregiver/search")
+    ResponseEntity<List<SearchCaregiverResponse>> searchCaregiver(
+            @RequestParam String keyword
+    );
     @Operation(summary = "요양 보호사 말소 API", description = "입력받은 센터 ID와 보호사 ID를 이용하여 해당 요양 보호사를 말소(삭제)합니다.")
     @ApiResponse(responseCode = "204", description = "요양 보호사 말소 성공")
     @DeleteMapping("/{centerId}/caregiver/{caregiverId}")

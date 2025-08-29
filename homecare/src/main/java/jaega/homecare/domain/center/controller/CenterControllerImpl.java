@@ -1,7 +1,12 @@
 package jaega.homecare.domain.center.controller;
 
+import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.caregiverCenter.dto.req.CreateCaregiverCenterRequest;
+import jaega.homecare.domain.caregiverCenter.service.command.CaregiverCenterCommandService;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.center.entity.Center;
+import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardSettlementResponse;
 import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
@@ -9,7 +14,6 @@ import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
-import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.command.CertificationCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiver.service.query.CertificationQueryService;
@@ -33,7 +37,8 @@ import java.util.UUID;
 public class CenterControllerImpl implements CenterController{
 
     private final CenterCommandService centerCommandService;
-    private final CaregiverCommandService caregiverCommandService;
+    private final CenterQueryService centerQueryService;
+    private final CaregiverCenterCommandService caregiverCenterCommandService;
     private final CaregiverQueryService caregiverQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final SettlementQueryService settlementQueryService;
@@ -64,6 +69,14 @@ public class CenterControllerImpl implements CenterController{
     }
 
      */
+
+    @Override
+    public ResponseEntity<List<SearchCaregiverResponse>> searchCaregiver(
+            @RequestParam String keyword
+    ){
+        List<SearchCaregiverResponse> responses = caregiverQueryService.searchCaregiver(keyword);
+        return ResponseEntity.ok(responses);
+    }
 
     /**
      *
@@ -190,7 +203,7 @@ public class CenterControllerImpl implements CenterController{
      */
     @Override
     public ResponseEntity<GetDashboardPopularResponse> getDashboardPopular(@RequestParam UUID centerId){
-        GetDashboardPopularResponse response = caregiverQueryService.getCaregiverStatus(centerId);
+        GetDashboardPopularResponse response = caregiverQueryService.getCaregiverStats(centerId);
         return ResponseEntity.ok(response);
     }
 

@@ -23,10 +23,13 @@ public class Center {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "name")
     private String name;
 
+    @Column(name = "center_address")
     private String center_address;
 
+    @Column(name = "contact_number")
     private String contact_number;
 
     public void setCenter(UUID centerId, User user, String name, String center_address, String contact_number){
