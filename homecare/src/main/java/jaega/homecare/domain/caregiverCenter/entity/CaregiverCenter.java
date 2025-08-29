@@ -2,19 +2,19 @@ package jaega.homecare.domain.caregiverCenter.entity;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.center.entity.Center;
+import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Table(name = "caregiver_center")
 @NoArgsConstructor
-public class CaregiverCenter {
+public class CaregiverCenter extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,23 +35,17 @@ public class CaregiverCenter {
     @Column(name = "caregiver_status")
     private CaregiverStatus status;
 
-    // TODO : basetimeEntity로 대체?
-    @Column(name = "joined_at")
-    private LocalDateTime joinedAt;
-
     @Builder
-    public CaregiverCenter(UUID caregiverCenterId, Caregiver caregiver, Center center, CaregiverStatus status, LocalDateTime joinedAt){
+    public CaregiverCenter(UUID caregiverCenterId, Caregiver caregiver, Center center, CaregiverStatus status){
         this.caregiverCenterId = caregiverCenterId;
         this.caregiver = caregiver;
         this.center = center;
         this.status = status;
-        this.joinedAt = joinedAt;
     }
 
-    public void setCaregiverCenter(UUID caregiverCenterId, CaregiverStatus status, LocalDateTime joinedAt){
+    public void setCaregiverCenter(UUID caregiverCenterId, CaregiverStatus status){
         this.caregiverCenterId = caregiverCenterId;
         this.status = status;
-        this.joinedAt = joinedAt;
     }
 
     public void deregister() {

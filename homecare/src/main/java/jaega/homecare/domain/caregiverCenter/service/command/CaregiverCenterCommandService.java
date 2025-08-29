@@ -23,7 +23,7 @@ public class CaregiverCenterCommandService {
 
     public void createCaregiverCenter(Center center, Caregiver caregiver){
         CaregiverCenter caregiverCenter = caregiverCenterMapper.toEntity(caregiver, center);
-        caregiverCenter.setCaregiverCenter(UUID.randomUUID(), CaregiverStatus.ACTIVE, LocalDateTime.now());
+        caregiverCenter.setCaregiverCenter(UUID.randomUUID(), CaregiverStatus.ACTIVE);
 
         caregiverCenterRepository.save(caregiverCenter);
     }

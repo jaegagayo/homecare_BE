@@ -48,7 +48,7 @@ public class ConsumerCommandService {
     }
 
     public ConsumerLoginResponse loginConsumer(UserLoginRequest request){
-        User user = userQueryService.loginUser(request);
+        User user = userCommandService.loginUser(request);
         Consumer consumer = consumerRepository.findByUser(user);
         if(consumer == null) throw new BadCredentialsException("로그인에 실패했습니다.");
         return consumerMapper.toLoginResponse(consumer);
