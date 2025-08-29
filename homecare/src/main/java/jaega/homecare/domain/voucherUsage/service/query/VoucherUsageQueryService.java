@@ -23,6 +23,7 @@ public class VoucherUsageQueryService {
     // 바우처 사용 안내 조회
     public VoucherUsageGuideResponse getVoucherUsageGuide(UUID voucherId, Long totalVoucherAmount){
         Long usedAmount = voucherUsageQueryRepository.findTotalUsageAmountByVoucherId(voucherId, ServiceRequestStatus.ASSIGNED);
+        if(usedAmount == null) usedAmount = 0L;
         Long remainingAmount = totalVoucherAmount - usedAmount;
 
         Long expectedUsageAmount = (long) (DEFAULT_SERVICE_AMOUNT * (1 - MINIMUM_COPAY_RATE));   // 예상 바우처 사용액
