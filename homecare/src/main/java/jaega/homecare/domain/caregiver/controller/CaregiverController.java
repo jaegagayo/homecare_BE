@@ -12,6 +12,8 @@ import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusRespons
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewSummaryResponse;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,8 @@ public interface CaregiverController {
     @PostMapping("/register")
     ResponseEntity<GetCaregiverSignupResponse> signupCaregiver(@RequestBody CaregiverSignupRequest request);
 
+    @Operation(summary = "요양보호사 로그인 API", description = "입력받은 정보로 요양보호사의 로그인을 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사 로그인 성공")
     @PostMapping("/login")
     ResponseEntity<CaregiverLoginResponse> loginCaregiver(@RequestBody UserLoginRequest request);
 
@@ -86,4 +90,15 @@ public interface CaregiverController {
     @GetMapping("/home/next-schedule")
     ResponseEntity<List<CaregiverScheduleResponse>> getTomorrowSchedule(@RequestParam UUID caregiverId);
 
+
+    @Operation(summary = "요양보호사에게 신청자가 남긴 리뷰 리스트 조회", description = "요양보호사를 대상으로 신청자가 남긴 리뷰들을 조회합니다.<br>" +
+            "평균 점수가 계산되고, 리뷰 리스트들이 조회됩니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 리스트 조회 성공")
+    @GetMapping("/review")
+    ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@PathVariable UUID caregiverId);
+
+    @Operation(summary = "요양보호사에게 등록된 리뷰 상세 조회", description = "요양보호사에게 등록된 특정 리뷰를 상세 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 상세 조회 성공")
+    @GetMapping("/review/{reviewId}")
+    ResponseEntity<CaregiverReviewDetailResponse> getReviewDetail(@PathVariable UUID reviewId);
 }

@@ -12,6 +12,9 @@ import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewSummaryResponse;
+import jaega.homecare.domain.review.service.query.ReviewQueryService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
@@ -35,6 +38,7 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final CaregiverCenterQueryService caregiverCenterQueryService;
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
+    private final ReviewQueryService reviewQueryService;
 
     // 요양보호사 회원가입
     @Override
@@ -131,4 +135,15 @@ public class CaregiverControllerImpl implements CaregiverController {
     }
 
 
+    @Override
+    public ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@PathVariable UUID caregiverId) {
+        CaregiverReviewSummaryResponse response = reviewQueryService.getReviewsForCaregiver(caregiverId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<CaregiverReviewDetailResponse> getReviewDetail(@PathVariable UUID reviewId) {
+        CaregiverReviewDetailResponse response = reviewQueryService.getReviewDetail(reviewId);
+        return ResponseEntity.ok(response);
+    }
 }
