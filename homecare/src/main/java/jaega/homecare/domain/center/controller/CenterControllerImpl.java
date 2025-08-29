@@ -70,6 +70,7 @@ public class CenterControllerImpl implements CenterController{
 
      */
 
+    // 요양보호사 검색 API
     @Override
     public ResponseEntity<List<SearchCaregiverResponse>> searchCaregiver(
             @RequestParam String keyword

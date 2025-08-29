@@ -90,12 +90,16 @@ public interface CaregiverController {
     @GetMapping("/home/next-schedule")
     ResponseEntity<List<CaregiverScheduleResponse>> getTomorrowSchedule(@RequestParam UUID caregiverId);
 
+    /**
+     *
+     * 리뷰 조회 API
+     */
 
     @Operation(summary = "요양보호사에게 신청자가 남긴 리뷰 리스트 조회", description = "요양보호사를 대상으로 신청자가 남긴 리뷰들을 조회합니다.<br>" +
             "평균 점수가 계산되고, 리뷰 리스트들이 조회됩니다.")
     @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 리스트 조회 성공")
     @GetMapping("/review")
-    ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@PathVariable UUID caregiverId);
+    ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@RequestParam UUID caregiverId);
 
     @Operation(summary = "요양보호사에게 등록된 리뷰 상세 조회", description = "요양보호사에게 등록된 특정 리뷰를 상세 조회합니다.")
     @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 상세 조회 성공")

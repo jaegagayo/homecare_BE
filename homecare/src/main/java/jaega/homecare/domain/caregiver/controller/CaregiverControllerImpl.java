@@ -134,9 +134,13 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     *  리뷰 조회 API
+     *
+     */
 
     @Override
-    public ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@PathVariable UUID caregiverId) {
+    public ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@RequestParam UUID caregiverId) {
         CaregiverReviewSummaryResponse response = reviewQueryService.getReviewsForCaregiver(caregiverId);
         return ResponseEntity.ok(response);
     }
