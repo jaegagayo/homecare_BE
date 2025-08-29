@@ -18,17 +18,21 @@ import jaega.homecare.domain.consumer.entity.CognitiveStatus;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
+import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
+import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
+import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
-import jaega.homecare.domain.settlement.repository.SettlementRepository;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.domain.voucher.repository.VoucherRepository;
+import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
+import jaega.homecare.domain.voucherUsage.service.command.VoucherUsageCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,13 +49,15 @@ public class DummyDataService {
     private final CenterRepository centerRepository;
     private final CaregiverRepository caregiverRepository;
     private final ConsumerRepository consumerRepository;
-    private final SettlementRepository settlementRepository;
     private final VoucherRepository voucherRepository;
     private final CaregiverCenterRepository caregiverCenterRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
     private final CaregiverPreferenceRepository caregiverPreferenceRepository;
 
+    private final VoucherQueryService voucherQueryService;
+    private final ServiceMatchQueryService serviceMatchQueryService;
+    private final VoucherUsageCommandService voucherUsageCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final SettlementCommandService settlementCommandService;
     private final Random random = new Random();
@@ -326,7 +332,18 @@ public class DummyDataService {
             // ✅ 매칭 생성 후 반환값에서 serviceMatchId 가져오기
             UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
-            // ✅ 정산 생성
+
+            // ✅ 일정 상태를 랜덤으로 CONFIRMED / CONFIRMED
+            ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+            boolean isConfirmed = random.nextBoolean(); // 50% 확률
+            serviceMatch.changeMatchStatus(isConfirmed ? MatchStatus.CONFIRMED : MatchStatus.COMPLETED);
+
+            UUID voucherId = voucherQueryService.getVoucherIdByConsumerId(consumer.getConsumerId());
+            Voucher voucher = voucherQueryService.getVoucher(voucherId);
+            voucherUsageCommandService.createVoucherUsage(voucher, serviceMatch);
+
+
+            // 정산 생성
             CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
                     selectedCaregiverCenter.getCaregiverCenterId(),
                     serviceMatchId,

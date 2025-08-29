@@ -1,14 +1,23 @@
 package jaega.homecare.domain.voucherUsage.service.query;
 
+import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
+import jaega.homecare.domain.voucher.entity.Voucher;
+import jaega.homecare.domain.voucher.repository.VoucherQueryRepository;
+import jaega.homecare.domain.voucher.repository.VoucherRepository;
+import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageDetail;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
+import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
+import jaega.homecare.domain.voucherUsage.entity.VoucherUsage;
 import jaega.homecare.domain.voucherUsage.mapper.VoucherUsageMapper;
 import jaega.homecare.domain.voucherUsage.repository.VoucherUsageQueryRepository;
+import jaega.homecare.domain.voucherUsage.repository.VoucherUsageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.time.YearMonth;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +26,8 @@ public class VoucherUsageQueryService {
     private static final double MINIMUM_COPAY_RATE = 0.15;      // 법정 부담률 15%
     private static final long DEFAULT_SERVICE_AMOUNT = 55350L;  // (하드코딩) 재가요양 3시간 기준 금액으로 고정
 
+    private final VoucherQueryRepository voucherQueryRepository;
+    private final VoucherUsageRepository voucherUsageRepository;
     private final VoucherUsageQueryRepository voucherUsageQueryRepository;
     private final VoucherUsageMapper voucherUsageMapper;
 
@@ -38,6 +49,51 @@ public class VoucherUsageQueryService {
         Long exceededAmount = Math.max(0L, expectedUsageAmount - remainingAmount);      // 초과 금액 계산
 
         return baseCopay + exceededAmount;
+    }
+
+    public VoucherUsageResponse getVoucherUsageSummary(UUID consumerId, int year, int month){
+        YearMonth targetMonth = YearMonth.of(year, month);
+        Voucher voucher = voucherQueryRepository.findByConsumerIdAndMonth(consumerId, targetMonth);
+
+        List<VoucherUsage> completedUsage = voucherUsageQueryRepository.findByVoucherAndStatus(voucher, MatchStatus.COMPLETED);
+        List<VoucherUsage> confirmedUsage = voucherUsageQueryRepository.findByVoucherAndStatus(voucher, MatchStatus.CONFIRMED);
+
+        long usedAmount = completedUsage.stream().mapToLong(VoucherUsage::getAmount).sum();
+        long expectedAmount = confirmedUsage.stream().mapToLong(VoucherUsage::getAmount).sum();
+        long remainingAmount = voucher.getTotalAmount() - (usedAmount + expectedAmount);
+
+        long confirmedCopay = completedUsage.stream().mapToLong(VoucherUsage::getCopay).sum();
+        long totalCopay = confirmedCopay + confirmedUsage.stream().mapToLong(VoucherUsage::getCopay).sum();
+
+
+        // 두 리스트 합치기
+        List<VoucherUsage> allUsage = new ArrayList<>();
+        allUsage.addAll(completedUsage);
+        allUsage.addAll(confirmedUsage);
+
+        // 날짜 기준 정렬 (최신순)
+        allUsage.sort(Comparator.comparing(u -> u.getServiceMatch().getServiceRequest().getRequestDate(), Comparator.reverseOrder()));
+
+        // 응답 DTO 변환
+        List<VoucherUsageDetail> usageList = allUsage.stream()
+                .map(u -> new VoucherUsageDetail(
+                        u.getServiceMatch().getServiceRequest().getRequestDate(),
+                        u.getAmount(),
+                        u.getCopay(),
+                        u.getServiceMatch().getServiceRequest().getServiceType().name(),
+                        u.getServiceMatch().getMatchStatus()
+                ))
+                .toList();
+
+        return new VoucherUsageResponse(
+                voucher.getTotalAmount(),
+                usedAmount,
+                expectedAmount,
+                remainingAmount,
+                confirmedCopay,
+                totalCopay,
+                usageList
+        );
     }
 
 }
