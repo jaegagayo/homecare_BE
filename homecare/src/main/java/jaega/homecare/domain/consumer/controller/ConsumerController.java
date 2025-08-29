@@ -130,6 +130,11 @@ public interface ConsumerController {
     ResponseEntity<GetServiceRequestById> getServiceRequestById(@RequestParam UUID requestId);
 
 
+    @Operation(summary = "(메인 페이지) 거절된 수요자 매칭의 서비스 신청 취소 ", description = "수요자에게 거절된 일정의 신청 정보를 취소합니다.")
+    @ApiResponse(responseCode = "200", description = "수요자의 거절된 일정의 신청 정보 취소")
+    @PostMapping("/home/notification/reject")
+    ResponseEntity<Void> rejectServiceRequestByMatch(@RequestParam UUID serviceMatchId);
+
     /**
      *
      * 정기 제안 관련 API

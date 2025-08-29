@@ -204,9 +204,17 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     // 수요자가 신청한 서비스 정보 상세 상세 조회
     @Override
-    public ResponseEntity<GetServiceRequestById> getServiceRequestById(UUID serviceRequestId) {
+    public ResponseEntity<GetServiceRequestById> getServiceRequestById(@RequestParam UUID serviceRequestId) {
         GetServiceRequestById response = serviceRequestQueryService.findServiceRequestById(serviceRequestId);
         return ResponseEntity.ok(response);
+    }
+
+
+    // (메인 페이지) 거절된 수요자 매칭의 서비스 신청 취소
+    @Override
+    public ResponseEntity<Void> rejectServiceRequestByMatch(@RequestParam UUID serviceMatchId){
+        serviceRequestCommandService.rejectServiceRequestByMatch(serviceMatchId);
+        return ResponseEntity.noContent().build();
     }
 
 

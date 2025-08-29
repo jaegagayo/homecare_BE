@@ -21,8 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class ServiceMatchCommandService {
-
-    private final ServiceMatchQueryService serviceMatchQueryService;
+    
     private final ServiceMatchRepository serviceMatchRepository;
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final CaregiverQueryService caregiverQueryService;
