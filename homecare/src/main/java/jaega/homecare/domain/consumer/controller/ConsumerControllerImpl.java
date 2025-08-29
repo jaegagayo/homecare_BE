@@ -18,10 +18,7 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferRespo
 import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.review.service.command.ReviewCommandService;
@@ -162,6 +159,13 @@ public class ConsumerControllerImpl implements ConsumerController {
     public ResponseEntity<List<GetScheduleWithoutReviewResponse>> getPendingReviews(@PathVariable UUID consumerId) {
         List<GetScheduleWithoutReviewResponse> pending = serviceMatchQueryService.getScheduleWithoutReview(consumerId);
         return ResponseEntity.ok(pending);
+    }
+
+    // (메인 페이지) 수요자에게 거절된 일정 조회
+    @Override
+    public ResponseEntity<List<ConsumerCancelledScheduleResponse>> getCancelledSchedule(@RequestParam UUID consumerId){
+        List<ConsumerCancelledScheduleResponse> responses = serviceMatchQueryService.getCancelledSchedules(consumerId);
+        return ResponseEntity.ok(responses);
     }
 
     /**

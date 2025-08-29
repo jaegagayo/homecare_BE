@@ -96,6 +96,10 @@ public class ServiceMatchQueryService {
         return serviceMatchQueryRepository.findCompletedScheduleWithoutReview(consumerId);
     }
 
+    public List<ConsumerCancelledScheduleResponse> getCancelledSchedules(UUID consumerId){
+        return serviceMatchQueryRepository.getCancelledSchedules(consumerId);
+    }
+
 
     /**
      *

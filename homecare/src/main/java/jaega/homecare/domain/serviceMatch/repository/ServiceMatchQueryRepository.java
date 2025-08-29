@@ -35,6 +35,9 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static jaega.homecare.domain.serviceMatch.entity.QServiceMatch.serviceMatch;
+import static jaega.homecare.domain.serviceRequest.entity.QServiceRequest.serviceRequest;
+
 @Repository
 @RequiredArgsConstructor
 public class ServiceMatchQueryRepository {
@@ -640,6 +643,24 @@ public class ServiceMatchQueryRepository {
                         serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED)
                 )
                 .orderBy(serviceMatch.serviceStartTime.asc())
+                .fetch();
+    }
+
+    public List<ConsumerCancelledScheduleResponse> getCancelledSchedules(UUID consumerId) {
+        return queryFactory
+                .select(Projections.constructor(
+                        ConsumerCancelledScheduleResponse.class,
+                        serviceMatch.serviceMatchId,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        serviceMatch.caregiver.user.name
+                ))
+                .from(serviceMatch)
+                .join(serviceMatch.serviceRequest, serviceRequest)
+                .where(serviceRequest.consumer.consumerId.eq(consumerId)
+                        .and(serviceMatch.matchStatus.eq(MatchStatus.CANCELLED)))
+                .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
                 .fetch();
     }
 }

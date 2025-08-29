@@ -15,10 +15,7 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailRespo
 import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferResponse;
 import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferResponse;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
@@ -93,6 +90,12 @@ public interface ConsumerController {
     @GetMapping("/home/notification/review")
     ResponseEntity<List<GetScheduleWithoutReviewResponse>> getScheduleWithoutReview(@RequestParam UUID consumerId);
 
+
+    @Operation(summary = "(메인 페이지) 수요자에게 거절된 일정 조회", description = "수요자에게 거절된 일정들을 조회합니다.<br>" +
+            "이후 신청 취소 및 재매칭 유도에 이용됩니다.")
+    @ApiResponse(responseCode = "200", description = "수요자에게 거절된 일정 조회")
+    @GetMapping("/home/notification/reject")
+    ResponseEntity<List<ConsumerCancelledScheduleResponse>> getCancelledSchedule(@RequestParam UUID consumerId);
 
     /**
      *
