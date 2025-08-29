@@ -8,6 +8,7 @@ import jaega.homecare.domain.center.dto.res.CenterLoginResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.mapper.CenterMapper;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
+import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.users.service.command.UserCommandService;
@@ -25,9 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CenterCommandService {
 
-    private final UserRepository userRepository;
     private final CenterMapper centerMapper;
-    private final PasswordEncoder passwordEncoder;
     private final CenterQueryService centerQueryService;
     private final UserCommandService userCommandService;
     private final CaregiverCommandService caregiverCommandService;
@@ -77,11 +76,8 @@ public class CenterCommandService {
     }
 
     // 실제 로그인
-    public CenterLoginResponse loginCenter(CenterLoginRequest request){
-        User user = userRepository.findByEmail(request.email());
-        if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new BadCredentialsException("로그인에 실패했습니다.");
-        }
+    public CenterLoginResponse loginCenter(UserLoginRequest request){
+        User user = userCommandService.loginUser(request);
         Center center = centerQueryService.findCenterByUser(user);
 
         return centerMapper.toLoginResponse(center);
