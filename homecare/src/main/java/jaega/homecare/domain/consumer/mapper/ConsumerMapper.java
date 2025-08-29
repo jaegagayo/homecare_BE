@@ -2,6 +2,7 @@ package jaega.homecare.domain.consumer.mapper;
 
 import jaega.homecare.domain.consumer.dto.req.ConsumerCreateRequest;
 import jaega.homecare.domain.consumer.dto.res.ConsumerDetailResponse;
+import jaega.homecare.domain.consumer.dto.res.ConsumerLoginResponse;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.users.entity.User;
 import org.mapstruct.Mapper;
@@ -23,6 +24,8 @@ public interface ConsumerMapper {
     @Mapping(target = "guardianPhone", source = "request.guardianPhone")
     @Mapping(target = "consumerId", ignore = true)
     Consumer toConsumer(ConsumerCreateRequest request, User user);
+
+    ConsumerLoginResponse toLoginResponse(Consumer consumer);
 
     @Mapping(target = "name", source = "user.name")
     @Mapping(target = "birthDate", source = "user.birthDate")

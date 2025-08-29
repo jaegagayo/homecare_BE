@@ -8,7 +8,6 @@ import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.mapper.UserMapper;
 import jaega.homecare.domain.users.repository.UserRepository;
-import jaega.homecare.domain.users.service.query.UserQueryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,4 +52,13 @@ public class UserCommandService {
         user.updateUser(request);
         userRepository.save(user);
     }
+
+    public User loginUser(UserLoginRequest request){
+        User user = userRepository.findByEmail(request.email());
+        if (user == null || !passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new BadCredentialsException("로그인에 실패했습니다.");
+        }
+        return user;
+    }
+
 }

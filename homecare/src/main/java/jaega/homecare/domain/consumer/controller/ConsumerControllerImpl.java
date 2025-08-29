@@ -39,6 +39,7 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.service.command.ServiceRequestCommandService;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
+import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
 import jaega.homecare.domain.voucherUsage.service.query.VoucherUsageQueryService;
@@ -77,6 +78,13 @@ public class ConsumerControllerImpl implements ConsumerController {
     public ResponseEntity<Void> createConsumer(@RequestBody ConsumerSignupRequest request) {
         consumerCommandService.signupConsumer(request);
         return ResponseEntity.noContent().build();
+    }
+
+    // 수요자 로그인 API
+    @Override
+    public ResponseEntity<ConsumerLoginResponse> loginConsumer(@RequestBody UserLoginRequest request){
+        ConsumerLoginResponse response = consumerCommandService.loginConsumer(request);
+        return ResponseEntity.ok(response);
     }
 
     // (마이페이지) 수요자의 프로필 정보 조회 API

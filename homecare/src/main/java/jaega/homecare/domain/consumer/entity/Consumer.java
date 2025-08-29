@@ -46,9 +46,11 @@ public class Consumer extends BaseTimeEntity {
     private Integer weight;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "disease")
     private Disease disease;                    // 질병 여부
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "cognitive_status")
     private CognitiveStatus cognitiveStatus;    // 인지 상태
 
     @Column(name ="livingSituation", columnDefinition = "TEXT")
