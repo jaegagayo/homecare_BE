@@ -4,6 +4,7 @@ import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,16 @@ public class VoucherUsage extends BaseTimeEntity {
     @Column(name = "copay", nullable = false)
     private Long copay;                         // 본인 부담금
 
+    @Builder
+    public VoucherUsage(UUID voucherUsageId, Voucher voucher, ServiceMatch serviceMatch, Long amount, Long copay){
+        this.voucherUsageId = voucherUsageId;
+        this.voucher = voucher;
+        this.serviceMatch = serviceMatch;
+        this.amount = amount;
+        this.copay = copay;
+    }
+
+    public void initializeVoucherUsage(UUID voucherUsageId){
+        this.voucherUsageId = voucherUsageId;
+    }
 }
