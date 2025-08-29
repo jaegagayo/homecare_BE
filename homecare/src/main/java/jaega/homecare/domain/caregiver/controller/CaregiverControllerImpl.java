@@ -1,9 +1,8 @@
 package jaega.homecare.domain.caregiver.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
+import jaega.homecare.domain.caregiver.dto.res.CaregiverLoginResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
@@ -17,6 +16,7 @@ import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
+import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +40,13 @@ public class CaregiverControllerImpl implements CaregiverController {
     @Override
     public ResponseEntity<GetCaregiverSignupResponse> signupCaregiver(@RequestBody CaregiverSignupRequest request){
         GetCaregiverSignupResponse response = caregiverCommandService.signupCaregiver(request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 요양보호사 로그인
+    @Override
+    public ResponseEntity<CaregiverLoginResponse> loginCaregiver(@RequestBody UserLoginRequest request){
+        CaregiverLoginResponse response = caregiverCommandService.loginCaregiver(request);
         return ResponseEntity.ok(response);
     }
 

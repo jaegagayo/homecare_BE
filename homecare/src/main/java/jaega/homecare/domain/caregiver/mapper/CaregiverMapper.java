@@ -1,6 +1,7 @@
 package jaega.homecare.domain.caregiver.mapper;
 
 import jaega.homecare.domain.caregiver.dto.req.CaregiverCreateRequest;
+import jaega.homecare.domain.caregiver.dto.res.CaregiverLoginResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
@@ -36,4 +37,6 @@ public interface CaregiverMapper {
     @Mapping(target = "phone", source = "caregiver.user.phone")
     @Mapping(target = "serviceTypes", source = "preference.serviceTypes")
     GetCaregiverProfileResponse toGetCaregiverProfile(Caregiver caregiver, CaregiverPreference preference);
+
+    CaregiverLoginResponse toLoginResponse(Caregiver caregiver);
 }

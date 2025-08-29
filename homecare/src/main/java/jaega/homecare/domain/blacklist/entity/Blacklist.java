@@ -27,7 +27,7 @@ public class Blacklist extends BaseTimeEntity {
     private Caregiver caregiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "consumer_id")
     private Consumer consumer;
 
     @Builder
