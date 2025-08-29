@@ -78,6 +78,14 @@ public class CenterControllerImpl implements CenterController{
         return ResponseEntity.ok(responses);
     }
 
+    @Override
+    public ResponseEntity<Void> registerCaregiver(@RequestBody CreateCaregiverCenterRequest request){
+        Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
+        Center center = centerQueryService.findCenterByUUID(request.centerId());
+        caregiverCenterCommandService.createCaregiverCenter(center, caregiver);
+        return ResponseEntity.noContent().build();
+    }
+
     /**
      *
      * 요양 보호사 말소 API

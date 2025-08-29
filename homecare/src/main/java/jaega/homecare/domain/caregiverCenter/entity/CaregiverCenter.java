@@ -32,8 +32,11 @@ public class CaregiverCenter {
     private Center center;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "caregiver_status")
     private CaregiverStatus status;
 
+    // TODO : basetimeEntity로 대체?
+    @Column(name = "joined_at")
     private LocalDateTime joinedAt;
 
     @Builder

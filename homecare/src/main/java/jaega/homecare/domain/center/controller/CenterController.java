@@ -3,6 +3,7 @@ package jaega.homecare.domain.center.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jaega.homecare.domain.caregiverCenter.dto.req.CreateCaregiverCenterRequest;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByCenterResponse;
@@ -46,6 +47,12 @@ public interface CenterController {
     ResponseEntity<List<SearchCaregiverResponse>> searchCaregiver(
             @RequestParam String keyword
     );
+
+    @Operation(summary = "센터의 요양보호사 기관 등록 API", description = "해당 요양보호사를 기관에 등록합니다.")
+    @ApiResponse(responseCode = "204", description = "요양 보호사 등록 성공")
+    @PostMapping("/caregiver/register")
+    ResponseEntity<Void> registerCaregiver(@RequestBody CreateCaregiverCenterRequest request);
+
     @Operation(summary = "요양 보호사 말소 API", description = "입력받은 센터 ID와 보호사 ID를 이용하여 해당 요양 보호사를 말소(삭제)합니다.")
     @ApiResponse(responseCode = "204", description = "요양 보호사 말소 성공")
     @DeleteMapping("/{centerId}/caregiver/{caregiverId}")
