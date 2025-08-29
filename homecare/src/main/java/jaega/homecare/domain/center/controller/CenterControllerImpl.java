@@ -79,6 +79,7 @@ public class CenterControllerImpl implements CenterController{
         return ResponseEntity.ok(responses);
     }
 
+    // 요양보호사 소속 등록 API
     @Override
     public ResponseEntity<Void> registerCaregiver(@RequestBody CreateCaregiverCenterRequest request){
         Caregiver caregiver = caregiverQueryService.getCaregiver(request.caregiverId());
