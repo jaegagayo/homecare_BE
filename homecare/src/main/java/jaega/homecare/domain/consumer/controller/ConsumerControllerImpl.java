@@ -42,6 +42,7 @@ import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
+import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
 import jaega.homecare.domain.voucherUsage.service.query.VoucherUsageQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -259,6 +260,17 @@ public class ConsumerControllerImpl implements ConsumerController {
 
         VoucherUsageGuideResponse response = voucherUsageQueryService.getVoucherUsageGuide(voucherId, totalVoucherAmount);
 
+        return ResponseEntity.ok(response);
+    }
+
+    // (마이페이지) 재가 급여(바우처) 내역 조회
+    @Override
+    public ResponseEntity<VoucherUsageResponse> getVoucherByConsumer(
+            @RequestParam UUID consumerId,
+            @RequestParam int year,
+            @RequestParam int month
+    ){
+        VoucherUsageResponse response = voucherUsageQueryService.getVoucherUsageSummary(consumerId, year, month);
         return ResponseEntity.ok(response);
     }
 

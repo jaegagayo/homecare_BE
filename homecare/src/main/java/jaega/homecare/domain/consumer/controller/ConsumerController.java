@@ -29,6 +29,7 @@ import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
+import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -182,6 +183,16 @@ public interface ConsumerController {
     @ApiResponse(responseCode = "200", description = "바우처 사용 안내 조회 성공")
     @GetMapping("/request/voucher")
     ResponseEntity<VoucherUsageGuideResponse> getVoucherUsageGuide(@RequestParam UUID consumerId);
+
+    // (마이페이지) 재가 급여(바우처) 내역 조회
+    @Operation(summary = "(마이페이지) 재가 급여(바우처) 내역 조회", description = "마이페이지에서 수요자의 재가 급여(바우처) 내역을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "(마이페이지) 사용자의 재가 급여 내역 조회 성공")
+    @GetMapping("/my-page/voucher")
+    ResponseEntity<VoucherUsageResponse> getVoucherByConsumer(
+            @RequestParam UUID consumerId,
+            @RequestParam int year,
+            @RequestParam int month
+    );
 
     /**
      *
