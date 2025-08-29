@@ -24,6 +24,7 @@ import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandSer
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
+import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
@@ -336,7 +337,14 @@ public class DummyDataService {
             // ✅ 일정 상태를 랜덤으로 CONFIRMED / CONFIRMED
             ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
             boolean isConfirmed = random.nextBoolean(); // 50% 확률
-            serviceMatch.changeMatchStatus(isConfirmed ? MatchStatus.CONFIRMED : MatchStatus.COMPLETED);
+            MatchStatus matchStatus = isConfirmed ? MatchStatus.CONFIRMED : MatchStatus.COMPLETED;
+            serviceMatch.changeMatchStatus(matchStatus);
+
+            // ✅ ServiceRequest 상태 동기화
+            ServiceRequest match_serviceRequest = serviceMatch.getServiceRequest();
+            if (matchStatus == MatchStatus.CONFIRMED || matchStatus == MatchStatus.COMPLETED) {
+                match_serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
+            }
 
             UUID voucherId = voucherQueryService.getVoucherIdByConsumerId(consumer.getConsumerId());
             Voucher voucher = voucherQueryService.getVoucher(voucherId);
