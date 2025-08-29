@@ -390,14 +390,16 @@ public class DummyDataService {
             MatchStatus matchStatus = isConfirmed ? MatchStatus.CONFIRMED : MatchStatus.COMPLETED;
             serviceMatch.changeMatchStatus(matchStatus);
 
-            Review review = Review.builder()
-                    .reviewId(UUID.randomUUID())
-                    .serviceMatch(serviceMatch)
-                    .reviewScore(1.0 + (4.0 * random.nextDouble())) // 1~5점 랜덤
-                    .reviewContent("더미 리뷰 내용입니다.")
-                    .build();
+            if (matchStatus == MatchStatus.COMPLETED) {
+                Review review = Review.builder()
+                        .reviewId(UUID.randomUUID())
+                        .serviceMatch(serviceMatch)
+                        .reviewScore(1.0 + (4.0 * random.nextDouble())) // 1~5점 랜덤
+                        .reviewContent("더미 리뷰 내용입니다.")
+                        .build();
 
-            reviewRepository.save(review);
+                reviewRepository.save(review);
+            }
 
             // ✅ ServiceRequest 상태 동기화
             ServiceRequest match_serviceRequest = serviceMatch.getServiceRequest();
