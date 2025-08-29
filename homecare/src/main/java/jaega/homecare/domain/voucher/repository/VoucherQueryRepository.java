@@ -35,6 +35,7 @@ public class VoucherQueryRepository {
                 .fetchOne();
     }
 
+    // 연도, 월별 바우처 조회
     public Voucher findByConsumerIdAndMonth(UUID consumerId, YearMonth targetMonth) {
         LocalDate startDate = targetMonth.atDay(1);
         LocalDate endDate = targetMonth.atEndOfMonth();

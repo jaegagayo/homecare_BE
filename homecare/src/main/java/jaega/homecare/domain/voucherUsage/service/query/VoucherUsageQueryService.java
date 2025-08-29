@@ -51,25 +51,34 @@ public class VoucherUsageQueryService {
         return baseCopay + exceededAmount;
     }
 
+    // 바우처 상세 내역 조회
     public VoucherUsageResponse getVoucherUsageSummary(UUID consumerId, int year, int month){
         YearMonth targetMonth = YearMonth.of(year, month);
         Voucher voucher = voucherQueryRepository.findByConsumerIdAndMonth(consumerId, targetMonth);
 
-        List<VoucherUsage> completedUsage = voucherUsageQueryRepository.findByVoucherAndStatus(voucher, MatchStatus.COMPLETED);
-        List<VoucherUsage> confirmedUsage = voucherUsageQueryRepository.findByVoucherAndStatus(voucher, MatchStatus.CONFIRMED);
+        // 두 상태를 한 번에 조회
+        List<VoucherUsage> allUsage = voucherUsageQueryRepository.findByVoucherAndStatusIn(
+                voucher, List.of(MatchStatus.COMPLETED, MatchStatus.CONFIRMED)
+        );
 
-        long usedAmount = completedUsage.stream().mapToLong(VoucherUsage::getAmount).sum();
-        long expectedAmount = confirmedUsage.stream().mapToLong(VoucherUsage::getAmount).sum();
+        // 금액 계산
+        long usedAmount = allUsage.stream()
+                .filter(u -> u.getServiceMatch().getMatchStatus() == MatchStatus.COMPLETED)
+                .mapToLong(VoucherUsage::getAmount)
+                .sum();
+
+        long expectedAmount = allUsage.stream()
+                .filter(u -> u.getServiceMatch().getMatchStatus() == MatchStatus.CONFIRMED)
+                .mapToLong(VoucherUsage::getAmount)
+                .sum();
+
         long remainingAmount = voucher.getTotalAmount() - (usedAmount + expectedAmount);
 
-        long confirmedCopay = completedUsage.stream().mapToLong(VoucherUsage::getCopay).sum();
-        long totalCopay = confirmedCopay + confirmedUsage.stream().mapToLong(VoucherUsage::getCopay).sum();
-
-
-        // 두 리스트 합치기
-        List<VoucherUsage> allUsage = new ArrayList<>();
-        allUsage.addAll(completedUsage);
-        allUsage.addAll(confirmedUsage);
+        long totalCopay = allUsage.stream().mapToLong(VoucherUsage::getCopay).sum();
+        long confirmedCopay = allUsage.stream()
+                .filter(u -> u.getServiceMatch().getMatchStatus() == MatchStatus.COMPLETED)
+                .mapToLong(VoucherUsage::getCopay)
+                .sum();
 
         // 날짜 기준 정렬 (최신순)
         allUsage.sort(Comparator.comparing(u -> u.getServiceMatch().getServiceRequest().getRequestDate(), Comparator.reverseOrder()));

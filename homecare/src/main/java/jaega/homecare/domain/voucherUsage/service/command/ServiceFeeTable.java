@@ -4,6 +4,8 @@ import jaega.homecare.domain.voucherUsage.entity.ServiceFee;
 
 import java.util.Map;
 
+// TODO : 현재 방문 요양 기준으로만 금액 계산
+// 서비스 유형 별 금액 계산
 public class ServiceFeeTable {
     private static final Map<Integer, ServiceFee> feeTable = Map.of(
             30, new ServiceFee(16940L, 2541L),
