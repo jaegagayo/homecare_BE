@@ -22,6 +22,7 @@ public class VoucherQueryRepository {
 
         return queryFactory
                 .select(voucher.voucherId)
+                .from(voucher)
                 .where(
                         voucher.consumer.consumerId.eq(consumerId),
                         voucher.voucherDate.year().eq(LocalDate.now().getYear()),

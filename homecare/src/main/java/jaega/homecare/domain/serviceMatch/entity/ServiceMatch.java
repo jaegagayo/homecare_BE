@@ -39,10 +39,10 @@ public class ServiceMatch {
     @Column(name = "service_date")
     private LocalDate serviceDate;
 
-    @Column(name = "start_time")
+    @Column(name = "service_start_time")
     private LocalTime serviceStartTime;
 
-    @Column(name = "end_time")
+    @Column(name = "service_end_time")
     private LocalTime serviceEndTime;
 
     @Builder

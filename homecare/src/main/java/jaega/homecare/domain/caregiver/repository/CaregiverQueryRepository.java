@@ -1,14 +1,17 @@
 package jaega.homecare.domain.caregiver.repository;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.caregiver.entity.QCertification;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.entity.QCaregiverPreference;
+import jaega.homecare.domain.center.dto.req.SearchCaregiverResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.ServiceType;
@@ -182,6 +185,26 @@ public class CaregiverQueryRepository {
                 .from(caregiver)
                 .leftJoin(pref).on(pref.caregiver.eq(caregiver))
                 .where(caregiver.caregiverId.in(caregiverIds))
+                .fetch();
+    }
+
+    public List<SearchCaregiverResponse> searchByNameOrPhone(String keyword) {
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QUser user = QUser.user;
+        QCertification certification = QCertification.certification;
+
+        return queryFactory
+                .select(Projections.constructor(SearchCaregiverResponse.class,
+                        caregiver.caregiverId,
+                        user.name,
+                        user.phone,
+                        certification.CertificationNumber
+                ))
+                .from(caregiver)
+                .join(caregiver.user, user)
+                .leftJoin(certification).on(certification.caregiver.eq(caregiver))
+                .where(user.name.containsIgnoreCase(keyword)
+                        .or(user.phone.containsIgnoreCase(keyword)))
                 .fetch();
     }
 }

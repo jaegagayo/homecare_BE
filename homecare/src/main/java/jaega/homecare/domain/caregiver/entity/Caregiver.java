@@ -42,6 +42,7 @@ public class Caregiver extends BaseTimeEntity {
     private String selfIntroduction;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "verified_status")
     private VerifiedStatus verifiedStatus;
 
     @Builder

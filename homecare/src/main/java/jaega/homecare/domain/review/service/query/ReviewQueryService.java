@@ -1,7 +1,6 @@
 package jaega.homecare.domain.review.service.query;
 
-import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
-import jaega.homecare.domain.review.dto.res.GetReviewResponse;
+import jaega.homecare.domain.review.dto.res.*;
 import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.review.mapper.ReviewMapper;
 import jaega.homecare.domain.review.repository.ReviewQueryRepository;
@@ -31,5 +30,27 @@ public class ReviewQueryService {
     public List<ConsumerReviewResponse> getWrittenReviews(UUID consumerId) {
         List<Review> reviews = reviewQueryRepository.findWrittenReviewsByConsumer(consumerId);
         return reviewMapper.toConsumerReviewResponse(reviews);
+    }
+
+    public CaregiverReviewSummaryResponse getReviewsForCaregiver(UUID caregiverId) {
+        List<Review> reviews = reviewRepository.findByServiceMatch_Caregiver_CaregiverId(caregiverId);
+
+        double averageScore = reviews.stream()
+                .mapToDouble(Review::getReviewScore)
+                .average()
+                .orElse(0.0);
+
+        List<CaregiverReviewItem> reviewItems = reviews.stream()
+                .map(reviewMapper::toCaregiverReviewItem)
+                .toList();
+
+        return new CaregiverReviewSummaryResponse(averageScore, reviewItems);
+    }
+
+    public CaregiverReviewDetailResponse getReviewDetail(UUID reviewId) {
+        Review review = reviewRepository.findByReviewId(reviewId)
+                .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
+
+        return reviewMapper.toDetailResponse(review);
     }
 }

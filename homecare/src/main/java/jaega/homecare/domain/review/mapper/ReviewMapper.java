@@ -1,6 +1,8 @@
 package jaega.homecare.domain.review.mapper;
 
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.review.entity.Review;
@@ -31,4 +33,12 @@ public interface ReviewMapper {
     ConsumerReviewResponse toConsumerReviewResponse(Review review);
 
     List<ConsumerReviewResponse> toConsumerReviewResponse(List<Review> reviews);
+
+    // TODO: ServiceMatch에서 일정 요약 가져오기
+    @Mapping(target = "scheduleSummary", ignore = true)
+    CaregiverReviewItem toCaregiverReviewItem(Review review);
+
+    // TODO: ServiceMatch에서 일정 상세 가져오기
+    @Mapping(target = "scheduleDetail", ignore = true)
+    CaregiverReviewDetailResponse toDetailResponse(Review review);
 }

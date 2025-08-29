@@ -24,10 +24,13 @@ public class Certification {
     @JoinColumn(name = "caregiver_id")
     private Caregiver caregiver;
 
+    @Column(name = "certification_number")
     private String CertificationNumber;
 
+    @Column(name = "certification_date")
     private LocalDate CertificationDate;
 
+    @Column(name = "train_status")
     private boolean trainStatus;
 
     @Builder

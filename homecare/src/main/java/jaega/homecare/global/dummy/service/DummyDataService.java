@@ -27,6 +27,8 @@ import jaega.homecare.domain.settlement.repository.SettlementRepository;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;
+import jaega.homecare.domain.voucher.entity.Voucher;
+import jaega.homecare.domain.voucher.repository.VoucherRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class DummyDataService {
     private final CaregiverRepository caregiverRepository;
     private final ConsumerRepository consumerRepository;
     private final SettlementRepository settlementRepository;
+    private final VoucherRepository voucherRepository;
     private final CaregiverCenterRepository caregiverCenterRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
@@ -218,7 +221,7 @@ public class DummyDataService {
                 .residentialAddress("서울시 마포구 월드컵북로 " + index)
                 .visitAddress("서울시 강남구 봉은사로 " + index)
                 .entranceType("공동현관 비밀번호: " + (1000 + random.nextInt(9000)))
-                .careGrade(random.nextInt(5) + 1)
+                .careGrade(random.nextInt(6) + 1)
                 .isMedicalAid(random.nextBoolean())
                 .weight(40 + random.nextInt(40)) // 40~80kg
                 .disease(Disease.values()[random.nextInt(Disease.values().length)])
@@ -230,6 +233,18 @@ public class DummyDataService {
 
         consumer.initializeConsumer(UUID.randomUUID());
         consumerRepository.save(consumer);
+
+        // ✅ Consumer 생성 시 Voucher 생성
+        long totalAmount = getTotalAmountByCareGrade(consumer.getCareGrade());
+
+        Voucher voucher = Voucher.builder()
+                .voucherId(UUID.randomUUID())
+                .consumer(consumer)
+                .voucherDate(LocalDate.now()) // 이번 달 바우처
+                .totalAmount(totalAmount)
+                .build();
+
+        voucherRepository.save(voucher);
     }
 
     private void createDummyServiceRequest(int index) {
@@ -319,5 +334,16 @@ public class DummyDataService {
             );
             settlementCommandService.createSettlement(createSettlementRequest);
         }
+    }
+
+    private long getTotalAmountByCareGrade(int careGrade) {
+        return switch (careGrade) {
+            case 1 -> 1_520_700L;
+            case 2 -> 1_351_700L;
+            case 3 -> 1_295_400L;
+            case 4 -> 1_189_800L;
+            case 5 -> 1_021_300L;
+            default -> 573_900L; // 인지지원등급
+        };
     }
 }

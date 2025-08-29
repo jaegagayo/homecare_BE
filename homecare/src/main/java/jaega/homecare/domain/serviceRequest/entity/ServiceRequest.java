@@ -57,7 +57,7 @@ public class ServiceRequest {
     private ServiceType serviceType;        // 서비스 유형
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "request_status", nullable = false)
     private ServiceRequestStatus requestStatus;    // 신청 상태
 
     @Column(name = "additional_information")

@@ -27,6 +27,7 @@ import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestById;
 import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
+import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,11 @@ public interface ConsumerController {
     @ApiResponse(responseCode = "204", description = "수요자 회원가입 성공")
     @PostMapping("/register")
     ResponseEntity<Void> createConsumer(@RequestBody ConsumerSignupRequest request);
+
+    @Operation(summary = "수요자 로그인 API", description = "입력받은 정보로 수요자의 로그인을 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "수요자 로그인 성공")
+    @PostMapping("/login")
+    ResponseEntity<ConsumerLoginResponse> loginConsumer(@RequestBody UserLoginRequest request);
 
     @Operation(summary = "(마이페이지) 수요자의 프로필 정보 조회 API", description = "수요자의 ID로 수요자의 프로필 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "수요자의 프로필 정보 조회 성공")

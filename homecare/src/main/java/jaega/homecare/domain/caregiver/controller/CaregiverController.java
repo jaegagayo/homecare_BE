@@ -6,11 +6,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
+import jaega.homecare.domain.caregiver.dto.res.CaregiverLoginResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewSummaryResponse;
+import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +30,11 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "204", description = "요양보호사의 회원가입 성공")
     @PostMapping("/register")
     ResponseEntity<GetCaregiverSignupResponse> signupCaregiver(@RequestBody CaregiverSignupRequest request);
+
+    @Operation(summary = "요양보호사 로그인 API", description = "입력받은 정보로 요양보호사의 로그인을 진행합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사 로그인 성공")
+    @PostMapping("/login")
+    ResponseEntity<CaregiverLoginResponse> loginCaregiver(@RequestBody UserLoginRequest request);
 
     @Operation(summary = "요양보호사 승인 상태 조회 API", description = "회원가입 후, 기관 선택으로 이동하기 전 승인 검증을 위해 승인 상태를 조회합니다.<br>" +
             "RequestParam으로 한 이유는, 추후 JWT 인증 로직 구현 시 대체를 편하게 하기 위함입니다.")
@@ -81,4 +90,19 @@ public interface CaregiverController {
     @GetMapping("/home/next-schedule")
     ResponseEntity<List<CaregiverScheduleResponse>> getTomorrowSchedule(@RequestParam UUID caregiverId);
 
+    /**
+     *
+     * 리뷰 조회 API
+     */
+
+    @Operation(summary = "요양보호사에게 신청자가 남긴 리뷰 리스트 조회", description = "요양보호사를 대상으로 신청자가 남긴 리뷰들을 조회합니다.<br>" +
+            "평균 점수가 계산되고, 리뷰 리스트들이 조회됩니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 리스트 조회 성공")
+    @GetMapping("/review")
+    ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "요양보호사에게 등록된 리뷰 상세 조회", description = "요양보호사에게 등록된 특정 리뷰를 상세 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 상세 조회 성공")
+    @GetMapping("/review/{reviewId}")
+    ResponseEntity<CaregiverReviewDetailResponse> getReviewDetail(@PathVariable UUID reviewId);
 }

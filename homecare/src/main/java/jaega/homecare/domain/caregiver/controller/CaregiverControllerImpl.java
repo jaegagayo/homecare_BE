@@ -1,9 +1,8 @@
 package jaega.homecare.domain.caregiver.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
+import jaega.homecare.domain.caregiver.dto.res.CaregiverLoginResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
@@ -13,10 +12,14 @@ import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewSummaryResponse;
+import jaega.homecare.domain.review.service.query.ReviewQueryService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
+import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,11 +38,19 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final CaregiverCenterQueryService caregiverCenterQueryService;
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
+    private final ReviewQueryService reviewQueryService;
 
     // 요양보호사 회원가입
     @Override
     public ResponseEntity<GetCaregiverSignupResponse> signupCaregiver(@RequestBody CaregiverSignupRequest request){
         GetCaregiverSignupResponse response = caregiverCommandService.signupCaregiver(request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 요양보호사 로그인
+    @Override
+    public ResponseEntity<CaregiverLoginResponse> loginCaregiver(@RequestBody UserLoginRequest request){
+        CaregiverLoginResponse response = caregiverCommandService.loginCaregiver(request);
         return ResponseEntity.ok(response);
     }
 
@@ -123,5 +134,20 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     *  리뷰 조회 API
+     *
+     */
 
+    @Override
+    public ResponseEntity<CaregiverReviewSummaryResponse> getReviews(@RequestParam UUID caregiverId) {
+        CaregiverReviewSummaryResponse response = reviewQueryService.getReviewsForCaregiver(caregiverId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<CaregiverReviewDetailResponse> getReviewDetail(@PathVariable UUID reviewId) {
+        CaregiverReviewDetailResponse response = reviewQueryService.getReviewDetail(reviewId);
+        return ResponseEntity.ok(response);
+    }
 }

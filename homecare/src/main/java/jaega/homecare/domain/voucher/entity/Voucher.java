@@ -4,6 +4,7 @@ package jaega.homecare.domain.voucher.entity;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.users.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,12 @@ public class Voucher {
 
     @Column(name = "total_amount", nullable = false)
     private Long totalAmount;
+
+    @Builder
+    public Voucher(UUID voucherId, Consumer consumer, LocalDate voucherDate, Long totalAmount){
+        this.voucherId = voucherId;
+        this.consumer = consumer;
+        this.voucherDate = voucherDate;
+        this.totalAmount = totalAmount;
+    }
 }

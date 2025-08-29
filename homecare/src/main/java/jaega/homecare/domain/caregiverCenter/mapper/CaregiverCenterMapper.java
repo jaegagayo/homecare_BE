@@ -11,6 +11,5 @@ public interface CaregiverCenterMapper {
 
     @Mapping(target = "caregiverCenterId", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "joinedAt", ignore = true)
     CaregiverCenter toEntity(Caregiver caregiver, Center center);
 }
