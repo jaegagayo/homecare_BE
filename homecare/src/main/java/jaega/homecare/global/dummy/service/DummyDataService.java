@@ -37,6 +37,7 @@ import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.domain.voucher.repository.VoucherRepository;
+import jaega.homecare.domain.voucher.service.command.VoucherCommandService;
 import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
 import jaega.homecare.domain.voucherUsage.service.command.VoucherUsageCommandService;
 import jakarta.transaction.Transactional;
@@ -67,6 +68,7 @@ public class DummyDataService {
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final VoucherUsageCommandService voucherUsageCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
+    private final VoucherCommandService voucherCommandService;
     private final SettlementCommandService settlementCommandService;
     private final Random random = new Random();
 
@@ -248,7 +250,7 @@ public class DummyDataService {
         consumerRepository.save(consumer);
 
         // ✅ Consumer 생성 시 Voucher 생성
-        long totalAmount = getTotalAmountByCareGrade(consumer.getCareGrade());
+        Long totalAmount = voucherCommandService.getTotalAmountByCareGrade(consumer.getCareGrade());
 
         Voucher voucher = Voucher.builder()
                 .voucherId(UUID.randomUUID())
@@ -418,16 +420,5 @@ public class DummyDataService {
             );
             settlementCommandService.createSettlement(createSettlementRequest);
         }
-    }
-
-    private long getTotalAmountByCareGrade(int careGrade) {
-        return switch (careGrade) {
-            case 1 -> 1_520_700L;
-            case 2 -> 1_351_700L;
-            case 3 -> 1_295_400L;
-            case 4 -> 1_189_800L;
-            case 5 -> 1_021_300L;
-            default -> 573_900L; // 인지지원등급
-        };
     }
 }

@@ -57,6 +57,10 @@ public class VoucherUsageQueryService {
         YearMonth targetMonth = YearMonth.of(year, month);
         Voucher voucher = voucherQueryRepository.findByConsumerIdAndMonth(consumerId, targetMonth);
 
+        if (voucher == null) {
+            throw new IllegalArgumentException("해당 월에 바우처가 없습니다.");
+        }
+
         // 금액 합계 조회
         VoucherUsageCost cost = voucherUsageQueryRepository.findVoucherUsageSummary(voucher);
 
