@@ -82,15 +82,22 @@ public class DummyDataService {
         // 더미 센터 5개 생성
         createDummyCenter(0);
 
-        // 더미 요양보호사 생성
+        // 3. 더미 요양보호사 생성
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
         IntStream.range(0, caregivers.size()).forEach(index -> createDummyCaregiver(index, caregivers));
 
-        // ✅ 4. Consumer 생성
+        // 4. Consumer 생성
         List<User> consumers = userRepository.findByUserRole(UserRole.ROLE_CONSUMER);
         IntStream.range(0, consumers.size()).forEach(index -> createDummyConsumer(index, consumers));
 
-        // ✅ 5. ServiceRequest 생성 (Consumer 기반)
+        // 4-1. dummy1@user.com 전용 Consumer 보장 생성
+        User dummyUser = userRepository.findByEmail("user1@dummy.com");
+        Consumer dummyConsumer = consumerRepository.findByUser(dummyUser);
+
+        // 전용 ServiceRequest / ServiceMatch / VoucherUsage / Review 생성
+        createDummyServiceRequestForConsumer(dummyConsumer);
+
+        // 5. ServiceRequest 생성 (Consumer 기반)
         IntStream.range(0, 30).forEach(this::createDummyServiceRequest);
     }
 
@@ -163,7 +170,13 @@ public class DummyDataService {
         caregiverRepository.save(caregiver);
 
         // CaregiverCenter 생성 (상태 랜덤)
-        CaregiverStatus status = CaregiverStatus.values()[random.nextInt(CaregiverStatus.values().length)];
+        CaregiverStatus status;
+        if (index == 0) {
+            status = CaregiverStatus.ACTIVE; // 첫 번째는 무조건 ACTIVE
+        } else {
+            status = CaregiverStatus.values()[random.nextInt(CaregiverStatus.values().length)];
+        }
+
         CaregiverCenter caregiverCenter = CaregiverCenter.builder()
                 .caregiverCenterId(UUID.randomUUID())
                 .caregiver(caregiver)
@@ -420,5 +433,73 @@ public class DummyDataService {
             );
             settlementCommandService.createSettlement(createSettlementRequest);
         }
+    }
+
+    private void createDummyServiceRequestForConsumer(Consumer consumer) {
+        // ✅ ServiceRequest 생성
+        LocalTime startTime = LocalTime.of(9, 0);
+        LocalTime endTime = LocalTime.of(12, 0);
+        LocalDate requestedDate = LocalDate.now().plusDays(1);
+
+        ServiceRequest serviceRequest = ServiceRequest.builder()
+                .consumer(consumer)
+                .serviceAddress(consumer.getResidentialAddress())
+                .addressType(AddressType.ROAD)
+                .location(new Location(37.500, 126.970))
+                .requestDate(requestedDate)
+                .preferredStartTime(startTime)
+                .preferredEndTime(endTime)
+                .duration((int) Duration.between(startTime, endTime).toHours())
+                .serviceType(ServiceType.values()[0])
+                .additionalInformation("테스트용 서비스 요청")
+                .build();
+        UUID serviceRequestId = UUID.randomUUID();
+        serviceRequest.initializeServiceRequest(serviceRequestId);
+        serviceRequestRepository.save(serviceRequest);
+
+        // ✅ ACTIVE 요양보호사 선택
+        List<Caregiver> activeCaregivers = caregiverCenterRepository.findByStatus(CaregiverStatus.ACTIVE)
+                .stream().map(CaregiverCenter::getCaregiver).toList();
+        if (activeCaregivers.isEmpty()) return;
+
+        Caregiver caregiver = activeCaregivers.get(0); // 첫 번째 ACTIVE 요양보호사
+
+        // ✅ ServiceMatch 생성
+        CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(
+                serviceRequestId,
+                caregiver.getCaregiverId(),
+                startTime,
+                endTime,
+                requestedDate
+        );
+        UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
+
+        ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+        serviceMatch.changeMatchStatus(MatchStatus.COMPLETED); // 리뷰 가능 상태
+
+        // ✅ Review 생성
+        Review review = Review.builder()
+                .reviewId(UUID.randomUUID())
+                .serviceMatch(serviceMatch)
+                .reviewScore(5.0)
+                .reviewContent("테스트용 리뷰")
+                .build();
+        reviewRepository.save(review);
+
+        // ✅ ServiceRequest 상태 동기화
+        serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
+
+        // ✅ VoucherUsage 생성
+        UUID voucherId = voucherQueryService.getVoucherIdByConsumerId(consumer.getConsumerId());
+        Voucher voucher = voucherQueryService.getVoucher(voucherId);
+        voucherUsageCommandService.createVoucherUsage(voucher, serviceMatch);
+
+        // ✅ Settlement 생성
+        CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
+                caregiverCenterRepository.findByCaregiver_CaregiverId(caregiver.getCaregiverId()).get(0).getCaregiverCenterId(),
+                serviceMatchId,
+                100.0 // 테스트용 거리
+        );
+        settlementCommandService.createSettlement(createSettlementRequest);
     }
 }
