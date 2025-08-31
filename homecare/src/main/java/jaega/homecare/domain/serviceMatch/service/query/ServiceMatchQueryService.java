@@ -34,7 +34,7 @@ public class ServiceMatchQueryService {
     }
 
     // UUID 기반 매칭 결과 조회
-    public GetServiceMatchByUUID getMatchesByUUID(UUID serviceMatchId){
+    public CenterScheduleDetailResponse getMatchesByUUID(UUID serviceMatchId){
         ServiceMatch serviceMatch = getServiceMatch(serviceMatchId);
         return serviceMatchMapper.toGetResponseByUUID(serviceMatch);
     }
@@ -45,9 +45,8 @@ public class ServiceMatchQueryService {
      *
      */
 
-    // Center 기반 매칭 결과 조회, CaregiverCenter
-    public List<GetServiceMatchByCenterResponse> getMatchesByCenter(UUID centerId) {
-        return serviceMatchQueryRepository.findMatchesByCenterId(centerId);
+    public List<CenterScheduleResponse> getCenterSchedule(UUID centerId, LocalDate from, LocalDate to) {
+        return serviceMatchQueryRepository.findCenterSchedule(centerId, from, to);
     }
 
     public List<GetCaregiverMatchesResponse> getMatchesByCaregiver(UUID caregiverId){
@@ -116,6 +115,5 @@ public class ServiceMatchQueryService {
     public List<CaregiverScheduleResponse> getCaregiverScheduleByDate(UUID caregiverId, LocalDate date){
         return serviceMatchQueryRepository.findCaregiverScheduleByDate(caregiverId, date);
     }
-
 
 }
