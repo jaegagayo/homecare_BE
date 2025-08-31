@@ -25,6 +25,7 @@ import jaega.homecare.domain.review.repository.ReviewRepository;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
+import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
@@ -60,6 +61,7 @@ public class DummyDataService {
     private final VoucherRepository voucherRepository;
     private final RecurringOfferRepository recurringOfferRepository;
     private final CaregiverCenterRepository caregiverCenterRepository;
+    private final ServiceMatchQueryRepository serviceMatchQueryRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
     private final CaregiverPreferenceRepository caregiverPreferenceRepository;
@@ -338,8 +340,8 @@ public class DummyDataService {
             serviceEndTime = LocalTime.of(20, 0);
         }
 
-        // ✅ 요청 날짜 → 한 개만 랜덤으로 설정 (미래 날짜)
-        LocalDate requestedDate = LocalDate.now().plusDays(random.nextInt(3) + 1);
+        // ✅ 요청 날짜 → +-2일로 생성되도록 변경
+        LocalDate requestedDate = LocalDate.now().plusDays(random.nextInt(5) - 2);
 
         // 3. Duration 계산 (시간 차)
         int duration = (int) java.time.Duration.between(serviceStartTime, serviceEndTime).toHours();
@@ -400,11 +402,17 @@ public class DummyDataService {
 
 
             // ✅ 일정 상태를 랜덤으로 CONFIRMED / CONFIRMED
+            // ✅ 일정 상태 결정: 날짜 기준
             ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
-            boolean isConfirmed = random.nextBoolean(); // 50% 확률
-            MatchStatus matchStatus = isConfirmed ? MatchStatus.CONFIRMED : MatchStatus.COMPLETED;
+            MatchStatus matchStatus;
+            if (requestedDate.isAfter(LocalDate.now())) {
+                matchStatus = MatchStatus.CONFIRMED;
+            } else {
+                matchStatus = MatchStatus.COMPLETED;
+            }
             serviceMatch.changeMatchStatus(matchStatus);
 
+            // COMPLETED인 경우에만 리뷰 생성
             if (matchStatus == MatchStatus.COMPLETED) {
                 Review review = Review.builder()
                         .reviewId(UUID.randomUUID())
@@ -420,10 +428,6 @@ public class DummyDataService {
             ServiceRequest match_serviceRequest = serviceMatch.getServiceRequest();
             match_serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
 
-            UUID voucherId = voucherQueryService.getVoucherIdByConsumerId(consumer.getConsumerId());
-            Voucher voucher = voucherQueryService.getVoucher(voucherId);
-            voucherUsageCommandService.createVoucherUsage(voucher, serviceMatch);
-
 
             // 정산 생성
             CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
@@ -436,70 +440,92 @@ public class DummyDataService {
     }
 
     private void createDummyServiceRequestForConsumer(Consumer consumer) {
-        // ✅ ServiceRequest 생성
-        LocalTime startTime = LocalTime.of(9, 0);
-        LocalTime endTime = LocalTime.of(12, 0);
-        LocalDate requestedDate = LocalDate.now().plusDays(1);
+        // user3@dummy.com 요양보호사 조회
+        User user = userRepository.findByEmail("user3@dummy.com");
+        if (user == null) return;
 
-        ServiceRequest serviceRequest = ServiceRequest.builder()
-                .consumer(consumer)
-                .serviceAddress(consumer.getResidentialAddress())
-                .addressType(AddressType.ROAD)
-                .location(new Location(37.500, 126.970))
-                .requestDate(requestedDate)
-                .preferredStartTime(startTime)
-                .preferredEndTime(endTime)
-                .duration((int) Duration.between(startTime, endTime).toHours())
-                .serviceType(ServiceType.values()[0])
-                .additionalInformation("테스트용 서비스 요청")
-                .build();
-        UUID serviceRequestId = UUID.randomUUID();
-        serviceRequest.initializeServiceRequest(serviceRequestId);
-        serviceRequestRepository.save(serviceRequest);
+        Caregiver caregiver = caregiverRepository.findByUser(user);
+        if (caregiver == null) return;
 
-        // ✅ ACTIVE 요양보호사 선택
-        List<Caregiver> activeCaregivers = caregiverCenterRepository.findByStatus(CaregiverStatus.ACTIVE)
-                .stream().map(CaregiverCenter::getCaregiver).toList();
-        if (activeCaregivers.isEmpty()) return;
+        // 날짜 범위: 오늘 기준 -4일 ~ +4일
+        List<LocalDate> possibleDates = IntStream.rangeClosed(-4, 4)
+                .mapToObj(i -> LocalDate.now().plusDays(i))
+                .toList();
 
-        Caregiver caregiver = activeCaregivers.get(0); // 첫 번째 ACTIVE 요양보호사
-
-        // ✅ ServiceMatch 생성
-        CreateServiceMatchRequest createServiceMatchRequest = new CreateServiceMatchRequest(
-                serviceRequestId,
-                caregiver.getCaregiverId(),
-                startTime,
-                endTime,
-                requestedDate
+        // 시간대
+        List<LocalTime[]> timeSlots = List.of(
+                new LocalTime[]{LocalTime.of(9, 0), LocalTime.of(12, 0)},
+                new LocalTime[]{LocalTime.of(13, 0), LocalTime.of(16, 0)},
+                new LocalTime[]{LocalTime.of(17, 0), LocalTime.of(20, 0)}
         );
-        UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
-        ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
-        serviceMatch.changeMatchStatus(MatchStatus.COMPLETED); // 리뷰 가능 상태
+        for (LocalDate date : possibleDates) {
+            for (LocalTime[] slot : timeSlots) {
+                LocalTime startTime = slot[0];
+                LocalTime endTime = slot[1];
 
-        // ✅ Review 생성
-        Review review = Review.builder()
-                .reviewId(UUID.randomUUID())
-                .serviceMatch(serviceMatch)
-                .reviewScore(5.0)
-                .reviewContent("테스트용 리뷰")
-                .build();
-        reviewRepository.save(review);
+                // 중복 체크
+                if (serviceMatchQueryRepository.existsByCaregiverAndDateTime(caregiver.getCaregiverId(), date, startTime, endTime)) {
+                    continue; // 이미 겹치면 스킵
+                }
 
-        // ✅ ServiceRequest 상태 동기화
-        serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
+                // ServiceRequest 생성
+                ServiceRequest serviceRequest = ServiceRequest.builder()
+                        .consumer(consumer)
+                        .serviceAddress(consumer.getResidentialAddress())
+                        .addressType(AddressType.ROAD)
+                        .location(new Location(37.500, 126.970))
+                        .requestDate(date)
+                        .preferredStartTime(startTime)
+                        .preferredEndTime(endTime)
+                        .duration((int) Duration.between(startTime, endTime).toHours())
+                        .serviceType(ServiceType.values()[0])
+                        .additionalInformation("테스트용 서비스 요청")
+                        .build();
 
-        // ✅ VoucherUsage 생성
-        UUID voucherId = voucherQueryService.getVoucherIdByConsumerId(consumer.getConsumerId());
-        Voucher voucher = voucherQueryService.getVoucher(voucherId);
-        voucherUsageCommandService.createVoucherUsage(voucher, serviceMatch);
+                UUID serviceRequestId = UUID.randomUUID();
+                serviceRequest.initializeServiceRequest(serviceRequestId);
+                serviceRequestRepository.save(serviceRequest);
 
-        // ✅ Settlement 생성
-        CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
-                caregiverCenterRepository.findByCaregiver_CaregiverId(caregiver.getCaregiverId()).get(0).getCaregiverCenterId(),
-                serviceMatchId,
-                100.0 // 테스트용 거리
-        );
-        settlementCommandService.createSettlement(createSettlementRequest);
+                // ServiceMatch 생성
+                CreateServiceMatchRequest matchRequest = new CreateServiceMatchRequest(
+                        serviceRequestId,
+                        caregiver.getCaregiverId(),
+                        startTime,
+                        endTime,
+                        date
+                );
+                UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(matchRequest);
+
+                ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+
+                // 상태: 오늘 이후면 CONFIRMED, 이전이면 COMPLETED
+                if (date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now())) {
+                    serviceMatch.changeMatchStatus(MatchStatus.CONFIRMED);
+                } else {
+                    serviceMatch.changeMatchStatus(MatchStatus.COMPLETED);
+
+                    // COMPLETED이면 리뷰 생성
+                    Review review = Review.builder()
+                            .reviewId(UUID.randomUUID())
+                            .serviceMatch(serviceMatch)
+                            .reviewScore(5.0)
+                            .reviewContent("테스트용 리뷰")
+                            .build();
+                    reviewRepository.save(review);
+                }
+
+                // ServiceRequest 상태 동기화
+                serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
+
+                // Settlement 생성
+                CreateSettlementRequest settlementRequest = new CreateSettlementRequest(
+                        caregiverCenterRepository.findByCaregiver_CaregiverId(caregiver.getCaregiverId()).get(0).getCaregiverCenterId(),
+                        serviceMatchId,
+                        100.0
+                );
+                settlementCommandService.createSettlement(settlementRequest);
+            }
+        }
     }
 }

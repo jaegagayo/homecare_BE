@@ -663,4 +663,23 @@ public class ServiceMatchQueryRepository {
                 .orderBy(serviceMatch.serviceDate.asc(), serviceMatch.serviceStartTime.asc())
                 .fetch();
     }
+
+    /**
+     * 특정 요양보호사에 대해 주어진 날짜, 시간 범위에 중복된 매칭이 존재하는지 확인
+     */
+    public boolean existsByCaregiverAndDateTime(UUID caregiverId, LocalDate serviceDate, LocalTime startTime, LocalTime endTime) {
+        Long count = queryFactory
+                .select(serviceMatch.count())
+                .from(serviceMatch)
+                .where(
+                        serviceMatch.caregiver.caregiverId.eq(caregiverId),
+                        serviceMatch.serviceDate.eq(serviceDate),
+                        serviceMatch.matchStatus.in(MatchStatus.CONFIRMED, MatchStatus.COMPLETED),
+                        serviceMatch.serviceStartTime.lt(endTime)
+                                .and(serviceMatch.serviceEndTime.gt(startTime)) // 시간 겹침 체크
+                )
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
 }
