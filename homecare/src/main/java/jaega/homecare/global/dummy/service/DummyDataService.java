@@ -108,8 +108,8 @@ public class DummyDataService {
         List<String> koreanNames = List.of(
                 "김기현", "박지성", "이재민", "최유진", "장서연",
                 "정하늘", "김소희", "이수환", "박민재", "윤지영",
-                "한동훈", "강채영", "오세훈", "조민아", "서지수",
-                "신재혁", "배유림", "노지민", "황서현", "문지호"
+                "강채영", "조민아", "서지수", "신재혁", "배유림",
+                "노지민", "황서현", "문지호", "임지훈", "정예원"
         );
 
         String name = koreanNames.get(index % koreanNames.size());
@@ -224,6 +224,8 @@ public class DummyDataService {
                 .workMaxTime(4 + random.nextInt(4))      // 최대 근무시간 4~7시간
                 .availableTime(30 + random.nextInt(91))  // 이동 가능 시간 30~120분
                 .workArea("서울시 송파구")                // 근무 가능 지역
+                .addressType(random.nextBoolean() ? AddressType.ROAD : AddressType.JIBUN) // 랜덤
+                .location(new Location(37.500 + random.nextDouble() * 0.1, 126.970 + random.nextDouble() * 0.1)) // ✅ 위도/경도 수정
                 .transportation(random.nextBoolean() ? "자가차량" : "대중교통")
                 .lunchBreak(30)                           // 점심시간 30분
                 .bufferTime(15)                           // 이동 시간 제외 버퍼 15분
