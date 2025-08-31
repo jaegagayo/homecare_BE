@@ -40,4 +40,8 @@ public class Voucher {
         this.voucherDate = voucherDate;
         this.totalAmount = totalAmount;
     }
+
+    public void initializeVoucher(UUID voucherId){
+        this.voucherId = voucherId;
+    }
 }

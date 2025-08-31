@@ -5,7 +5,7 @@ import java.util.UUID;
 public record CreateReviewRequest(
         UUID consumerId,
         UUID serviceMatchId,
-        Integer reviewScore,
+        Double reviewScore,
         String reviewContent
 ) {
 }

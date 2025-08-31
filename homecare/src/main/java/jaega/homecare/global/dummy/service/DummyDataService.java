@@ -17,18 +17,30 @@ import jaega.homecare.domain.center.repository.CenterRepository;
 import jaega.homecare.domain.consumer.entity.CognitiveStatus;
 import jaega.homecare.domain.consumer.entity.Consumer;
 import jaega.homecare.domain.consumer.repository.ConsumerRepository;
+import jaega.homecare.domain.recurringOffer.entity.RecurringOffer;
+import jaega.homecare.domain.recurringOffer.entity.RecurringStatus;
+import jaega.homecare.domain.recurringOffer.repository.RecurringOfferRepository;
+import jaega.homecare.domain.review.entity.Review;
+import jaega.homecare.domain.review.repository.ReviewRepository;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
+import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
+import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
+import jaega.homecare.domain.serviceMatch.repository.ServiceMatchQueryRepository;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
+import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
+import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.repository.ServiceRequestRepository;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
-import jaega.homecare.domain.settlement.repository.SettlementRepository;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.domain.voucher.repository.VoucherRepository;
+import jaega.homecare.domain.voucher.service.command.VoucherCommandService;
+import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
+import jaega.homecare.domain.voucherUsage.service.command.VoucherUsageCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,14 +57,20 @@ public class DummyDataService {
     private final CenterRepository centerRepository;
     private final CaregiverRepository caregiverRepository;
     private final ConsumerRepository consumerRepository;
-    private final SettlementRepository settlementRepository;
+    private final ReviewRepository reviewRepository;
     private final VoucherRepository voucherRepository;
+    private final RecurringOfferRepository recurringOfferRepository;
     private final CaregiverCenterRepository caregiverCenterRepository;
+    private final ServiceMatchQueryRepository serviceMatchQueryRepository;
     private final ServiceRequestRepository serviceRequestRepository;
     private final CertificationRepository certificationRepository;
     private final CaregiverPreferenceRepository caregiverPreferenceRepository;
 
+    private final VoucherQueryService voucherQueryService;
+    private final ServiceMatchQueryService serviceMatchQueryService;
+    private final VoucherUsageCommandService voucherUsageCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
+    private final VoucherCommandService voucherCommandService;
     private final SettlementCommandService settlementCommandService;
     private final Random random = new Random();
 
@@ -66,16 +84,22 @@ public class DummyDataService {
         // 더미 센터 5개 생성
         createDummyCenter(0);
 
-        // 더미 요양보호사 생성
+        // 3. 더미 요양보호사 생성
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
         IntStream.range(0, caregivers.size()).forEach(index -> createDummyCaregiver(index, caregivers));
 
-
-        // ✅ 4. Consumer 생성
+        // 4. Consumer 생성
         List<User> consumers = userRepository.findByUserRole(UserRole.ROLE_CONSUMER);
         IntStream.range(0, consumers.size()).forEach(index -> createDummyConsumer(index, consumers));
 
-        // ✅ 5. ServiceRequest 생성 (Consumer 기반)
+        // 4-1. dummy1@user.com 전용 Consumer 보장 생성
+        User dummyUser = userRepository.findByEmail("user1@dummy.com");
+        Consumer dummyConsumer = consumerRepository.findByUser(dummyUser);
+
+        // 전용 ServiceRequest / ServiceMatch / VoucherUsage / Review 생성
+        createDummyServiceRequestForConsumer(dummyConsumer);
+
+        // 5. ServiceRequest 생성 (Consumer 기반)
         IntStream.range(0, 30).forEach(this::createDummyServiceRequest);
     }
 
@@ -143,12 +167,18 @@ public class DummyDataService {
                 .koreanProficiency(KoreanProficiency.values()[random.nextInt(KoreanProficiency.values().length)])
                 .isAccompanyOuting(random.nextBoolean())
                 .selfIntroduction("안녕하세요! 요양보호사 " + user.getName() + "입니다.")
-                .verifiedStatus(VerifiedStatus.PENDING)
                 .build();
+        caregiver.changeVerifiedStatus(VerifiedStatus.APPROVED);
         caregiverRepository.save(caregiver);
 
         // CaregiverCenter 생성 (상태 랜덤)
-        CaregiverStatus status = CaregiverStatus.values()[random.nextInt(CaregiverStatus.values().length)];
+        CaregiverStatus status;
+        if (index == 0) {
+            status = CaregiverStatus.ACTIVE; // 첫 번째는 무조건 ACTIVE
+        } else {
+            status = CaregiverStatus.values()[random.nextInt(CaregiverStatus.values().length)];
+        }
+
         CaregiverCenter caregiverCenter = CaregiverCenter.builder()
                 .caregiverCenterId(UUID.randomUUID())
                 .caregiver(caregiver)
@@ -235,7 +265,7 @@ public class DummyDataService {
         consumerRepository.save(consumer);
 
         // ✅ Consumer 생성 시 Voucher 생성
-        long totalAmount = getTotalAmountByCareGrade(consumer.getCareGrade());
+        Long totalAmount = voucherCommandService.getTotalAmountByCareGrade(consumer.getCareGrade());
 
         Voucher voucher = Voucher.builder()
                 .voucherId(UUID.randomUUID())
@@ -245,6 +275,50 @@ public class DummyDataService {
                 .build();
 
         voucherRepository.save(voucher);
+
+        createDummyRecurringOfferForConsumer(consumer);
+    }
+
+    private void createDummyRecurringOfferForConsumer(Consumer consumer) {
+        List<Caregiver> approvedCaregivers = caregiverRepository.findAll();
+
+        if (approvedCaregivers.isEmpty()) return;
+
+        Caregiver caregiver = approvedCaregivers.get(random.nextInt(approvedCaregivers.size()));
+
+        // 근무 요일 랜덤
+        Set<DayOfWeek> dayOfWeek = new HashSet<>();
+        int numDays = 1 + random.nextInt(5);
+        while (dayOfWeek.size() < numDays) {
+            dayOfWeek.add(DayOfWeek.values()[random.nextInt(7)]);
+        }
+
+        LocalTime startTime = LocalTime.of(9 + random.nextInt(8), 0);
+        LocalTime endTime = startTime.plusHours(3 + random.nextInt(3));
+
+        LocalDate startDate = LocalDate.now().plusDays(random.nextInt(30));
+        LocalDate endDate = startDate.plusWeeks(4 + random.nextInt(8));
+
+        ServiceType serviceType = ServiceType.values()[random.nextInt(ServiceType.values().length)];
+
+        RecurringOffer offer = RecurringOffer.builder()
+                .recurringOfferId(UUID.randomUUID())
+                .consumer(consumer)
+                .caregiver(caregiver)
+                .serviceAddress(consumer.getResidentialAddress())
+                .addressType(AddressType.ROAD)
+                .location(new Location(37.500 + random.nextDouble() * 0.1, 126.970 + random.nextDouble() * 0.1))
+                .dayOfWeek(dayOfWeek)
+                .serviceStartDate(startDate)
+                .serviceEndDate(endDate)
+                .serviceStartTime(startTime)
+                .serviceEndTime(endTime)
+                .serviceType(serviceType)
+                .recurringStatus(RecurringStatus.PENDING)
+                .recurringOfferUnread(true)
+                .build();
+
+        recurringOfferRepository.save(offer);
     }
 
     private void createDummyServiceRequest(int index) {
@@ -266,8 +340,8 @@ public class DummyDataService {
             serviceEndTime = LocalTime.of(20, 0);
         }
 
-        // ✅ 요청 날짜 → 한 개만 랜덤으로 설정 (미래 날짜)
-        LocalDate requestedDate = LocalDate.now().plusDays(random.nextInt(3) + 1);
+        // ✅ 요청 날짜 → +-2일로 생성되도록 변경
+        LocalDate requestedDate = LocalDate.now().plusDays(random.nextInt(5) - 2);
 
         // 3. Duration 계산 (시간 차)
         int duration = (int) java.time.Duration.between(serviceStartTime, serviceEndTime).toHours();
@@ -326,7 +400,36 @@ public class DummyDataService {
             // ✅ 매칭 생성 후 반환값에서 serviceMatchId 가져오기
             UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(createServiceMatchRequest);
 
-            // ✅ 정산 생성
+
+            // ✅ 일정 상태를 랜덤으로 CONFIRMED / CONFIRMED
+            // ✅ 일정 상태 결정: 날짜 기준
+            ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+            MatchStatus matchStatus;
+            if (requestedDate.isAfter(LocalDate.now())) {
+                matchStatus = MatchStatus.CONFIRMED;
+            } else {
+                matchStatus = MatchStatus.COMPLETED;
+            }
+            serviceMatch.changeMatchStatus(matchStatus);
+
+            // COMPLETED인 경우에만 리뷰 생성
+            if (matchStatus == MatchStatus.COMPLETED) {
+                Review review = Review.builder()
+                        .reviewId(UUID.randomUUID())
+                        .serviceMatch(serviceMatch)
+                        .reviewScore(1.0 + (4.0 * random.nextDouble())) // 1~5점 랜덤
+                        .reviewContent("더미 리뷰 내용입니다.")
+                        .build();
+
+                reviewRepository.save(review);
+            }
+
+            // ✅ ServiceRequest 상태 동기화
+            ServiceRequest match_serviceRequest = serviceMatch.getServiceRequest();
+            match_serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
+
+
+            // 정산 생성
             CreateSettlementRequest createSettlementRequest = new CreateSettlementRequest(
                     selectedCaregiverCenter.getCaregiverCenterId(),
                     serviceMatchId,
@@ -336,14 +439,93 @@ public class DummyDataService {
         }
     }
 
-    private long getTotalAmountByCareGrade(int careGrade) {
-        return switch (careGrade) {
-            case 1 -> 1_520_700L;
-            case 2 -> 1_351_700L;
-            case 3 -> 1_295_400L;
-            case 4 -> 1_189_800L;
-            case 5 -> 1_021_300L;
-            default -> 573_900L; // 인지지원등급
-        };
+    private void createDummyServiceRequestForConsumer(Consumer consumer) {
+        // user3@dummy.com 요양보호사 조회
+        User user = userRepository.findByEmail("user3@dummy.com");
+        if (user == null) return;
+
+        Caregiver caregiver = caregiverRepository.findByUser(user);
+        if (caregiver == null) return;
+
+        // 날짜 범위: 오늘 기준 -4일 ~ +4일
+        List<LocalDate> possibleDates = IntStream.rangeClosed(-4, 4)
+                .mapToObj(i -> LocalDate.now().plusDays(i))
+                .toList();
+
+        // 시간대
+        List<LocalTime[]> timeSlots = List.of(
+                new LocalTime[]{LocalTime.of(9, 0), LocalTime.of(12, 0)},
+                new LocalTime[]{LocalTime.of(13, 0), LocalTime.of(16, 0)},
+                new LocalTime[]{LocalTime.of(17, 0), LocalTime.of(20, 0)}
+        );
+
+        for (LocalDate date : possibleDates) {
+            for (LocalTime[] slot : timeSlots) {
+                LocalTime startTime = slot[0];
+                LocalTime endTime = slot[1];
+
+                // 중복 체크
+                if (serviceMatchQueryRepository.existsByCaregiverAndDateTime(caregiver.getCaregiverId(), date, startTime, endTime)) {
+                    continue; // 이미 겹치면 스킵
+                }
+
+                // ServiceRequest 생성
+                ServiceRequest serviceRequest = ServiceRequest.builder()
+                        .consumer(consumer)
+                        .serviceAddress(consumer.getResidentialAddress())
+                        .addressType(AddressType.ROAD)
+                        .location(new Location(37.500, 126.970))
+                        .requestDate(date)
+                        .preferredStartTime(startTime)
+                        .preferredEndTime(endTime)
+                        .duration((int) Duration.between(startTime, endTime).toHours())
+                        .serviceType(ServiceType.values()[0])
+                        .additionalInformation("테스트용 서비스 요청")
+                        .build();
+
+                UUID serviceRequestId = UUID.randomUUID();
+                serviceRequest.initializeServiceRequest(serviceRequestId);
+                serviceRequestRepository.save(serviceRequest);
+
+                // ServiceMatch 생성
+                CreateServiceMatchRequest matchRequest = new CreateServiceMatchRequest(
+                        serviceRequestId,
+                        caregiver.getCaregiverId(),
+                        startTime,
+                        endTime,
+                        date
+                );
+                UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(matchRequest);
+
+                ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+
+                // 상태: 오늘 이후면 CONFIRMED, 이전이면 COMPLETED
+                if (date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now())) {
+                    serviceMatch.changeMatchStatus(MatchStatus.CONFIRMED);
+                } else {
+                    serviceMatch.changeMatchStatus(MatchStatus.COMPLETED);
+
+                    // COMPLETED이면 리뷰 생성
+                    Review review = Review.builder()
+                            .reviewId(UUID.randomUUID())
+                            .serviceMatch(serviceMatch)
+                            .reviewScore(5.0)
+                            .reviewContent("테스트용 리뷰")
+                            .build();
+                    reviewRepository.save(review);
+                }
+
+                // ServiceRequest 상태 동기화
+                serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
+
+                // Settlement 생성
+                CreateSettlementRequest settlementRequest = new CreateSettlementRequest(
+                        caregiverCenterRepository.findByCaregiver_CaregiverId(caregiver.getCaregiverId()).get(0).getCaregiverCenterId(),
+                        serviceMatchId,
+                        100.0
+                );
+                settlementCommandService.createSettlement(settlementRequest);
+            }
+        }
     }
 }

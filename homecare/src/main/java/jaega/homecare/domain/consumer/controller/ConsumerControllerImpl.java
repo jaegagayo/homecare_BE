@@ -18,10 +18,7 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferRespo
 import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.review.service.command.ReviewCommandService;
@@ -42,6 +39,7 @@ import jaega.homecare.domain.consumer.service.command.ConsumerCommandService;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
+import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
 import jaega.homecare.domain.voucherUsage.service.query.VoucherUsageQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -163,6 +161,13 @@ public class ConsumerControllerImpl implements ConsumerController {
         return ResponseEntity.ok(pending);
     }
 
+    // (메인 페이지) 수요자에게 거절된 일정 조회
+    @Override
+    public ResponseEntity<List<ConsumerCancelledScheduleResponse>> getCancelledSchedule(@RequestParam UUID consumerId){
+        List<ConsumerCancelledScheduleResponse> responses = serviceMatchQueryService.getCancelledSchedules(consumerId);
+        return ResponseEntity.ok(responses);
+    }
+
     /**
      * 서비스 요청 API
      */
@@ -199,9 +204,17 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     // 수요자가 신청한 서비스 정보 상세 상세 조회
     @Override
-    public ResponseEntity<GetServiceRequestById> getServiceRequestById(UUID serviceRequestId) {
+    public ResponseEntity<GetServiceRequestById> getServiceRequestById(@RequestParam UUID serviceRequestId) {
         GetServiceRequestById response = serviceRequestQueryService.findServiceRequestById(serviceRequestId);
         return ResponseEntity.ok(response);
+    }
+
+
+    // (메인 페이지) 거절된 수요자 매칭의 서비스 신청 취소
+    @Override
+    public ResponseEntity<Void> rejectServiceRequestByMatch(@RequestParam UUID serviceMatchId){
+        serviceRequestCommandService.rejectServiceRequestByMatch(serviceMatchId);
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -259,6 +272,17 @@ public class ConsumerControllerImpl implements ConsumerController {
 
         VoucherUsageGuideResponse response = voucherUsageQueryService.getVoucherUsageGuide(voucherId, totalVoucherAmount);
 
+        return ResponseEntity.ok(response);
+    }
+
+    // (마이페이지) 재가 급여(바우처) 내역 조회
+    @Override
+    public ResponseEntity<VoucherUsageResponse> getVoucherByConsumer(
+            @RequestParam UUID consumerId,
+            @RequestParam int year,
+            @RequestParam int month
+    ){
+        VoucherUsageResponse response = voucherUsageQueryService.getVoucherUsageSummary(consumerId, year, month);
         return ResponseEntity.ok(response);
     }
 

@@ -34,6 +34,7 @@ public class Review extends BaseTimeEntity {
     @Builder
     public Review(UUID reviewId, ServiceMatch serviceMatch, Double reviewScore,
                   String reviewContent) {
+        this.reviewId = reviewId;
         this.reviewContent = reviewContent;
         this.serviceMatch = serviceMatch;
         this.reviewScore = reviewScore;

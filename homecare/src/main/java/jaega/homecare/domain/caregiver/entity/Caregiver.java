@@ -61,4 +61,8 @@ public class Caregiver extends BaseTimeEntity {
     public void initializeCaregiver(UUID uuid) {
         this.caregiverId = uuid;
     }
+
+    public void changeVerifiedStatus(VerifiedStatus verifiedStatus){
+        this.verifiedStatus = verifiedStatus;
+    }
 }
