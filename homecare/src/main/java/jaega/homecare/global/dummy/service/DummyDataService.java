@@ -440,12 +440,15 @@ public class DummyDataService {
     }
 
     private void createDummyServiceRequestForConsumer(Consumer consumer) {
-        // user3@dummy.com 요양보호사 조회
-        User user = userRepository.findByEmail("user3@dummy.com");
-        if (user == null) return;
+        // 전체 ACTIVE 요양보호사 조회
+        List<Caregiver> activeCaregivers = caregiverCenterRepository.findByStatus(CaregiverStatus.ACTIVE)
+                .stream()
+                .map(CaregiverCenter::getCaregiver)
+                .distinct()
+                .limit(10) // 앞 10명만
+                .toList();
 
-        Caregiver caregiver = caregiverRepository.findByUser(user);
-        if (caregiver == null) return;
+        if (activeCaregivers.isEmpty()) return;
 
         // 날짜 범위: 오늘 기준 -4일 ~ +4일
         List<LocalDate> possibleDates = IntStream.rangeClosed(-4, 4)
@@ -463,6 +466,9 @@ public class DummyDataService {
             for (LocalTime[] slot : timeSlots) {
                 LocalTime startTime = slot[0];
                 LocalTime endTime = slot[1];
+
+                // 랜덤으로 매칭할 요양보호사 선택
+                Caregiver caregiver = activeCaregivers.get(random.nextInt(activeCaregivers.size()));
 
                 // 중복 체크
                 if (serviceMatchQueryRepository.existsByCaregiverAndDateTime(caregiver.getCaregiverId(), date, startTime, endTime)) {
@@ -499,7 +505,7 @@ public class DummyDataService {
 
                 ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
 
-                // 상태: 오늘 이후면 CONFIRMED, 이전이면 COMPLETED
+                // 상태 결정
                 if (date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now())) {
                     serviceMatch.changeMatchStatus(MatchStatus.CONFIRMED);
                 } else {
