@@ -2,7 +2,7 @@ package jaega.homecare.domain.match.infra;
 
 import jaega.homecare.domain.match.dto.req.CaregiverDTO;
 import jaega.homecare.domain.match.dto.req.ServiceRequestDTO;
-import jaega.homecare.domain.match.dto.res.MatchResponse;
+import jaega.homecare.domain.match.dto.res.MatchingResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ public class AiRecommendation {
 
     private final WebClient webClient;
 
-    public MatchResponse sendRecommendRequest(ServiceRequestDTO request, List<CaregiverDTO> caregivers) {
+    public MatchingResponseDTO sendRecommendRequest(ServiceRequestDTO request, List<CaregiverDTO> caregivers) {
         Map<String, Object> requestBody = Map.of(
                 "serviceRequest", request,
                 "candidateCaregivers", caregivers
@@ -35,7 +35,7 @@ public class AiRecommendation {
                             System.err.println("에러 메세지 : " + errorBody);
                             return Mono.error(new RuntimeException("API 호출 실패: " + errorBody));
                         }))
-                .bodyToMono(MatchResponse.class)
+                .bodyToMono(MatchingResponseDTO.class)
                 .block();
     }
 }

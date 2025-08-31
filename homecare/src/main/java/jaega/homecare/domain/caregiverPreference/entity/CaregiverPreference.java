@@ -1,7 +1,9 @@
 package jaega.homecare.domain.caregiverPreference.entity;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.users.entity.Disease;
+import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -52,8 +54,17 @@ public class CaregiverPreference {
     @Column(name = "available_time")
     private Integer availableTime;
 
+    // serviceRequest의 service_address
     @Column(name = "work_area")
     private String workArea;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "address_type")
+    private AddressType addressType;
+
+    @Embedded
+    @Column(name = "location")
+    private Location location;
 
     @Column(name = "transportation")
     private String transportation;
@@ -93,9 +104,9 @@ public class CaregiverPreference {
     @Builder
     public CaregiverPreference(UUID caregiverPreferenceId, Caregiver caregiver, Set<DayOfWeek> dayOfWeek,
                                LocalTime workStartTime, LocalTime workEndTime, Integer workMinTime, Integer workMaxTime,
-                               Integer availableTime, String workArea, String transportation, Integer lunchBreak, Integer bufferTime,
-                               Set<Disease> supportedConditions, Integer preferredMaxAge, Integer preferredMinAge, PreferredGender preferredGender,
-                               Set<ServiceType> serviceTypes){
+                               Integer availableTime, String workArea, AddressType addressType, Location location,
+                               String transportation, Integer lunchBreak, Integer bufferTime, Set<Disease> supportedConditions,
+                               Integer preferredMaxAge, Integer preferredMinAge, PreferredGender preferredGender, Set<ServiceType> serviceTypes){
         this.caregiverPreferenceId = caregiverPreferenceId;
         this.caregiver = caregiver;
         this.dayOfWeek = dayOfWeek;
@@ -105,6 +116,8 @@ public class CaregiverPreference {
         this.workMaxTime = workMaxTime;
         this.availableTime = availableTime;
         this.workArea = workArea;
+        this.addressType = addressType;
+        this.location = location;
         this.transportation = transportation;
         this.lunchBreak = lunchBreak;
         this.bufferTime = bufferTime;

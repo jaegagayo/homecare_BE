@@ -2,7 +2,9 @@ package jaega.homecare.domain.caregiverPreference.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jaega.homecare.domain.caregiverPreference.entity.PreferredGender;
+import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.users.entity.Disease;
+import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.time.DayOfWeek;
@@ -28,6 +30,11 @@ public record CreateCaregiverPreferenceRequest(
         Integer availableTime,
 
         String workArea,
+
+        AddressType addressType,
+
+        Location location,
+
         String transportation,
 
         @Schema(type = "integer", example = "3600")

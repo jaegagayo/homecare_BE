@@ -15,10 +15,7 @@ import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailRespo
 import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferResponse;
 import jaega.homecare.domain.recurringOffer.dto.res.GetUnreadRecurringOfferResponse;
 import jaega.homecare.domain.review.dto.req.CreateReviewRequest;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerNextScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleDetailResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.ConsumerScheduleResponse;
-import jaega.homecare.domain.serviceMatch.dto.res.GetScheduleWithoutReviewResponse;
+import jaega.homecare.domain.serviceMatch.dto.res.*;
 import jaega.homecare.domain.review.dto.res.ConsumerReviewResponse;
 import jaega.homecare.domain.review.dto.res.GetReviewResponse;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
@@ -29,10 +26,13 @@ import jaega.homecare.domain.serviceRequest.dto.res.GetServiceRequestResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
+import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,6 +77,15 @@ public interface ConsumerController {
     @GetMapping("/schedule")
     ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID consumerId);
 
+
+    @Operation(summary = "특정 수요자의 지정 날짜 스케줄 조회", description = "특정 수요자의 지정된 시작, 종료날짜에 해당하는 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 수요자의 지정된 날짜의 스케줄 조회 성공")
+    @GetMapping("/schedule/date")
+    ResponseEntity<List<ConsumerScheduleResponse>> getConsumerScheduleByDate(
+            @RequestParam UUID consumerId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate);
+
     @Operation(summary = "특정 스케줄 상세 조회", description = "수요자가 선택한 특정 스케줄의 상세 정보를 불러옵니다.")
     @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")
     @GetMapping("/schedule/{id}")
@@ -92,6 +101,12 @@ public interface ConsumerController {
     @GetMapping("/home/notification/review")
     ResponseEntity<List<GetScheduleWithoutReviewResponse>> getScheduleWithoutReview(@RequestParam UUID consumerId);
 
+
+    @Operation(summary = "(메인 페이지) 수요자에게 거절된 일정 조회", description = "수요자에게 거절된 일정들을 조회합니다.<br>" +
+            "이후 신청 취소 및 재매칭 유도에 이용됩니다.")
+    @ApiResponse(responseCode = "200", description = "수요자에게 거절된 일정 조회")
+    @GetMapping("/home/notification/reject")
+    ResponseEntity<List<ConsumerCancelledScheduleResponse>> getCancelledSchedule(@RequestParam UUID consumerId);
 
     /**
      *
@@ -125,6 +140,11 @@ public interface ConsumerController {
     @GetMapping("/{requestId}")
     ResponseEntity<GetServiceRequestById> getServiceRequestById(@RequestParam UUID requestId);
 
+
+    @Operation(summary = "(메인 페이지) 거절된 수요자 매칭의 서비스 신청 취소 ", description = "수요자에게 거절된 일정의 신청 정보를 취소합니다.")
+    @ApiResponse(responseCode = "200", description = "수요자의 거절된 일정의 신청 정보 취소")
+    @PostMapping("/home/notification/reject")
+    ResponseEntity<Void> rejectServiceRequestByMatch(@RequestParam UUID serviceMatchId);
 
     /**
      *
@@ -182,6 +202,16 @@ public interface ConsumerController {
     @ApiResponse(responseCode = "200", description = "바우처 사용 안내 조회 성공")
     @GetMapping("/request/voucher")
     ResponseEntity<VoucherUsageGuideResponse> getVoucherUsageGuide(@RequestParam UUID consumerId);
+
+    // (마이페이지) 재가 급여(바우처) 내역 조회
+    @Operation(summary = "(마이페이지) 재가 급여(바우처) 내역 조회", description = "마이페이지에서 수요자의 재가 급여(바우처) 내역을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "(마이페이지) 사용자의 재가 급여 내역 조회 성공")
+    @GetMapping("/my-page/voucher")
+    ResponseEntity<VoucherUsageResponse> getVoucherByConsumer(
+            @RequestParam UUID consumerId,
+            @RequestParam int year,
+            @RequestParam int month
+    );
 
     /**
      *

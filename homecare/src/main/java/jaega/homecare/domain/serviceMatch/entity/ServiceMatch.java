@@ -58,4 +58,9 @@ public class ServiceMatch {
     public void initializeServiceMatch(UUID serviceMatchId){
         this.serviceMatchId = serviceMatchId;
     }
+
+    public void changeMatchStatus(MatchStatus matchStatus){
+        this.matchStatus = matchStatus;
+
+    }
 }

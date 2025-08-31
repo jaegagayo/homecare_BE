@@ -12,6 +12,7 @@ import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.service.command.UserCommandService;
 import jaega.homecare.domain.users.service.query.UserQueryService;
+import jaega.homecare.domain.voucher.service.command.VoucherCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,17 +28,21 @@ public class ConsumerCommandService {
     private final ConsumerRepository consumerRepository;
     private final ConsumerMapper consumerMapper;
     private final UserCommandService userCommandService;
-    private final UserQueryService userQueryService;
+    private final VoucherCommandService voucherCommandService;
 
     public void signupConsumer(ConsumerSignupRequest request){
         User user = userCommandService.createUser(request.user(), UserRole.ROLE_CONSUMER);
         createConsumer(request.consumer(), user);
+
     }
 
     public void createConsumer(ConsumerCreateRequest request, User user){
         Consumer consumer = consumerMapper.toConsumer(request, user);
         consumer.initializeConsumer(UUID.randomUUID());
         consumerRepository.save(consumer);
+
+        // 수요자의 현재 월의 바우처 생성
+        voucherCommandService.createVoucher(consumer.getConsumerId());
     }
 
     public void updateConsumer(ConsumerProfileUpdateRequest request, Consumer consumer){

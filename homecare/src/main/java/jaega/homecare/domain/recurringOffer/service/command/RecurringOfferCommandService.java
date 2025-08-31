@@ -11,8 +11,10 @@ import jaega.homecare.domain.recurringOffer.mapper.RecurringOfferMapper;
 import jaega.homecare.domain.recurringOffer.repository.RecurringOfferRepository;
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
+import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
+import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.serviceRequest.dto.req.ConsumerServiceRequest;
 import jaega.homecare.domain.serviceRequest.dto.res.GetCreateServiceResponse;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
@@ -40,6 +42,7 @@ public class RecurringOfferCommandService {
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final ServiceRequestCommandService serviceRequestCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
+    private final ServiceMatchQueryService serviceMatchQueryService;
 
     /**
      * 수요자 ( consumer )
@@ -91,7 +94,9 @@ public class RecurringOfferCommandService {
                         recurringOffer.getServiceEndTime(),
                         currentDate
                 );
-                serviceMatchCommandService.createServiceMatch(request);
+                UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(request);
+                ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+                serviceMatch.changeMatchStatus(MatchStatus.CONFIRMED);
             }
             currentDate = currentDate.plusDays(1);
         }

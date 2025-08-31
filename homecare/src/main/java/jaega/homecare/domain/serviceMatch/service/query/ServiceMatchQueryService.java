@@ -83,6 +83,10 @@ public class ServiceMatchQueryService {
         return serviceMatchQueryRepository.findConsumerWeeklySchedule(consumerId, weekStart, weekEnd);
     }
 
+    public List<ConsumerScheduleResponse> getConsumerScheduleByDate(UUID consumerId, LocalDate startDate, LocalDate endDate){
+        return serviceMatchQueryRepository.findConsumerWeeklySchedule(consumerId, startDate, endDate);
+    }
+
     public ConsumerScheduleDetailResponse getConsumerScheduleDetail(UUID serviceMatchId){
         return serviceMatchQueryRepository.findConsumerScheduleDetail(serviceMatchId);
     }
@@ -93,6 +97,10 @@ public class ServiceMatchQueryService {
 
     public List<GetScheduleWithoutReviewResponse> getScheduleWithoutReview(UUID consumerId){
         return serviceMatchQueryRepository.findCompletedScheduleWithoutReview(consumerId);
+    }
+
+    public List<ConsumerCancelledScheduleResponse> getCancelledSchedules(UUID consumerId){
+        return serviceMatchQueryRepository.getCancelledSchedules(consumerId);
     }
 
 
