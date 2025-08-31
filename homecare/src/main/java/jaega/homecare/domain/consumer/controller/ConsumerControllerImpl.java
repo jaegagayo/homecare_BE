@@ -240,8 +240,8 @@ public class ConsumerControllerImpl implements ConsumerController {
 
     // 정기 제안 상세 조회 API
     @Override
-    public ResponseEntity<GetRecurringOfferDetailResponse> getRecurringOfferDetail(@PathVariable UUID recurringOfferId){
-        GetRecurringOfferDetailResponse response = recurringOfferQueryService.findRecurringOfferDetail(recurringOfferId);
+    public ResponseEntity<GetRecurringOfferDetailResponse> getRecurringOfferDetail(@PathVariable UUID recurringId){
+        GetRecurringOfferDetailResponse response = recurringOfferQueryService.findRecurringOfferDetail(recurringId);
         return ResponseEntity.ok(response);
     }
 
