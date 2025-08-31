@@ -20,6 +20,7 @@ import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import jaega.homecare.domain.recurringOffer.entity.RecurringOffer;
 import jaega.homecare.domain.recurringOffer.entity.RecurringStatus;
 import jaega.homecare.domain.recurringOffer.repository.RecurringOfferRepository;
+import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.review.repository.ReviewRepository;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
@@ -40,12 +41,12 @@ import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.domain.voucher.repository.VoucherRepository;
 import jaega.homecare.domain.voucher.service.command.VoucherCommandService;
 import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
-import jaega.homecare.domain.voucherUsage.service.command.VoucherUsageCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -68,7 +69,7 @@ public class DummyDataService {
 
     private final VoucherQueryService voucherQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
-    private final VoucherUsageCommandService voucherUsageCommandService;
+    private final RecurringOfferCommandService recurringOfferCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final VoucherCommandService voucherCommandService;
     private final SettlementCommandService settlementCommandService;
@@ -81,7 +82,7 @@ public class DummyDataService {
 
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
-        // 더미 센터 5개 생성
+        // 더미 센터 생성
         createDummyCenter(0);
 
         // 3. 더미 요양보호사 생성
@@ -117,8 +118,13 @@ public class DummyDataService {
         String emailPrefix = "user" + index;
         String email = emailPrefix + "@dummy.com";
 
-        UserRole role = index % 5 == 0 ? UserRole.ROLE_CENTER :
-                (index % 3 == 0 ? UserRole.ROLE_CAREGIVER : UserRole.ROLE_CONSUMER);
+        UserRole role;
+        if (index == 0) {
+            role = UserRole.ROLE_CENTER; // 0번은 센터
+        } else {
+            // 나머지는 CAREGIVER 또는 CONSUMER로 분기
+            role = (index % 2 == 0) ? UserRole.ROLE_CAREGIVER : UserRole.ROLE_CONSUMER;
+        }
 
         User user = User.builder()
                 .name(name)
@@ -279,10 +285,10 @@ public class DummyDataService {
         createDummyRecurringOfferForConsumer(consumer);
     }
 
-    private void createDummyRecurringOfferForConsumer(Consumer consumer) {
+    private UUID createDummyRecurringOfferForConsumer(Consumer consumer) {
         List<Caregiver> approvedCaregivers = caregiverRepository.findAll();
 
-        if (approvedCaregivers.isEmpty()) return;
+        if (approvedCaregivers.isEmpty()) return null;
 
         Caregiver caregiver = approvedCaregivers.get(random.nextInt(approvedCaregivers.size()));
 
@@ -319,6 +325,7 @@ public class DummyDataService {
                 .build();
 
         recurringOfferRepository.save(offer);
+        return offer.getRecurringOfferId();
     }
 
     private void createDummyServiceRequest(int index) {
@@ -440,12 +447,15 @@ public class DummyDataService {
     }
 
     private void createDummyServiceRequestForConsumer(Consumer consumer) {
-        // user3@dummy.com 요양보호사 조회
-        User user = userRepository.findByEmail("user3@dummy.com");
-        if (user == null) return;
+        // 전체 ACTIVE 요양보호사 조회
+        List<Caregiver> activeCaregivers = caregiverCenterRepository.findByStatus(CaregiverStatus.ACTIVE)
+                .stream()
+                .map(CaregiverCenter::getCaregiver)
+                .distinct()
+                .limit(10) // 앞 10명만
+                .toList();
 
-        Caregiver caregiver = caregiverRepository.findByUser(user);
-        if (caregiver == null) return;
+        if (activeCaregivers.isEmpty()) return;
 
         // 날짜 범위: 오늘 기준 -4일 ~ +4일
         List<LocalDate> possibleDates = IntStream.rangeClosed(-4, 4)
@@ -463,6 +473,9 @@ public class DummyDataService {
             for (LocalTime[] slot : timeSlots) {
                 LocalTime startTime = slot[0];
                 LocalTime endTime = slot[1];
+
+                // 랜덤으로 매칭할 요양보호사 선택
+                Caregiver caregiver = activeCaregivers.get(random.nextInt(activeCaregivers.size()));
 
                 // 중복 체크
                 if (serviceMatchQueryRepository.existsByCaregiverAndDateTime(caregiver.getCaregiverId(), date, startTime, endTime)) {
@@ -499,7 +512,7 @@ public class DummyDataService {
 
                 ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
 
-                // 상태: 오늘 이후면 CONFIRMED, 이전이면 COMPLETED
+                // 상태 결정
                 if (date.isAfter(LocalDate.now()) || date.isEqual(LocalDate.now())) {
                     serviceMatch.changeMatchStatus(MatchStatus.CONFIRMED);
                 } else {
@@ -527,5 +540,8 @@ public class DummyDataService {
                 settlementCommandService.createSettlement(settlementRequest);
             }
         }
+        UUID recurringOfferId = createDummyRecurringOfferForConsumer(consumer);
+
+        recurringOfferCommandService.approveRecurringStatus(recurringOfferId);
     }
 }

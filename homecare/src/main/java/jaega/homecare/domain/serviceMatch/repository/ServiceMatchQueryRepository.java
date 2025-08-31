@@ -510,13 +510,13 @@ public class ServiceMatchQueryRepository {
         QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
         QServiceRequest serviceRequest = QServiceRequest.serviceRequest;
         QCaregiver caregiver = QCaregiver.caregiver;
-        QUser caregiverUser = caregiver.user;
         QReview review = QReview.review;
 
         return queryFactory
                 .select(Projections.constructor(
                         GetScheduleWithoutReviewResponse.class,
-                        caregiverUser.name,
+                        serviceMatch.serviceMatchId,
+                        serviceMatch.caregiver.user.name,
                         serviceMatch.serviceDate,
                         serviceMatch.serviceStartTime,
                         serviceMatch.serviceEndTime,
@@ -525,7 +525,6 @@ public class ServiceMatchQueryRepository {
                 .from(serviceMatch)
                 .join(serviceMatch.serviceRequest, serviceRequest)
                 .join(serviceMatch.caregiver, caregiver)
-                .join(caregiver.user, caregiverUser)
                 .leftJoin(review).on(review.serviceMatch.eq(serviceMatch))
                 .where(
                         serviceRequest.consumer.consumerId.eq(consumerId),

@@ -88,7 +88,7 @@ public class VoucherUsageQueryRepository {
             }
         }
 
-        return new VoucherUsageCost(usedAmount, expectedAmount, confirmedCopay, usedCopay);
+        return new VoucherUsageCost(usedAmount, usedCopay, expectedAmount, confirmedCopay);
     }
 
 }

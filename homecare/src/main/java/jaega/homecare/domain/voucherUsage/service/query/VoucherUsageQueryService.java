@@ -75,8 +75,18 @@ public class VoucherUsageQueryService {
                 .map(voucherUsageMapper::toVoucherUsageDetail)
                 .toList();
 
-        long remainingAmount = voucher.getTotalAmount() - (cost.usedAmount() + cost.expectedAmount());
-        long totalCopay = cost.usedCopay() + cost.confirmedCopay();
+        // 실제 바우처 사용액: 바우처 총액을 초과하지 않도록
+        long totalUsed = cost.usedAmount() + cost.expectedAmount();
+        long actualVoucherUsed = Math.min(voucher.getTotalAmount(), totalUsed);
+
+        // 초과분은 본인 부담금으로 반영
+        long extraCopay = Math.max(0, totalUsed - voucher.getTotalAmount());
+
+        // 남은 바우처 금액
+        long remainingAmount = voucher.getTotalAmount() - actualVoucherUsed;
+
+        // 총 본인 부담금
+        long totalCopay = cost.usedCopay() + cost.confirmedCopay() + extraCopay;
 
         return voucherUsageMapper.toVoucherUsageResponse(voucher, cost, remainingAmount, totalCopay, usageList);
     }
