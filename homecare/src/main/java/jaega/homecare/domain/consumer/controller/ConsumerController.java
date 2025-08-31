@@ -27,10 +27,12 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,6 +76,15 @@ public interface ConsumerController {
     @ApiResponse(responseCode = "200", description = "특정 수요자의 주간 스케줄 조회 성공")
     @GetMapping("/schedule")
     ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID consumerId);
+
+
+    @Operation(summary = "특정 수요자의 지정 날짜 스케줄 조회", description = "특정 수요자의 지정된 시작, 종료날짜에 해당하는 스케줄을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 수요자의 지정된 날짜의 스케줄 조회 성공")
+    @GetMapping("/schedule/date")
+    ResponseEntity<List<ConsumerScheduleResponse>> getConsumerScheduleByDate(
+            @RequestParam UUID consumerId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate);
 
     @Operation(summary = "특정 스케줄 상세 조회", description = "수요자가 선택한 특정 스케줄의 상세 정보를 불러옵니다.")
     @ApiResponse(responseCode = "200", description = "스케줄 상세 조회 성공")

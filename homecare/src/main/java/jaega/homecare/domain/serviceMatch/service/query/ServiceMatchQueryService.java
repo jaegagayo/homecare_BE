@@ -84,6 +84,10 @@ public class ServiceMatchQueryService {
         return serviceMatchQueryRepository.findConsumerWeeklySchedule(consumerId, weekStart, weekEnd);
     }
 
+    public List<ConsumerScheduleResponse> getConsumerScheduleByDate(UUID consumerId, LocalDate startDate, LocalDate endDate){
+        return serviceMatchQueryRepository.findConsumerWeeklySchedule(consumerId, startDate, endDate);
+    }
+
     public ConsumerScheduleDetailResponse getConsumerScheduleDetail(UUID serviceMatchId){
         return serviceMatchQueryRepository.findConsumerScheduleDetail(serviceMatchId);
     }

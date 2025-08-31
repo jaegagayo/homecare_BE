@@ -422,7 +422,8 @@ public class ServiceMatchQueryRepository {
                         serviceMatch.serviceEndTime,
                         serviceRequest.serviceAddress,
                         serviceRequest.serviceType,
-                        serviceMatch.matchStatus
+                        serviceMatch.matchStatus,
+                        serviceRequest.requestStatus
                 ))
                 .from(serviceMatch)
                 .join(serviceMatch.caregiver, caregiver)

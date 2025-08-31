@@ -42,6 +42,7 @@ import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageGuideResponse;
 import jaega.homecare.domain.voucherUsage.dto.res.VoucherUsageResponse;
 import jaega.homecare.domain.voucherUsage.service.query.VoucherUsageQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -130,6 +131,17 @@ public class ConsumerControllerImpl implements ConsumerController {
     public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerSchedule(@RequestParam UUID consumerId){
         LocalDate today = LocalDate.now();
         List<ConsumerScheduleResponse> responses = serviceMatchQueryService.getConsumerSchedule(consumerId, today);
+        return ResponseEntity.ok(responses);
+    }
+
+    // 특정 수요자의 지정 날짜 스케줄 조회
+    @Override
+    public ResponseEntity<List<ConsumerScheduleResponse>> getConsumerScheduleByDate(
+            @RequestParam UUID consumerId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+        LocalDate today = LocalDate.now();
+        List<ConsumerScheduleResponse> responses = serviceMatchQueryService.getConsumerScheduleByDate(consumerId, startDate, endDate);
         return ResponseEntity.ok(responses);
     }
 
