@@ -81,7 +81,7 @@ public class DummyDataService {
 
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
-        // 더미 센터 5개 생성
+        // 더미 센터 생성
         createDummyCenter(0);
 
         // 3. 더미 요양보호사 생성
@@ -117,8 +117,13 @@ public class DummyDataService {
         String emailPrefix = "user" + index;
         String email = emailPrefix + "@dummy.com";
 
-        UserRole role = index % 5 == 0 ? UserRole.ROLE_CENTER :
-                (index % 3 == 0 ? UserRole.ROLE_CAREGIVER : UserRole.ROLE_CONSUMER);
+        UserRole role;
+        if (index == 0) {
+            role = UserRole.ROLE_CENTER; // 0번은 센터
+        } else {
+            // 나머지는 CAREGIVER 또는 CONSUMER로 분기
+            role = (index % 2 == 0) ? UserRole.ROLE_CAREGIVER : UserRole.ROLE_CONSUMER;
+        }
 
         User user = User.builder()
                 .name(name)
