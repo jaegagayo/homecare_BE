@@ -65,10 +65,10 @@ public class VoucherUsageQueryRepository {
                 .groupBy(sm.matchStatus)
                 .fetch();
 
-        long usedAmount = 0L;
-        long expectedAmount = 0L;
-        long confirmedCopay = 0L;
-        long totalCopay = 0L;
+        long usedAmount = 0L;       // 현재까지의 총 사용금액
+        long usedCopay = 0L;       // 현재까지의 본인 부담금
+        long expectedAmount = 0L;   // 예상 금액 ( 매칭 완료 전 )
+        long confirmedCopay = 0L;   // 예상 본인부담금 ( 매칭 완료 전 )
 
         for (Tuple t : sums) {
             MatchStatus status = t.get(sm.matchStatus);
@@ -78,17 +78,17 @@ public class VoucherUsageQueryRepository {
             if (amountSum == null) amountSum = 0L;
             if (copaySum == null) copaySum = 0L;
 
-            totalCopay += copaySum;
 
             if (status == MatchStatus.COMPLETED) {
                 usedAmount = amountSum;
-                confirmedCopay = copaySum;
+                usedCopay = copaySum;
             } else if (status == MatchStatus.CONFIRMED) {
                 expectedAmount = amountSum;
+                confirmedCopay = copaySum;
             }
         }
 
-        return new VoucherUsageCost(usedAmount, expectedAmount, confirmedCopay, totalCopay);
+        return new VoucherUsageCost(usedAmount, expectedAmount, confirmedCopay, usedCopay);
     }
 
 }

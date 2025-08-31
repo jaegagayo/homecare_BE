@@ -76,8 +76,9 @@ public class VoucherUsageQueryService {
                 .toList();
 
         long remainingAmount = voucher.getTotalAmount() - (cost.usedAmount() + cost.expectedAmount());
+        long totalCopay = cost.usedCopay() + cost.confirmedCopay();
 
-        return voucherUsageMapper.toVoucherUsageResponse(voucher, cost, remainingAmount, usageList);
+        return voucherUsageMapper.toVoucherUsageResponse(voucher, cost, remainingAmount, totalCopay, usageList);
     }
 
 }

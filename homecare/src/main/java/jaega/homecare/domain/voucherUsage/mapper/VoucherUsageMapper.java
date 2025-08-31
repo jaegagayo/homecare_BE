@@ -36,9 +36,9 @@ public interface VoucherUsageMapper {
     @Mapping(target = "expectedAmount", source = "cost.expectedAmount")
     @Mapping(target = "remainingAmount", source = "remainingAmount")
     @Mapping(target = "confirmedCopay", source = "cost.confirmedCopay")
-    @Mapping(target = "totalCopay", source = "cost.totalCopay")
+    @Mapping(target = "totalCopay", source = "totalCopay")
     @Mapping(target = "usageList", source = "usageList")
-    VoucherUsageResponse toVoucherUsageResponse(Voucher voucher, VoucherUsageCost cost, long remainingAmount, List<VoucherUsageDetail> usageList);
+    VoucherUsageResponse toVoucherUsageResponse(Voucher voucher, VoucherUsageCost cost, long remainingAmount, long totalCopay, List<VoucherUsageDetail> usageList);
 
     @Mapping(target = "isHighCopayRate",
             expression = "java(isHighCopayRate(remainingAmount, expectedUsageAmount))")
