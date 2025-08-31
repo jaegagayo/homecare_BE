@@ -184,28 +184,32 @@ public class CenterControllerImpl implements CenterController{
      * 정산 관련 API
      */
 
-    // 정산 내역 조회
+    // 센터의 정산 내역 조회
     @Override
-    public ResponseEntity<GetSettlementResponse> getSettlement(@RequestParam UUID settlementId){
-        GetSettlementResponse responses = settlementQueryService.findSettlement(settlementId);
+    public ResponseEntity<List<GetSettlementResponse>> getSettlement(
+            @RequestParam UUID centerId,
+            @RequestParam MatchStatus status,
+            @RequestParam LocalDate date
+    ){
+        List<GetSettlementResponse> responses = settlementQueryService.getCenterSettlement(centerId, status, date);
         return ResponseEntity.ok(responses);
     }
 
     // 센터의 총 정산 금액 및 정산 상태 통계 조회
     @Override
     public GetSettlementSummaryResponse getSettlementSummary(@RequestParam UUID centerId){
-        return settlementQueryService.getSettlementSummary(centerId);
+        return settlementQueryService.getCenterSettlementSummary(centerId);
     }
 
     // 요양보호사 별 정산 내역 조회
     @Override
-    public ResponseEntity<List<GetSettlementByCaregiverResponse>> getSettlementByCaregiver(
+    public ResponseEntity<List<GetSettlementResponse>> getSettlementByCaregiver(
             @PathVariable UUID caregiverId,
             @RequestParam UUID centerId,
             @RequestParam MatchStatus status,
             @RequestParam LocalDate date
             ){
-        List<GetSettlementByCaregiverResponse> result = settlementQueryService.getSettlementByCaregiver(centerId, caregiverId, status, date);
+        List<GetSettlementResponse> result = settlementQueryService.getSettlementByCaregiver(centerId, caregiverId, status, date);
         return ResponseEntity.ok(result);
     }
 

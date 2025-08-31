@@ -6,7 +6,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
-import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
@@ -27,8 +26,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SettlementQueryRepository {
     private final JPAQueryFactory queryFactory;
-    private final SettlementRepository settlementRepository;
-    private final CaregiverRepository caregiverRepository;
 
     // 정산 상태 기반 정산 내역 조회
     // TODO : 추후 정산 날짜 속성 추가 시 날짜 속성 리팩터링 필요
@@ -75,13 +72,74 @@ public class SettlementQueryRepository {
                 .fetch();
     }
 
+    
     /**
-     *  정산 페이지
+     *  
+     *  Center
      **/
+
+    // 센터의 정산 내역 전체 조회 (상태/날짜/요양보호사 별)
+    public List<GetSettlementResponse> getCenterSettlement(
+            UUID centerId,
+            UUID caregiverId,       // nullable
+            MatchStatus status,     // nullable
+            LocalDate date          // nullable
+    ) {
+        QSettlement settlement = QSettlement.settlement;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(caregiverCenter.center.centerId.eq(centerId));
+
+        // 요양보호사 필터
+        if (caregiverId != null) {
+            where.and(caregiverCenter.caregiver.caregiverId.eq(caregiverId));
+        }
+
+        // 상태 필터
+        if (status != null) {
+            where.and(settlement.serviceMatch.matchStatus.eq(status));
+        }
+
+        // 월 단위 필터
+        if (date != null) {
+            int year = date.getYear();
+            int month = date.getMonthValue();
+            where.and(
+                    settlement.serviceMatch.serviceDate.year().eq(year)
+                            .and(settlement.serviceMatch.serviceDate.month().eq(month))
+            );
+        }
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetSettlementResponse.class,
+                        settlement.settlementId,
+                        caregiver.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        settlement.settlementAmount,
+                        serviceMatch.matchStatus
+                ))
+                .from(settlement)
+                .join(settlement.serviceMatch, serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(where)
+                .orderBy(
+                        settlement.modifiedAt
+                                .coalesce(settlement.createdAt)
+                                .desc()
+                )
+                .fetch();
+    }
 
     // 센터의 총 정산 금액 및 정산 상태 통계 조회
     // TODO : 정산 금액 때문에 현재 클래스에 위치해있으며, 도메인으로 각각 분리하도록 리팩터링 필요
-    public GetSettlementSummaryResponse getSettlementCenterSummary(UUID centerId) {
+    public GetSettlementSummaryResponse getCenterSettlementSummary(UUID centerId) {
         QSettlement settlement = QSettlement.settlement;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
@@ -125,60 +183,6 @@ public class SettlementQueryRepository {
                 plannedCount,
                 cancelledCount
         );
-    }
-
-    // 요양 보호사 별 정산 내역 조회 (센터-요양보호사 관계 기반)
-    public List<GetSettlementByCaregiverResponse> getSettlementByCaregiver(
-            UUID centerId,
-            UUID caregiverId,
-            MatchStatus status,   // nullable
-            LocalDate date        // nullable (월 단위 조회)
-    ) {
-        QSettlement settlement = QSettlement.settlement;
-        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-
-        BooleanBuilder where = new BooleanBuilder();
-        where.and(caregiverCenter.center.centerId.eq(centerId));
-        where.and(caregiverCenter.caregiver.caregiverId.eq(caregiverId));
-
-        // 상태 필터
-        if (status != null) {
-            where.and(settlement.serviceMatch.matchStatus.eq(status));
-        }
-
-        // 월 단위 필터
-        if (date != null) {
-            int year = date.getYear();
-            int month = date.getMonthValue();
-            where.and(
-                    settlement.serviceMatch.serviceDate.year().eq(year)
-                            .and(settlement.serviceMatch.serviceDate.month().eq(month))
-            );
-        }
-
-        return queryFactory
-                .select(Projections.constructor(
-                        GetSettlementByCaregiverResponse.class,
-                        caregiver.user.name,
-                        serviceMatch.serviceDate,
-                        serviceMatch.serviceStartTime,
-                        serviceMatch.serviceEndTime,
-                        settlement.settlementAmount,
-                        serviceMatch.matchStatus
-                ))
-                .from(settlement)
-                .join(settlement.serviceMatch, serviceMatch)
-                .join(serviceMatch.caregiver, caregiver)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(where)
-                .orderBy(
-                        settlement.modifiedAt
-                                .coalesce(settlement.createdAt)
-                                .desc()
-                )
-                .fetch();
     }
 
     // 요양보호사 개별 정산 금액, 건수 조회
@@ -363,4 +367,5 @@ public class SettlementQueryRepository {
                 )
                 .fetchOne();
     }
+
 }

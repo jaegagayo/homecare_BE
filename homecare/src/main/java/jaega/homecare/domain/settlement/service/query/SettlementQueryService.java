@@ -29,31 +29,30 @@ public class SettlementQueryService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 settlementId로 정산 내역을 찾을 수 없습니다."));
     }
 
-    // 프론트엔드 GET 조회
-    public GetSettlementResponse findSettlement(UUID settlementId){
-        Settlement settlement = getSettlement(settlementId);
-        return settlementMapper.toGetResponse(settlement);
-    }
-
 
     /**
      *
      * Center
      */
 
+    // 센터의 정산 내역 조회
+    public List<GetSettlementResponse> getCenterSettlement(UUID centerId, MatchStatus status, LocalDate date) {
+        return settlementQueryRepository.getCenterSettlement(centerId, null, status, date);
+    }
+
     // 센터의 총 정산 금액 및 정산 상태 통계 조회
-    public GetSettlementSummaryResponse getSettlementSummary(UUID centerId){
-        return settlementQueryRepository.getSettlementCenterSummary(centerId);
+    public GetSettlementSummaryResponse getCenterSettlementSummary(UUID centerId){
+        return settlementQueryRepository.getCenterSettlementSummary(centerId);
     }
 
     // 요양 보호사 별 정산 내역 조회
-    public List<GetSettlementByCaregiverResponse> getSettlementByCaregiver(
+    public List<GetSettlementResponse> getSettlementByCaregiver(
             UUID centerId,
             UUID caregiverId,
             MatchStatus status,
             LocalDate date
     ) {
-        return settlementQueryRepository.getSettlementByCaregiver(centerId, caregiverId, status, date);
+        return settlementQueryRepository.getCenterSettlement(centerId, caregiverId, status, date);
     }
 
     // 요양보호사 총 정산 금액 및 정산 상태 통계 조회
@@ -94,4 +93,5 @@ public class SettlementQueryService {
 
         return new GetDashboardSettlementResponse(totalSettledAmount, unsettledCount, fraudAlertsCount);
     }
+
 }

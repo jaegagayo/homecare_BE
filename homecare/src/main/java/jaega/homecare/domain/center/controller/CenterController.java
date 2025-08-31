@@ -134,10 +134,14 @@ public interface CenterController {
      * 정산 관련 API
      */
 
-    @Operation(summary = "정산 내역 조회 API", description = "정산 내역의 ID를 기반으로 정보를 조회합니다.")
+    @Operation(summary = "정산 내역 전체 조회 API", description = "센터의 전체 정산 내역을 조회합니다.")
     @ApiResponse(responseCode = "204", description = "정산 내역 상세 조회 성공")
     @GetMapping("/settlement")
-    ResponseEntity<GetSettlementResponse> getSettlement(@RequestParam UUID settlementId);
+    ResponseEntity<List<GetSettlementResponse>> getSettlement(
+            @RequestParam UUID centerId,
+            @RequestParam MatchStatus status,
+            @RequestParam LocalDate date
+    );
 
     @Operation(summary = "센터의 총 정산 금액 및 정산 상태 통계 조회", description = "센터의 정산 금액 및 정산 상태 통계를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "센터의 정산 금액, 상태 통계 조회 성공")
@@ -147,7 +151,7 @@ public interface CenterController {
     @Operation(summary = "요양보호사 별 정산 내역 조회", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회합니다.")
     @ApiResponse(responseCode = "204", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회 성공")
     @GetMapping(("/settlement/{caregiverId}"))
-    ResponseEntity<List<GetSettlementByCaregiverResponse>> getSettlementByCaregiver(
+    ResponseEntity<List<GetSettlementResponse>> getSettlementByCaregiver(
             @PathVariable UUID caregiverId,
             @RequestParam UUID centerId,
             @RequestParam MatchStatus status,
