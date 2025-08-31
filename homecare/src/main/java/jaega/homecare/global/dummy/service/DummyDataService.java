@@ -20,6 +20,7 @@ import jaega.homecare.domain.consumer.repository.ConsumerRepository;
 import jaega.homecare.domain.recurringOffer.entity.RecurringOffer;
 import jaega.homecare.domain.recurringOffer.entity.RecurringStatus;
 import jaega.homecare.domain.recurringOffer.repository.RecurringOfferRepository;
+import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.review.repository.ReviewRepository;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
@@ -40,12 +41,12 @@ import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.domain.voucher.repository.VoucherRepository;
 import jaega.homecare.domain.voucher.service.command.VoucherCommandService;
 import jaega.homecare.domain.voucher.service.query.VoucherQueryService;
-import jaega.homecare.domain.voucherUsage.service.command.VoucherUsageCommandService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -68,7 +69,7 @@ public class DummyDataService {
 
     private final VoucherQueryService voucherQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
-    private final VoucherUsageCommandService voucherUsageCommandService;
+    private final RecurringOfferCommandService recurringOfferCommandService;
     private final ServiceMatchCommandService serviceMatchCommandService;
     private final VoucherCommandService voucherCommandService;
     private final SettlementCommandService settlementCommandService;
@@ -284,10 +285,10 @@ public class DummyDataService {
         createDummyRecurringOfferForConsumer(consumer);
     }
 
-    private void createDummyRecurringOfferForConsumer(Consumer consumer) {
+    private UUID createDummyRecurringOfferForConsumer(Consumer consumer) {
         List<Caregiver> approvedCaregivers = caregiverRepository.findAll();
 
-        if (approvedCaregivers.isEmpty()) return;
+        if (approvedCaregivers.isEmpty()) return null;
 
         Caregiver caregiver = approvedCaregivers.get(random.nextInt(approvedCaregivers.size()));
 
@@ -324,6 +325,7 @@ public class DummyDataService {
                 .build();
 
         recurringOfferRepository.save(offer);
+        return offer.getRecurringOfferId();
     }
 
     private void createDummyServiceRequest(int index) {
@@ -538,5 +540,8 @@ public class DummyDataService {
                 settlementCommandService.createSettlement(settlementRequest);
             }
         }
+        UUID recurringOfferId = createDummyRecurringOfferForConsumer(consumer);
+
+        recurringOfferCommandService.approveRecurringStatus(recurringOfferId);
     }
 }
