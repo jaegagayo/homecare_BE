@@ -15,7 +15,7 @@ import jaega.homecare.domain.center.dto.req.SearchCaregiverResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.users.entity.ServiceType;
-import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverByStatusResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
 import jaega.homecare.domain.users.entity.QUser;
@@ -68,7 +68,7 @@ public class CaregiverQueryRepository {
     }
 
     // 센터의 요양보호사 근무 상태 기반 목록 조회
-    public List<GetCaregiverByCaregiverStatusResponse> findCaregiverByCaregiverStatus(
+    public List<GetCaregiverByStatusResponse> findCaregiverByCaregiverStatus(
             UUID centerId, CaregiverStatus status
     ) {
         QCaregiver caregiver = QCaregiver.caregiver;
@@ -86,7 +86,7 @@ public class CaregiverQueryRepository {
                 .fetch();
 
         return caregiverCenters.stream()
-                .map(cc -> new GetCaregiverByCaregiverStatusResponse(
+                .map(cc -> new GetCaregiverByStatusResponse(
                         cc.getCaregiver().getUser().getName(),
                         cc.getStatus()
                 ))

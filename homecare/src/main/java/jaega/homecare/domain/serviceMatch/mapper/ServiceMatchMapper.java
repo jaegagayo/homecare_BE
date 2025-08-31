@@ -2,7 +2,7 @@ package jaega.homecare.domain.serviceMatch.mapper;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.serviceMatch.dto.req.CreateServiceMatchRequest;
-import jaega.homecare.domain.serviceMatch.dto.res.GetServiceMatchByUUID;
+import jaega.homecare.domain.serviceMatch.dto.res.CenterScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import org.mapstruct.Mapper;
@@ -24,6 +24,6 @@ public interface ServiceMatchMapper {
     @Mapping(target = "serviceStartTime", source = "serviceStartTime")
     @Mapping(target = "serviceEndTime", source = "serviceEndTime")
     @Mapping(target = "matchStatus", source = "matchStatus")
-    GetServiceMatchByUUID toGetResponseByUUID(ServiceMatch serviceMatch);
+    CenterScheduleDetailResponse toGetResponseByUUID(ServiceMatch serviceMatch);
 
 }

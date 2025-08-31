@@ -10,7 +10,7 @@ import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
 import jaega.homecare.domain.center.dto.req.SearchCaregiverResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverByCaregiverStatusResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverByStatusResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
@@ -70,7 +70,7 @@ public class CaregiverQueryService {
     }
 
     // 센터의 요양보호사 상태 기반 조회
-    public List<GetCaregiverByCaregiverStatusResponse> getCaregiverByWorkStatus(UUID centerId, CaregiverStatus status){
+    public List<GetCaregiverByStatusResponse> getCaregiverByWorkStatus(UUID centerId, CaregiverStatus status){
         return caregiverQueryRepository.findCaregiverByCaregiverStatus(centerId, status);
     }
 
