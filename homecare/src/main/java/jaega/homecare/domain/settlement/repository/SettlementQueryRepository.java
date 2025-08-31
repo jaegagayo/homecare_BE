@@ -9,6 +9,7 @@ import jaega.homecare.domain.caregiver.entity.QCaregiver;
 import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
+import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
 import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.entity.QSettlement;
 import jaega.homecare.domain.settlement.entity.Settlement;
@@ -78,9 +79,9 @@ public class SettlementQueryRepository {
      *  정산 페이지
      **/
 
-    // 센터에 등록된 요양보호사 정산 금액, 건수 조회
+    // 센터의 총 정산 금액 및 정산 상태 통계 조회
     // TODO : 정산 금액 때문에 현재 클래스에 위치해있으며, 도메인으로 각각 분리하도록 리팩터링 필요
-    public GetSettlementCenterSummaryResponse getSettlementCenterSummary(UUID centerId) {
+    public GetSettlementSummaryResponse getSettlementCenterSummary(UUID centerId) {
         QSettlement settlement = QSettlement.settlement;
         QCaregiver caregiver = QCaregiver.caregiver;
         QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
@@ -118,7 +119,7 @@ public class SettlementQueryRepository {
             }
         }
 
-        return new GetSettlementCenterSummaryResponse(
+        return new GetSettlementSummaryResponse(
                 totalAmount,
                 completedCount,
                 plannedCount,
@@ -126,8 +127,62 @@ public class SettlementQueryRepository {
         );
     }
 
+    // 요양 보호사 별 정산 내역 조회 (센터-요양보호사 관계 기반)
+    public List<GetSettlementByCaregiverResponse> getSettlementByCaregiver(
+            UUID centerId,
+            UUID caregiverId,
+            MatchStatus status,   // nullable
+            LocalDate date        // nullable (월 단위 조회)
+    ) {
+        QSettlement settlement = QSettlement.settlement;
+        QServiceMatch serviceMatch = QServiceMatch.serviceMatch;
+        QCaregiver caregiver = QCaregiver.caregiver;
+        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
+
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(caregiverCenter.center.centerId.eq(centerId));
+        where.and(caregiverCenter.caregiver.caregiverId.eq(caregiverId));
+
+        // 상태 필터
+        if (status != null) {
+            where.and(settlement.serviceMatch.matchStatus.eq(status));
+        }
+
+        // 월 단위 필터
+        if (date != null) {
+            int year = date.getYear();
+            int month = date.getMonthValue();
+            where.and(
+                    settlement.serviceMatch.serviceDate.year().eq(year)
+                            .and(settlement.serviceMatch.serviceDate.month().eq(month))
+            );
+        }
+
+        return queryFactory
+                .select(Projections.constructor(
+                        GetSettlementByCaregiverResponse.class,
+                        caregiver.user.name,
+                        serviceMatch.serviceDate,
+                        serviceMatch.serviceStartTime,
+                        serviceMatch.serviceEndTime,
+                        settlement.settlementAmount,
+                        serviceMatch.matchStatus
+                ))
+                .from(settlement)
+                .join(settlement.serviceMatch, serviceMatch)
+                .join(serviceMatch.caregiver, caregiver)
+                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
+                .where(where)
+                .orderBy(
+                        settlement.modifiedAt
+                                .coalesce(settlement.createdAt)
+                                .desc()
+                )
+                .fetch();
+    }
+
     // 요양보호사 개별 정산 금액, 건수 조회
-    public GetCaregiverSettlementSummaryResponse getCaregiverSettlementSummary(UUID caregiverId) {
+    public GetSettlementSummaryByCaregiverResponse getCaregiverSettlementSummary(UUID caregiverId) {
         QSettlement settlement = QSettlement.settlement;
 
         // 총 정산 금액 (isPaid = true만)
@@ -177,112 +232,12 @@ public class SettlementQueryRepository {
                         .fetchOne()
         ).orElse(0L);
 
-        return new GetCaregiverSettlementSummaryResponse(
+        return new GetSettlementSummaryByCaregiverResponse(
                 totalAmount,
                 completedCount,
                 plannedCount,
                 cancelledCount
         );
-    }
-
-    // 센터에 등록된 요양보호사의 근무 상태, 월-연도별 내역 조회
-    public List<GetCaregiverWorkResponse> getCaregiverWorkListByCenter(
-            UUID centerId,
-            MatchStatus matchStatus,   // nullable
-            Integer year,        // nullable
-            Integer month        // nullable
-    ) {
-        QSettlement settlement = QSettlement.settlement;
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-        QUser user = QUser.user;
-
-        BooleanBuilder where = new BooleanBuilder();
-        where.and(caregiverCenter.center.centerId.eq(centerId));
-
-        // 상태 필터
-        if (matchStatus != null) {
-            where.and(settlement.serviceMatch.matchStatus.eq(matchStatus));
-        } else {
-            where.and(settlement.serviceMatch.matchStatus.eq(MatchStatus.COMPLETED));
-        }
-
-        // 연/월 필터
-        if (year != null && month != null) {
-            where.and(settlement.serviceMatch.serviceDate.year().eq(year)
-                    .and(settlement.serviceMatch.serviceDate.month().eq(month)));
-        }
-
-        return queryFactory
-                .select(Projections.constructor(
-                        GetCaregiverWorkResponse.class,
-                        user.name,
-                        settlement.serviceMatch.serviceDate,
-                        settlement.serviceMatch.serviceStartTime,
-                        settlement.serviceMatch.serviceEndTime,
-                        settlement.settlementAmount,
-                        settlement.serviceMatch.matchStatus
-                ))
-                .from(settlement)
-                .join(settlement.serviceMatch.caregiver, caregiver)
-                .join(caregiver.user, user)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(where)
-                .orderBy(
-                        settlement.modifiedAt
-                                .coalesce(settlement.createdAt)
-                                .desc()
-                )
-                .fetch();
-    }
-
-    // 개별 요양보호사의 근무 상태, 월-연도별 내역 조회
-    public List<GetCaregiverWorkResponse> getCaregiverWorkListByCaregiver(
-            UUID caregiverId,
-            MatchStatus matchStatus,   // nullable
-            Integer year,        // nullable
-            Integer month        // nullable
-    ) {
-        QSettlement settlement = QSettlement.settlement;
-        QCaregiver caregiver = QCaregiver.caregiver;
-        QCaregiverCenter caregiverCenter = QCaregiverCenter.caregiverCenter;
-        QUser user = QUser.user;
-
-        BooleanBuilder where = new BooleanBuilder();
-        where.and(caregiver.caregiverId.eq(caregiverId));
-
-        // 상태 필터
-        if (matchStatus != null) {
-            where.and(settlement.serviceMatch.matchStatus.eq(matchStatus));
-        }
-
-        // 연/월 필터
-        if (year != null && month != null) {
-            where.and(settlement.serviceMatch.serviceDate.year().eq(year)
-                    .and(settlement.serviceMatch.serviceDate.month().eq(month)));
-        }
-
-        return queryFactory
-                .select(Projections.constructor(
-                        GetCaregiverWorkResponse.class,
-                        user.name,
-                        settlement.serviceMatch.serviceDate,
-                        settlement.serviceMatch.serviceStartTime,
-                        settlement.serviceMatch.serviceEndTime,
-                        settlement.settlementAmount,
-                        settlement.serviceMatch.matchStatus
-                ))
-                .from(settlement)
-                .join(settlement.serviceMatch.caregiver, caregiver)
-                .join(caregiver.user, user)
-                .join(caregiverCenter).on(caregiverCenter.caregiver.eq(caregiver))
-                .where(where)
-                .orderBy(
-                        settlement.modifiedAt
-                                .coalesce(settlement.createdAt)
-                                .desc()
-                )
-                .fetch();
     }
 
     // 센터의 6개월 간 정산 내역 표시

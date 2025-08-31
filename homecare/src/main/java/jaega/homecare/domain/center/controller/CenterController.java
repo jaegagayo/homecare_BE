@@ -1,6 +1,7 @@
 package jaega.homecare.domain.center.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.caregiverCenter.dto.req.CreateCaregiverCenterRequest;
@@ -9,8 +10,8 @@ import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesByMonth;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CenterScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CenterScheduleResponse;
-import jaega.homecare.domain.settlement.dto.res.GetDashboardSettlementResponse;
-import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
+import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
+import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.center.dto.req.*;
@@ -132,6 +133,53 @@ public interface CenterController {
      *
      * 정산 관련 API
      */
+
+    @Operation(summary = "정산 내역 조회 API", description = "정산 내역의 ID를 기반으로 정보를 조회합니다.")
+    @ApiResponse(responseCode = "204", description = "정산 내역 상세 조회 성공")
+    @GetMapping("/settlement")
+    ResponseEntity<GetSettlementResponse> getSettlement(@RequestParam UUID settlementId);
+
+    @Operation(summary = "센터의 총 정산 금액 및 정산 상태 통계 조회", description = "센터의 정산 금액 및 정산 상태 통계를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터의 정산 금액, 상태 통계 조회 성공")
+    @GetMapping("/settlement/summary")
+    GetSettlementSummaryResponse getSettlementSummary(@RequestParam UUID centerId);
+
+    @Operation(summary = "요양보호사 별 정산 내역 조회", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회합니다.")
+    @ApiResponse(responseCode = "204", description = "센터에 등록된 요양 보호사들의 정산 내역을 조회 성공")
+    @GetMapping(("/settlement/{caregiverId}"))
+    ResponseEntity<List<GetSettlementByCaregiverResponse>> getSettlementByCaregiver(
+            @PathVariable UUID caregiverId,
+            @RequestParam UUID centerId,
+            @RequestParam MatchStatus status,
+            @RequestParam LocalDate date
+    );
+
+    @Operation(summary = "요양보호사 총 정산 금액 및 정산 상태 통계 조회", description = "센터의 요양보호사 정산 금액 및 정산 상태 통계 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터의 요양보호사 정산 금액 및 정산 상태 통계 조회 성공")
+    @GetMapping("/settlement/{caregiverId}/summary")
+    ResponseEntity<GetSettlementSummaryByCaregiverResponse> getSettlementSummaryByCaregiver(@PathVariable UUID caregiverId);
+
+    @Operation(summary = "최근 6개월 총 정산 금액 조회", description = "센터의 최근 6개월 간 총 정산 금액을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터의 6개월 간 총 정산 금액 조회 성공")
+    @GetMapping("/settlement/monthly")
+    List<GetMonthlyPaymentResponse> getMonthlySettlement(@RequestParam UUID centerId);
+
+    @Operation(summary = "최근 일주일 간 미정산 된 건수 조회", description = "센터의 최근 일주일 간 미정산 된 건수를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "센터의 일주일 간 미정산 건 조회 성공")
+    @GetMapping("/settlement/weekly")
+    List<GetDailyUnsettledResponse> getWeeklyUnsettled(@RequestParam UUID centerId);
+
+    @Operation(summary = "정산 상태 기반 정산 내역 조회 API", description = "정산 상태를 기반으로 특정 정산 내역들을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "특정 정산 상태 기반 정산 내역 조회 성공")
+    @GetMapping("/settlement/status")
+    ResponseEntity<List<GetSettlementByPaid>> getSettlementByPaid(
+            @RequestParam UUID centerId,
+            @Parameter(
+                    description = "정산 여부 (true: 정산 완료, false: 미정산)",
+                    example = "true",
+                    required = true
+            )
+            @RequestParam Boolean isPaid);
 
 
     /**

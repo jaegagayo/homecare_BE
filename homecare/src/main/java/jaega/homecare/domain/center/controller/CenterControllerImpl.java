@@ -9,8 +9,8 @@ import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
 import jaega.homecare.domain.serviceMatch.dto.res.CenterScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CenterScheduleResponse;
-import jaega.homecare.domain.settlement.dto.res.GetDashboardSettlementResponse;
-import jaega.homecare.domain.settlement.dto.res.GetDashboardWorkStatusResponse;
+import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
+import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.caregiver.dto.res.GetCertificationResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
@@ -177,6 +177,62 @@ public class CenterControllerImpl implements CenterController{
         return ResponseEntity.noContent().build();
     }
 
+
+
+    /**
+     *
+     * 정산 관련 API
+     */
+
+    // 정산 내역 조회
+    @Override
+    public ResponseEntity<GetSettlementResponse> getSettlement(@RequestParam UUID settlementId){
+        GetSettlementResponse responses = settlementQueryService.findSettlement(settlementId);
+        return ResponseEntity.ok(responses);
+    }
+
+    // 센터의 총 정산 금액 및 정산 상태 통계 조회
+    @Override
+    public GetSettlementSummaryResponse getSettlementSummary(@RequestParam UUID centerId){
+        return settlementQueryService.getSettlementSummary(centerId);
+    }
+
+    // 요양보호사 별 정산 내역 조회
+    @Override
+    public ResponseEntity<List<GetSettlementByCaregiverResponse>> getSettlementByCaregiver(
+            @PathVariable UUID caregiverId,
+            @RequestParam UUID centerId,
+            @RequestParam MatchStatus status,
+            @RequestParam LocalDate date
+            ){
+        List<GetSettlementByCaregiverResponse> result = settlementQueryService.getSettlementByCaregiver(centerId, caregiverId, status, date);
+        return ResponseEntity.ok(result);
+    }
+
+    // 요양보호사 총 정산 금액 및 정산 상태 통계 조회
+    @Override
+    public ResponseEntity<GetSettlementSummaryByCaregiverResponse> getSettlementSummaryByCaregiver(@PathVariable UUID caregiverId){
+        return ResponseEntity.ok(settlementQueryService.getCaregiverSettlementSummary(caregiverId));
+    }
+
+    // 최근 6개월 간 총 정산 금액 조회
+    @Override
+    public List<GetMonthlyPaymentResponse> getMonthlySettlement(@RequestParam UUID centerId){
+        return settlementQueryService.getMonthlyPaidSettlements(centerId);
+    }
+
+    // 최근 일주일 간 미정산 된 건수 조회
+    @Override
+    public List<GetDailyUnsettledResponse> getWeeklyUnsettled(@RequestParam UUID centerId){
+        return settlementQueryService.getWeeklyUnsettledCount(centerId);
+    }
+
+    // 정산 상태 기반 정산 내역 조회 API
+    @Override
+    public ResponseEntity<List<GetSettlementByPaid>> getSettlementByPaid(@RequestParam UUID centerId, @RequestParam Boolean isPaid){
+        List<GetSettlementByPaid> response = settlementQueryService.getSettlementByPaid(centerId, isPaid);
+        return ResponseEntity.ok(response);
+    }
 
 
     /**

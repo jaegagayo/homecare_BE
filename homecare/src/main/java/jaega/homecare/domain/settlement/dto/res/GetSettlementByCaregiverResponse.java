@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record GetCaregiverWorkResponse (
+public record GetSettlementByCaregiverResponse(
         String caregiverName,
         LocalDate serviceDate,
         LocalTime serviceStartTime,
