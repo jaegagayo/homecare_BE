@@ -496,6 +496,7 @@ public class ServiceMatchQueryRepository {
         return queryFactory.
                 select(Projections.constructor(
                         ConsumerNextScheduleResponse.class,
+                        serviceMatch.serviceMatchId,
                         caregiverUser.name,
                         serviceMatch.serviceDate,
                         serviceMatch.serviceStartTime,

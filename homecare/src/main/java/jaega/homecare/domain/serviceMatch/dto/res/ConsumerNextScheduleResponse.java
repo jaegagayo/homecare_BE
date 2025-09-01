@@ -4,8 +4,10 @@ import jaega.homecare.domain.users.entity.ServiceType;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 public record ConsumerNextScheduleResponse(
+        UUID serviceMatchId,
         String caregiverName,
 
         LocalDate serviceDate,
