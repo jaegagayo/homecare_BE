@@ -1,7 +1,9 @@
 package jaega.homecare.domain.caregiverPreference.controller;
 
 import jaega.homecare.domain.caregiverPreference.dto.req.CreateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.req.UpdateCaregiverPreferenceRequest;
 import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.service.command.CaregiverPreferenceCommandService;
 import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,15 @@ public class CaregiverPreferenceControllerImpl implements CaregiverPreferenceCon
             @RequestParam UUID caregiverId,
             @RequestBody CreateCaregiverPreferenceRequest request){
         caregiverPreferenceCommandService.createCaregiverPreference(request, caregiverId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateCaregiverPreference(
+            @RequestParam UUID caregiverId,
+            @RequestBody UpdateCaregiverPreferenceRequest request){
+        CaregiverPreference caregiverPreference = caregiverPreferenceQueryService.findCaregiverPreferenceByCaregiver(caregiverId);
+        caregiverPreferenceCommandService.updateCaregiverPreference(caregiverPreference, request);
         return ResponseEntity.noContent().build();
     }
 

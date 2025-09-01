@@ -85,8 +85,8 @@ public class CenterControllerImpl implements CenterController{
 
     // 요양보호사 인사카드 조회 (상세 조회)
     @Override
-    public ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId){
-        GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfile(caregiverId);
+    public ResponseEntity<GetCaregiverProfileResponseByCenter> getCaregiverProfile(@RequestParam UUID caregiverId){
+        GetCaregiverProfileResponseByCenter response = caregiverQueryService.getCaregiverProfileByCenter(caregiverId);
         return ResponseEntity.ok(response);
     }
 

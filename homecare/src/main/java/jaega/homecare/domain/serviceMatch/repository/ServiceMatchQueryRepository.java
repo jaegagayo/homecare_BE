@@ -1,6 +1,7 @@
 package jaega.homecare.domain.serviceMatch.repository;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -28,6 +29,8 @@ import jaega.homecare.domain.settlement.dto.res.WorkPlaceDistribution;
 import jaega.homecare.domain.users.entity.QUser;
 import jaega.homecare.domain.users.entity.ServiceType;
 import jaega.homecare.domain.center.dto.res.GetCaregiverMatchesResponse;
+import jaega.homecare.domain.voucherUsage.entity.ServiceFee;
+import jaega.homecare.domain.voucherUsage.service.command.ServiceFeeTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -467,8 +470,11 @@ public class ServiceMatchQueryRepository {
                         serviceMatch.serviceEndTime,
                         serviceRequest.duration,
                         serviceRequest.serviceAddress,
+                        serviceRequest.consumer.entranceType,
                         serviceRequest.serviceType,
                         serviceMatch.matchStatus,
+                        Expressions.constant(ServiceFeeTable.getFee(60).totalAmount()),
+                        serviceMatch.serviceRequest.additionalInformation,
                         review.id.isNull()
                 ))
                 .from(serviceMatch)

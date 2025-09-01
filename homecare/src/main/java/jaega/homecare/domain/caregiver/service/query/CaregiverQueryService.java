@@ -1,5 +1,6 @@
 package jaega.homecare.domain.caregiver.service.query;
 
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverProfileResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetDashboardPopularResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
@@ -12,7 +13,7 @@ import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferen
 import jaega.homecare.domain.center.dto.req.SearchCaregiverResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByStatusResponse;
 import jaega.homecare.domain.center.dto.res.GetCaregiverByServiceTypeResponse;
-import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponseByCenter;
 import jaega.homecare.domain.center.dto.res.GetCaregiverResponse;
 import jaega.homecare.domain.center.entity.Center;
 import jaega.homecare.domain.center.service.query.CenterQueryService;
@@ -57,6 +58,11 @@ public class CaregiverQueryService {
         return caregiverMapper.toGetCaregiverVerifiedStatus(caregiver);
     }
 
+    public GetCaregiverProfileResponse getCaregiverProfileByCaregiver(UUID caregiverId){
+        Caregiver caregiver = getCaregiver(caregiverId);
+        return caregiverMapper.toGetCaregiverProfileByCaregiver(caregiver);
+    }
+
 
     /**
      *
@@ -80,10 +86,10 @@ public class CaregiverQueryService {
     }
 
     // 요양보호사 프로필 정보 조회
-    public GetCaregiverProfileResponse getCaregiverProfile(UUID caregiverId){
+    public GetCaregiverProfileResponseByCenter getCaregiverProfileByCenter(UUID caregiverId){
         Caregiver caregiver = getCaregiver(caregiverId);
         CaregiverPreference caregiverPreference = caregiverPreferenceQueryService.findCaregiverPreferenceByCaregiver(caregiverId);
-        return caregiverMapper.toGetCaregiverProfile(caregiver, caregiverPreference);
+        return caregiverMapper.toGetCaregiverProfileByCenter(caregiver, caregiverPreference);
     }
 
     // 센터 대시보드 통계 조회

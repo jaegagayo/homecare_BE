@@ -2,11 +2,12 @@ package jaega.homecare.domain.caregiver.mapper;
 
 import jaega.homecare.domain.caregiver.dto.req.CaregiverCreateRequest;
 import jaega.homecare.domain.caregiver.dto.res.CaregiverLoginResponse;
+import jaega.homecare.domain.caregiver.dto.res.GetCaregiverProfileResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
 import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
-import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponse;
+import jaega.homecare.domain.center.dto.res.GetCaregiverProfileResponseByCenter;
 import jaega.homecare.domain.users.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,7 +37,13 @@ public interface CaregiverMapper {
     @Mapping(target = "birthDate", source = "caregiver.user.birthDate")
     @Mapping(target = "phone", source = "caregiver.user.phone")
     @Mapping(target = "serviceTypes", source = "preference.serviceTypes")
-    GetCaregiverProfileResponse toGetCaregiverProfile(Caregiver caregiver, CaregiverPreference preference);
+    GetCaregiverProfileResponseByCenter toGetCaregiverProfileByCenter(Caregiver caregiver, CaregiverPreference preference);
+
+    @Mapping(target = "caregiverName", source = "user.name")
+    @Mapping(target = "phone", source = "user.phone")
+    @Mapping(target = "birthDate", source = "user.birthDate")
+    @Mapping(target = "isAccompanyOuting", source = "accompanyOuting")
+    GetCaregiverProfileResponse toGetCaregiverProfileByCaregiver(Caregiver caregiver);
 
     CaregiverLoginResponse toLoginResponse(Caregiver caregiver);
 }

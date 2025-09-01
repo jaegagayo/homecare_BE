@@ -60,7 +60,7 @@ public interface CenterController {
     @Operation(summary = "요양보호사 인사카드 조회 (상세 조회) API", description = "요양보호사의 ID로 인사카드를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "요양보호사 인사카드 조회 성공")
     @GetMapping("/caregiver/{caregiverId}")
-    ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@PathVariable UUID caregiverId);
+    ResponseEntity<GetCaregiverProfileResponseByCenter> getCaregiverProfile(@PathVariable UUID caregiverId);
 
     @Operation(summary = "요양보호사 근무 상태 기반 조회 API", description = "센터의 요양보호사들의 근무 상태(근무 중, 휴직, ...)를 기반으로 요양보호사 리스트를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "센터 요양보호사의 근무 상태 기반 목록 조회 성공")

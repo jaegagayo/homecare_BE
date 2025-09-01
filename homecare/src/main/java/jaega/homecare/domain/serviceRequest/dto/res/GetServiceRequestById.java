@@ -20,6 +20,7 @@ public record GetServiceRequestById(
         ServiceType serviceType,
         ServiceRequestStatus requestStatus,
         LocalDate requestDate,
-        Location location
+        Location location,
+        String additionalInformation
 ) {
 }

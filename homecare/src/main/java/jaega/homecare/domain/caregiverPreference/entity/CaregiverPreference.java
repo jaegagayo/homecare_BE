@@ -1,6 +1,7 @@
 package jaega.homecare.domain.caregiverPreference.entity;
 
 import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.caregiverPreference.dto.req.UpdateCaregiverPreferenceRequest;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.users.entity.Disease;
 import jaega.homecare.domain.users.entity.Location;
@@ -130,6 +131,27 @@ public class CaregiverPreference {
 
     public void initializeCaregiverPreference(UUID caregiverPreferenceId){
         this.caregiverPreferenceId = caregiverPreferenceId;
+    }
+
+    public void updateCaregiverPreference(UpdateCaregiverPreferenceRequest request){
+        this.dayOfWeek = request.dayOfWeek();
+        this.workStartTime = request.workStartTime();
+        this.workEndTime = request.workEndTime();
+        this.workMinTime = request.workMinTime();
+        this.workMaxTime = request.workMaxTime();
+        this.availableTime = request.availableTime();
+        this.workArea = request.workArea();
+        this.addressType = request.addressType();
+        this.location = request.location();
+        this.transportation = request.transportation();
+        this.lunchBreak = request.lunchBreak();
+        this.bufferTime = request.bufferTime();
+        this.supportedConditions = request.supportedConditions();
+        this.preferredMinAge = request.preferredMinAge();
+        this.preferredMaxAge = request.preferredMaxAge();
+        this.preferredGender = request.preferredGender();
+        this.serviceTypes = request.serviceTypes();
+
     }
 
 

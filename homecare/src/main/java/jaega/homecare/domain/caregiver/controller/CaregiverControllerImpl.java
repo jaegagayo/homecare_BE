@@ -2,10 +2,7 @@ package jaega.homecare.domain.caregiver.controller;
 
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
-import jaega.homecare.domain.caregiver.dto.res.CaregiverLoginResponse;
-import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
-import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
-import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
+import jaega.homecare.domain.caregiver.dto.res.*;
 import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
@@ -60,6 +57,13 @@ public class CaregiverControllerImpl implements CaregiverController {
     public ResponseEntity<GetCaregiverVerifiedStatusResponse> getCaregiverVerifiedStatus(@RequestParam UUID caregiverId){
         GetCaregiverVerifiedStatusResponse response = caregiverQueryService.getCaregiverVerifiedStatus(caregiverId);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId){
+        GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfileByCaregiver(caregiverId);
+        return ResponseEntity.ok(response);
+
     }
 
     /**

@@ -3,6 +3,7 @@ package jaega.homecare.domain.caregiverPreference.service.command;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverPreference.dto.req.CreateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.req.UpdateCaregiverPreferenceRequest;
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.mapper.CaregiverPreferenceMapper;
 import jaega.homecare.domain.caregiverPreference.repository.CaregiverPreferenceRepository;
@@ -22,6 +23,11 @@ public class CaregiverPreferenceCommandService {
         Caregiver caregiver = caregiverQueryService.getCaregiver(caregiverId);
         CaregiverPreference caregiverPreference = caregiverPreferenceMapper.toEntity(request, caregiver);
         caregiverPreference.initializeCaregiverPreference(UUID.randomUUID());
+        caregiverPreferenceRepository.save(caregiverPreference);
+    }
+
+    public void updateCaregiverPreference(CaregiverPreference caregiverPreference, UpdateCaregiverPreferenceRequest request){
+        caregiverPreference.updateCaregiverPreference(request);
         caregiverPreferenceRepository.save(caregiverPreference);
     }
 }

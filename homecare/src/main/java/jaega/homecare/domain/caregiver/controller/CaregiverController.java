@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
-import jaega.homecare.domain.caregiver.dto.res.CaregiverLoginResponse;
-import jaega.homecare.domain.caregiver.dto.res.GetCaregiverSignupResponse;
-import jaega.homecare.domain.caregiver.dto.res.GetCaregiverVerifiedStatusResponse;
-import jaega.homecare.domain.caregiver.dto.res.SelectableCaregiverCenter;
+import jaega.homecare.domain.caregiver.dto.res.*;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
@@ -41,6 +38,11 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "200", description = "요양보호사의 승인 상태 조회 성공")
     @GetMapping("/verified")
     ResponseEntity<GetCaregiverVerifiedStatusResponse> getCaregiverVerifiedStatus(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "요양보호사 프로필 정보 조회 API", description = "요양보호사가 자신의 프로필 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사의 프로필 정보 조회 성공")
+    @GetMapping("/my-page")
+    ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId);
 
     /**
      *
