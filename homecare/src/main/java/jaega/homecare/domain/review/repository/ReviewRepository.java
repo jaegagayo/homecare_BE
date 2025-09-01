@@ -1,5 +1,6 @@
 package jaega.homecare.domain.review.repository;
 
+import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.review.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByServiceMatch_Caregiver_CaregiverId(UUID caregiverId);
 
     Optional<Review> findByReviewId(UUID reviewId);
+
+    List<Review> findByServiceMatch_Caregiver(Caregiver caregiver);
 }

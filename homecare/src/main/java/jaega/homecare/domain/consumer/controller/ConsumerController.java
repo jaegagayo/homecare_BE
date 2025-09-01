@@ -246,7 +246,7 @@ public interface ConsumerController {
     // TODO : 프론트엔드 연동 시, 일정 조회 -> 리뷰 조회 연동 과정에서 필요없다면 제거해도 됩니다.
     @Operation(summary = "매칭 일정의 리뷰 조회 API", description = "서비스 매치 ID를 통해 해당 매치의 리뷰를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "리뷰 조회 성공")
-    @GetMapping("/serviceMatch/{serviceMatchId}")
+    @GetMapping("/serviceMatch")
     ResponseEntity<GetReviewResponse> getReviewByServiceMatch(@RequestParam UUID serviceMatchId);
 
     @Operation(summary = "(마이페이지) 수요자 리뷰 조회 API", description = "수요자가 작성한 리뷰를 조회합니다.")

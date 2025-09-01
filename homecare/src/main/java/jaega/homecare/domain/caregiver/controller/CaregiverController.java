@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
 import jaega.homecare.domain.caregiver.dto.res.*;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
@@ -43,6 +44,11 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "200", description = "요양보호사의 프로필 정보 조회 성공")
     @GetMapping("/my-page")
     ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "(마이페이지) 요양보호사 리뷰 조회 API", description = "요양보호사에게 작성된 리뷰들을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "마이페이지에서 요양보호사의 리뷰 리스트 조회 성공")
+    @GetMapping("my-page/review")
+    ResponseEntity<List<CaregiverReviewItem>> getReviewByCaregiver(UUID caregiverId);
 
     /**
      *

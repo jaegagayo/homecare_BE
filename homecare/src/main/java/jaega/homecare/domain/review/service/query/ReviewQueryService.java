@@ -1,5 +1,7 @@
 package jaega.homecare.domain.review.service.query;
 
+import jaega.homecare.domain.caregiver.entity.Caregiver;
+import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.review.dto.res.*;
 import jaega.homecare.domain.review.entity.Review;
 import jaega.homecare.domain.review.mapper.ReviewMapper;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReviewQueryService {
 
+    private final CaregiverQueryService caregiverQueryService;
     private final ReviewRepository reviewRepository;
     private final ReviewQueryRepository reviewQueryRepository;
     private final ReviewMapper reviewMapper;
@@ -52,5 +55,19 @@ public class ReviewQueryService {
                 .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
 
         return reviewMapper.toDetailResponse(review);
+    }
+
+    public List<CaregiverReviewItem> getReviewByCaregiver(UUID caregiverId){
+        Caregiver caregiver = caregiverQueryService.getCaregiver(caregiverId);
+        List<Review> reviews = reviewRepository.findByServiceMatch_Caregiver(caregiver);
+        return reviews.stream()
+                .map(review -> new CaregiverReviewItem(
+                        review.getReviewId(),
+                        review.getServiceMatch().getServiceRequest().getConsumer().getUser().getName(),
+                        review.getReviewContent(),
+                        review.getReviewScore(),
+                        review.getCreatedAt()
+                ))
+                .toList();
     }
 }

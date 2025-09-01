@@ -7,6 +7,7 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
+import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
@@ -59,11 +60,19 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.ok(response);
     }
 
+    // 요양보호사 프로필 정보 조회
     @Override
     public ResponseEntity<GetCaregiverProfileResponse> getCaregiverProfile(@RequestParam UUID caregiverId){
         GetCaregiverProfileResponse response = caregiverQueryService.getCaregiverProfileByCaregiver(caregiverId);
         return ResponseEntity.ok(response);
 
+    }
+
+    // (마이페이지) 요양보호사 리뷰 조회 API
+    @Override
+    public ResponseEntity<List<CaregiverReviewItem>> getReviewByCaregiver(UUID caregiverId){
+        List<CaregiverReviewItem> response = reviewQueryService.getReviewByCaregiver(caregiverId);
+        return ResponseEntity.ok(response);
     }
 
     /**

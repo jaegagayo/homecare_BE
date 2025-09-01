@@ -34,8 +34,7 @@ public interface ReviewMapper {
 
     List<ConsumerReviewResponse> toConsumerReviewResponse(List<Review> reviews);
 
-    // TODO: ServiceMatch에서 일정 요약 가져오기
-    @Mapping(target = "scheduleSummary", ignore = true)
+    @Mapping(target = "consumerName", source = "serviceMatch.serviceRequest.consumer.user.name")
     CaregiverReviewItem toCaregiverReviewItem(Review review);
 
     // TODO: ServiceMatch에서 일정 상세 가져오기
