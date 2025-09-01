@@ -1,5 +1,7 @@
 package jaega.homecare.domain.settlement.service.query;
 
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
+import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterRepository;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.settlement.entity.Settlement;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SettlementQueryService {
 
+    private final CaregiverCenterRepository caregiverCenterRepository;
     private final SettlementRepository settlementRepository;
     private final SettlementQueryRepository settlementQueryRepository;
     private final SettlementMapper settlementMapper;
@@ -29,6 +33,34 @@ public class SettlementQueryService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 settlementId로 정산 내역을 찾을 수 없습니다."));
     }
 
+    /**
+     *
+     * Caregiver
+     */
+
+
+    public List<GetCaregiverCenterSettlementResponse> getSettlementHistoryByCaregiver(UUID caregiverId) {
+        // 1. caregiverId로 소속 기관 조회
+        List<CaregiverCenter> caregiverCenters = caregiverCenterRepository.findByCaregiver_CaregiverId(caregiverId);
+
+        if (caregiverCenters.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. 각 기관별로 Settlement 조회 후 그룹핑
+        return caregiverCenters.stream()
+                .map(caregiverCenter -> {
+                    List<Settlement> settlements = settlementRepository.findByCaregiverCenter(caregiverCenter);
+
+                    List<GetSettlementByCaregiverResponse> settlementDtos = settlementMapper.toDtoList(settlements);
+
+                    return new GetCaregiverCenterSettlementResponse(
+                            caregiverCenter.getCenter().getName(),
+                            settlementDtos
+                    );
+                })
+                .toList();
+    }
 
     /**
      *

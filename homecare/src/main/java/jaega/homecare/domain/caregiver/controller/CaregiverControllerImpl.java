@@ -16,7 +16,11 @@ import jaega.homecare.domain.review.service.query.ReviewQueryService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
+import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
+import jaega.homecare.domain.settlement.dto.res.GetSettlementByCaregiverResponse;
+import jaega.homecare.domain.settlement.dto.res.GetSettlementResponse;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
+import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +36,7 @@ import java.util.UUID;
 public class CaregiverControllerImpl implements CaregiverController {
 
     private final SettlementCommandService settlementCommandService;
+    private final SettlementQueryService settlementQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
     private final CaregiverCenterQueryService caregiverCenterQueryService;
     private final CaregiverCommandService caregiverCommandService;
@@ -73,6 +78,12 @@ public class CaregiverControllerImpl implements CaregiverController {
     public ResponseEntity<List<CaregiverReviewItem>> getReviewByCaregiver(UUID caregiverId){
         List<CaregiverReviewItem> response = reviewQueryService.getReviewByCaregiver(caregiverId);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<List<GetCaregiverCenterSettlementResponse>> getSettlementByCaregiver(UUID caregiverId){
+        List<GetCaregiverCenterSettlementResponse> responses = settlementQueryService.getSettlementHistoryByCaregiver(caregiverId);
+        return ResponseEntity.ok(responses);
     }
 
     /**
