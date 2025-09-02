@@ -682,21 +682,21 @@ public class DummyDataService {
             }
         }
 
-        LocalTime preferredStartTime = LocalTime.of(13, 0);
-        LocalTime preferredEndTime = LocalTime.of(16, 0);
+        LocalTime preferredStartTime = LocalTime.of(9, 0);
+        LocalTime preferredEndTime = LocalTime.of(12, 0);
 
 
         ServiceRequest serviceRequest = ServiceRequest.builder()
                 .consumer(consumer)
-                .serviceAddress("전남 순천시 성동3길 8")
+                .serviceAddress(DUMMY_ADDRESSES[0])
                 .addressType(AddressType.ROAD)
-                .location(new Location(34.9485, 127.4942))
+                .location(new Location(DUMMY_LATITUDES[0], DUMMY_LONGITUDES[0]))
                 .requestDate(LocalDate.of(2025, 9, 5))
                 .preferredStartTime(preferredStartTime)
                 .preferredEndTime(preferredEndTime)
                 .duration((int) Duration.between(preferredStartTime, preferredEndTime).toHours())
-                .serviceType(ServiceType.values()[0])
-                .additionalInformation("전시용 데이터")
+                .serviceType(ServiceType.IN_HOME_SUPPORT)
+                .additionalInformation("주차 공간 협소, 반려견 있음, 치매, 와상 환자이니 전문가가 필요합니다.")
                 .build();
 
         UUID serviceRequestId = UUID.randomUUID();
