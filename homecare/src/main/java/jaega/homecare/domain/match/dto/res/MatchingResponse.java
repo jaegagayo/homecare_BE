@@ -5,9 +5,6 @@ import java.util.UUID;
 
 public record MatchingResponse(
         UUID serviceRequestId,
-        List<CaregiverInfo> matchedCaregivers,
-        int totalCandidates,
-        int matchedCount,
-        long processingTimeMs
+        List<CaregiverInfo> matchedCaregivers
 ) {
 }

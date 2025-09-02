@@ -106,7 +106,6 @@ public class DummyDataService {
 
     private void createDummyUser(int index) {
         // 87명의 이름 리스트
-// 87명의 이름 리스트
         List<String> koreanNames = List.of(
                 "김기현", "박지성", "이재민", "최유진", "장서연",
                 "정하늘", "김소희", "이수환", "박민재", "윤지영",
@@ -128,26 +127,25 @@ public class DummyDataService {
                 "정유나", "김채원"
         );
 
-// 이름에 맞는 성별 배열 (남/여)
+// 이름에 맞는 정확한 성별 배열
         Gender[] genders = {
                 Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
-                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
                 Gender.FEMALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
                 Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
                 Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
                 Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
                 Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
-                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
-                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
-                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
                 Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
-                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
-                Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
+                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.MALE,
+                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE,
+                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
                 Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
-                Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE,
-                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
-                Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
-                Gender.FEMALE, Gender.FEMALE
+                Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE
         };
 
         String name = koreanNames.get(index % koreanNames.size());
@@ -599,7 +597,7 @@ public class DummyDataService {
                 Review review = Review.builder()
                         .reviewId(UUID.randomUUID())
                         .serviceMatch(serviceMatch)
-                        .reviewScore(1.0 + (4.0 * random.nextDouble())) // 1~5점 랜덤
+                        .reviewScore(4.5 + (0.5 * random.nextDouble())) // 1~5점 랜덤
                         .reviewContent("더미 리뷰 내용입니다.")
                         .build();
 

@@ -5,15 +5,13 @@ import java.util.UUID;
 public record CaregiverInfo(
         UUID caregiverId,
         String name,
-        double distanceKm,
-        int estimatedTravelTime,
-        int matchScore,
-        String matchReason,
-        String address,
-        String addressType,
-        String location,
-        String career,
-        String selfIntroduction,
-        boolean isVerified,
-        String serviceType
+        String gender,
+        int age,
+        int experience,
+        Double rating,
+        String koreanProficiency,
+        SpecialCaseExperience specialCaseExperience,
+        boolean outingAvailable,
+        Double rejectionRate,
+        String selfIntroduction
 ) {}

@@ -1,22 +1,27 @@
 package jaega.homecare.domain.match.service;
 
+import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiverPreference.repository.CaregiverPreferenceRepository;
 import jaega.homecare.domain.match.dto.req.ServiceRequestDTO;
 import jaega.homecare.domain.match.dto.res.CaregiverInfo;
 import jaega.homecare.domain.match.dto.res.MatchingResponse;
+import jaega.homecare.domain.match.dto.res.SpecialCaseExperience;
+import jaega.homecare.domain.review.repository.ReviewRepository;
+import jaega.homecare.domain.serviceMatch.repository.ServiceMatchRepository;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
+import jaega.homecare.domain.users.entity.Disease;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +33,10 @@ public class MatchingService {
 
     private final RestTemplate restTemplate;
     private final ServiceRequestQueryService serviceRequestQueryService;
+    private final CaregiverRepository caregiverRepository;
+    private final CaregiverPreferenceRepository caregiverPreferenceRepository;
+    private final ReviewRepository reviewRepository;
+    private final ServiceMatchRepository serviceMatchRepository;
 
     public MatchingResponse callRecommendLogging(UUID serviceRequestId) {
         String url = "http://localhost:8000/matching/recommend-logging";
@@ -69,32 +78,48 @@ public class MatchingService {
 
         String serviceType = sr.getServiceType().toString();
 
-        List<CaregiverInfo> updatedCaregivers = originalResponse.matchedCaregivers().stream()
-                .map(c -> new CaregiverInfo(
-                        c.caregiverId(),
-                        c.name(),
-                        c.distanceKm(),
-                        c.estimatedTravelTime(),
-                        c.matchScore(),
-                        c.matchReason(),
-                        c.address(),
-                        c.addressType(),
-                        c.location(),
-                        c.career(),
-                        c.selfIntroduction(),
-                        c.isVerified(),
-                        serviceType // 여기가 핵심
-                ))
-                .toList();
+        List<CaregiverInfo> updatedCaregivers =  originalResponse.matchedCaregivers().stream()
+                .map(c -> {
+                    var caregiver = caregiverRepository.findByCaregiverId(c.caregiverId())
+                            .orElseThrow(() -> new RuntimeException("Caregiver not found: " + c.caregiverId()));
 
-        MatchingResponse updatedResponse = new MatchingResponse(
+                    var preferences = caregiverPreferenceRepository.findByCaregiver_CaregiverId(c.caregiverId());
+
+                    boolean dementia = preferences.stream().anyMatch(p -> p.getSupportedConditions().contains(Disease.DEMENTIA));
+                    boolean bedridden = preferences.stream().anyMatch(p -> p.getSupportedConditions().contains(Disease.BEDRIDDEN));
+
+                    int age = Period.between(caregiver.getUser().getBirthDate(), LocalDate.now()).getYears();
+
+                    Double avgRating = reviewRepository.findAverageScoreByCaregiverId(c.caregiverId());
+
+                    if (avgRating == 0.0) {
+                        avgRating = 5.0;
+                    }
+
+                    Long totalMatches = serviceMatchRepository.countByCaregiverId(c.caregiverId());
+                    Long cancelledMatches = serviceMatchRepository.countCancelledByCaregiverId(c.caregiverId());
+
+                    double rejectionRate = (totalMatches == 0) ? 0.0 : (double) cancelledMatches / totalMatches * 100;
+
+                    return new CaregiverInfo(
+                            caregiver.getCaregiverId(),
+                            caregiver.getUser().getName(),
+                            caregiver.getUser().getGender().toString(),
+                            age,
+                            caregiver.getCareer(),
+                            avgRating, // rating 하드코딩
+                            caregiver.getKoreanProficiency().toString(),
+                            new SpecialCaseExperience(dementia, bedridden),
+                            caregiver.isAccompanyOuting(),
+                            rejectionRate,
+                            caregiver.getSelfIntroduction()
+                    );
+                }).toList();
+
+        return new MatchingResponse(
                 originalResponse.serviceRequestId(),
-                updatedCaregivers,
-                originalResponse.totalCandidates(),
-                originalResponse.matchedCount(),
-                originalResponse.processingTimeMs()
+                updatedCaregivers
         );
 
-        return updatedResponse;
     }
 }
