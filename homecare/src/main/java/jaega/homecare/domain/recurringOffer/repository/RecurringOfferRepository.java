@@ -15,4 +15,8 @@ public interface RecurringOfferRepository extends JpaRepository<RecurringOffer, 
     List<RecurringOffer> findByConsumer(Consumer consumer);
 
     List<RecurringOffer> findByCaregiver(Caregiver caregiver);
+
+    boolean existsByCaregiver(Caregiver caregiver);
+
+
 }

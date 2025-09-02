@@ -78,7 +78,7 @@ public class DummyDataService {
     @Transactional
     public void generateAllDummyData() {
         // 1. 모든 사용자 데이터 먼저 생성
-        IntStream.range(0, 400).forEach(this::createDummyUser);
+        IntStream.range(0, 87).forEach(this::createDummyUser);
 
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
@@ -87,7 +87,7 @@ public class DummyDataService {
 
         // 3. 더미 요양보호사 생성
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
-        IntStream.range(0, caregivers.size()).forEach(index -> createDummyCaregiver(index, caregivers));
+        createDummyCaregiversWithConditions(caregivers);
 
         // 4. Consumer 생성
         List<User> consumers = userRepository.findByUserRole(UserRole.ROLE_CONSUMER);
@@ -251,6 +251,136 @@ public class DummyDataService {
                 .trainStatus(random.nextBoolean())
                 .build();
         certificationRepository.save(certification);
+    }
+
+    private void createDummyCaregiversWithConditions(List<User> users) {
+        Center center = centerRepository.findAll().get(0);
+
+        // 각 조건별 카운트
+        List<Caregiver> dayOfWeekFiltered = new ArrayList<>();
+        List<Caregiver> timeFiltered = new ArrayList<>();
+        List<Caregiver> areaFiltered = new ArrayList<>();
+        List<Caregiver> conditionFiltered = new ArrayList<>();
+        List<Caregiver> serviceTypeFiltered = new ArrayList<>();
+
+        for (int index = 0; index < users.size(); index++) {
+            User user = users.get(index);
+
+            Set<DayOfWeek> dayOfWeek = new HashSet<>();
+            LocalTime startTime = LocalTime.of(9, 0);
+            LocalTime endTime = LocalTime.of(18, 0);
+            String workArea;
+            Set<Disease> supportedConditions = new HashSet<>();
+            Set<ServiceType> serviceTypes = new HashSet<>();
+
+            // --- 조건별 배정 ---
+
+            if (index < 8) {
+                dayOfWeek.addAll(List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
+            } else {
+                dayOfWeek.addAll(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+            }
+
+            if (index >= 8 && index < 15) {
+                startTime = LocalTime.of(15, 0);
+                endTime = LocalTime.of(18, 0);
+            } else {
+                startTime = LocalTime.of(9,0);
+                endTime = LocalTime.of(12,0);
+            }
+
+            if (index >= 15 && index < 21) {
+                workArea = pickNonSuncheonAddress(index - 15);
+            } else {
+                workArea = DUMMY_ADDRESSES[new Random().nextInt(DUMMY_ADDRESSES.length)];
+            }
+
+            if (index >= 21 && index < 26) {
+                supportedConditions.add(Disease.HYPERTENSION); // 조건 없는 사람
+            } else {
+                supportedConditions.add(Disease.DEMENTIA);
+                supportedConditions.add(Disease.BEDRIDDEN);
+            }
+
+            if (index >= 26 && index < 33) {
+                serviceTypes.add(ServiceType.VISITING_CARE); // 다른 유형
+            } else {
+                serviceTypes.add(ServiceType.IN_HOME_SUPPORT);
+            }
+
+            // --- Caregiver 생성 ---
+            Caregiver caregiver = Caregiver.builder()
+                    .caregiverId(UUID.randomUUID())
+                    .user(user)
+                    .address(workArea)
+                    .career(1 + new Random().nextInt(20))
+                    .koreanProficiency(KoreanProficiency.values()[new Random().nextInt(KoreanProficiency.values().length)])
+                    .isAccompanyOuting(new Random().nextBoolean())
+                    .selfIntroduction(DUMMY_INTRODUCTIONS[index % DUMMY_INTRODUCTIONS.length])
+                    .build();
+            caregiver.changeVerifiedStatus(VerifiedStatus.APPROVED);
+            caregiverRepository.save(caregiver);
+
+            // CaregiverCenter 생성
+            CaregiverCenter caregiverCenter = CaregiverCenter.builder()
+                    .caregiverCenterId(UUID.randomUUID())
+                    .caregiver(caregiver)
+                    .center(center)
+                    .status(CaregiverStatus.values()[new Random().nextInt(CaregiverStatus.values().length)])
+                    .build();
+            caregiverCenterRepository.save(caregiverCenter);
+
+            // CaregiverPreference 생성
+            CaregiverPreference preference = CaregiverPreference.builder()
+                    .caregiverPreferenceId(UUID.randomUUID())
+                    .caregiver(caregiver)
+                    .serviceTypes(serviceTypes)
+                    .dayOfWeek(dayOfWeek)
+                    .workStartTime(startTime)
+                    .workEndTime(endTime)
+                    .workMinTime(2 + new Random().nextInt(2))
+                    .workMaxTime(4 + new Random().nextInt(4))
+                    .availableTime(30 + new Random().nextInt(91))
+                    .workArea(workArea)
+                    .addressType(new Random().nextBoolean() ? AddressType.ROAD : AddressType.JIBUN)
+                    .location(new Location(DUMMY_LATITUDES[index % DUMMY_LATITUDES.length],
+                            DUMMY_LONGITUDES[index % DUMMY_LONGITUDES.length]))
+                    .transportation(new Random().nextBoolean() ? "자가차량" : "대중교통")
+                    .lunchBreak(30)
+                    .bufferTime(15)
+                    .supportedConditions(supportedConditions)
+                    .preferredMinAge(40 + new Random().nextInt(20))
+                    .preferredMaxAge(60 + new Random().nextInt(20))
+                    .preferredGender(PreferredGender.values()[new Random().nextInt(PreferredGender.values().length)])
+                    .build();
+            caregiverPreferenceRepository.save(preference);
+
+            // Certification 생성
+            Certification certification = Certification.builder()
+                    .certificationId(UUID.randomUUID())
+                    .caregiver(caregiver)
+                    .certificationNumber("CERT-2025-" + String.format("%04d", index))
+                    .certificationDate(LocalDate.of(2020 + new Random().nextInt(5),
+                            1 + new Random().nextInt(12),
+                            1 + new Random().nextInt(28)))
+                    .trainStatus(new Random().nextBoolean())
+                    .build();
+            certificationRepository.save(certification);
+
+            // --- 조건별 필터링 로그 ---
+            if (dayOfWeek.size() == 5) dayOfWeekFiltered.add(caregiver);
+            if (!(startTime.equals(LocalTime.of(9,0)) && endTime.equals(LocalTime.of(12,0))) ) timeFiltered.add(caregiver);
+            if (!workArea.startsWith("전라남도 순천시")) areaFiltered.add(caregiver);
+            if (supportedConditions.contains(Disease.HYPERTENSION)) conditionFiltered.add(caregiver);
+            if (serviceTypes.contains(ServiceType.VISITING_CARE)) serviceTypeFiltered.add(caregiver);
+        }
+
+        // --- 출력 ---
+        System.out.println("근무 요일 월~금 아닌 사람: " + dayOfWeekFiltered.size());
+        System.out.println("근무 시간이 9~12가 아닌 사람: " + timeFiltered.size());
+        System.out.println("근무 지역 순천 외 사람: " + areaFiltered.size());
+        System.out.println("지원 가능한 상태 조건이 없는 사람: " + conditionFiltered.size());
+        System.out.println("서비스 유형 VISITING_CARE인 사람: " + serviceTypeFiltered.size());
     }
 
     private void createDummyConsumer(int index, List<User> consumers) {
@@ -635,4 +765,17 @@ public class DummyDataService {
             "안녕하세요! 즐거운 마음과 따뜻한 손길로 케어하겠습니다.",
             "안녕하세요! 전문적이고 성실한 돌봄을 약속드립니다."
     };
+
+    // 예시: 순천 외 주소 선택 함수
+    private String pickNonSuncheonAddress(int index) {
+        String[] otherAddresses = {
+                "경기도 수원시 팔달구 매산로 1",
+                "전라북도 전주시 완산구 전동 3",
+                "충청북도 청주시 상당구 사직로 5",
+                "충청남도 천안시 동남구 중앙로 12",
+                "경상북도 포항시 남구 대이로 45",
+                "경상남도 창원시 성산구 중앙대로 34"
+        };
+        return otherAddresses[index % otherAddresses.length];
+    }
 }
