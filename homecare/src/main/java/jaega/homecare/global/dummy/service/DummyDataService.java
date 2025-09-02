@@ -78,7 +78,7 @@ public class DummyDataService {
     @Transactional
     public void generateAllDummyData() {
         // 1. 모든 사용자 데이터 먼저 생성
-        IntStream.range(0, 100).forEach(this::createDummyUser);
+        IntStream.range(0, 400).forEach(this::createDummyUser);
 
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
@@ -142,7 +142,7 @@ public class DummyDataService {
     private void createDummyCenter(int index) {
         User user = userRepository.findByUserRole(UserRole.ROLE_CENTER).get(index);
         Center center = new Center();
-        center.setCenter(UUID.randomUUID(), user, "더미센터" + index, "서울시 강남구 테헤란로 " + index, "02-1111-" + String.format("%04d", index));
+        center.setCenter(UUID.randomUUID(), user, "순천시재가노인지원센터" + index, "전라남도 순천시 매곡동 1213 ", "061-749-1114" + String.format("%04d", index));
         centerRepository.save(center);
     }
 
@@ -168,11 +168,11 @@ public class DummyDataService {
         Caregiver caregiver = Caregiver.builder()
                 .caregiverId(UUID.randomUUID())
                 .user(user)
-                .address("서울시 송파구 올림픽로 " + index)
+                .address(DUMMY_ADDRESSES[index % DUMMY_ADDRESSES.length])
                 .career(1 + random.nextInt(20)) // 경력 1~20년
                 .koreanProficiency(KoreanProficiency.values()[random.nextInt(KoreanProficiency.values().length)])
                 .isAccompanyOuting(random.nextBoolean())
-                .selfIntroduction("안녕하세요! 요양보호사 " + user.getName() + "입니다.")
+                .selfIntroduction(DUMMY_INTRODUCTIONS[index % DUMMY_INTRODUCTIONS.length])
                 .build();
         caregiver.changeVerifiedStatus(VerifiedStatus.APPROVED);
         caregiverRepository.save(caregiver);
@@ -202,7 +202,7 @@ public class DummyDataService {
 
         // 근무 가능 요일 랜덤
         Set<DayOfWeek> dayOfWeek = new HashSet<>();
-        int numDays = 1 + random.nextInt(5); // 1~5일 랜덤
+        int numDays = 4 + random.nextInt(2); // 1~5일 랜덤
         while (dayOfWeek.size() < numDays) {
             dayOfWeek.add(DayOfWeek.values()[random.nextInt(7)]);
         }
@@ -223,9 +223,12 @@ public class DummyDataService {
                 .workMinTime(2 + random.nextInt(2))      // 최소 근무시간 2~3시간
                 .workMaxTime(4 + random.nextInt(4))      // 최대 근무시간 4~7시간
                 .availableTime(30 + random.nextInt(91))  // 이동 가능 시간 30~120분
-                .workArea("서울시 송파구")                // 근무 가능 지역
+                .workArea(DUMMY_ADDRESSES[index % DUMMY_ADDRESSES.length])                // 근무 가능 지역
                 .addressType(random.nextBoolean() ? AddressType.ROAD : AddressType.JIBUN) // 랜덤
-                .location(new Location(37.500 + random.nextDouble() * 0.1, 126.970 + random.nextDouble() * 0.1)) // ✅ 위도/경도 수정
+                .location(new Location(
+                        DUMMY_LATITUDES[index % DUMMY_LATITUDES.length],
+                        DUMMY_LONGITUDES[index % DUMMY_LONGITUDES.length]
+                ))
                 .transportation(random.nextBoolean() ? "자가차량" : "대중교통")
                 .lunchBreak(30)                           // 점심시간 30분
                 .bufferTime(15)                           // 이동 시간 제외 버퍼 15분
@@ -256,8 +259,8 @@ public class DummyDataService {
         Consumer consumer = Consumer.builder()
                 .user(user)
                 .consumerId(UUID.randomUUID())
-                .residentialAddress("서울시 마포구 월드컵북로 " + index)
-                .visitAddress("서울시 강남구 봉은사로 " + index)
+                .residentialAddress(DUMMY_ADDRESSES[index % DUMMY_ADDRESSES.length])
+                .visitAddress(DUMMY_ADDRESSES[index % DUMMY_ADDRESSES.length])
                 .entranceType("공동현관 비밀번호: " + (1000 + random.nextInt(9000)))
                 .careGrade(random.nextInt(6) + 1)
                 .isMedicalAid(random.nextBoolean())
@@ -358,9 +361,12 @@ public class DummyDataService {
         // ✅ 서비스 요청 생성
         ServiceRequest serviceRequest = ServiceRequest.builder()
                 .consumer(consumer)
-                .serviceAddress("서울시 강남구 테헤란로 " + index)
+                .serviceAddress(DUMMY_ADDRESSES[index % DUMMY_ADDRESSES.length])
                 .addressType(random.nextBoolean() ? AddressType.ROAD : AddressType.JIBUN) // 랜덤
-                .location(new Location(37.500 + random.nextDouble() * 0.1, 126.970 + random.nextDouble() * 0.1)) // ✅ 위도/경도 수정
+                .location(new Location(
+                        DUMMY_LATITUDES[index % DUMMY_LATITUDES.length],
+                        DUMMY_LONGITUDES[index % DUMMY_LONGITUDES.length]
+                ))
                 .requestDate(requestedDate)
                 .preferredStartTime(serviceStartTime)
                 .preferredEndTime(serviceEndTime)
@@ -462,6 +468,7 @@ public class DummyDataService {
         // 날짜 범위: 오늘 기준 -4일 ~ +4일
         List<LocalDate> possibleDates = IntStream.rangeClosed(-4, 4)
                 .mapToObj(i -> LocalDate.now().plusDays(i))
+                .filter(d -> !(d.getYear() == 2025 && d.getMonthValue() == 9 && d.getDayOfMonth() == 5)) // 9월 5일 제외
                 .toList();
 
         // 시간대
@@ -489,7 +496,7 @@ public class DummyDataService {
                         .consumer(consumer)
                         .serviceAddress(consumer.getResidentialAddress())
                         .addressType(AddressType.ROAD)
-                        .location(new Location(37.500, 126.970))
+                        .location(new Location(34.9485, 127.4942))
                         .requestDate(date)
                         .preferredStartTime(startTime)
                         .preferredEndTime(endTime)
@@ -544,8 +551,88 @@ public class DummyDataService {
                 settlementCommandService.createSettlement(settlementRequest);
             }
         }
+
+        LocalTime preferredStartTime = LocalTime.of(13, 0);
+        LocalTime preferredEndTime = LocalTime.of(16, 0);
+
+
+        ServiceRequest serviceRequest = ServiceRequest.builder()
+                .consumer(consumer)
+                .serviceAddress("전남 순천시 성동3길 8")
+                .addressType(AddressType.ROAD)
+                .location(new Location(34.9485, 127.4942))
+                .requestDate(LocalDate.of(2025, 9, 5))
+                .preferredStartTime(preferredStartTime)
+                .preferredEndTime(preferredEndTime)
+                .duration((int) Duration.between(preferredStartTime, preferredEndTime).toHours())
+                .serviceType(ServiceType.values()[0])
+                .additionalInformation("전시용 데이터")
+                .build();
+
+        UUID serviceRequestId = UUID.randomUUID();
+        serviceRequest.initializeServiceRequest(serviceRequestId);
+        serviceRequestRepository.save(serviceRequest);
+
         UUID recurringOfferId = createDummyRecurringOfferForConsumer(consumer);
 
         recurringOfferCommandService.approveRecurringStatus(recurringOfferId);
     }
+
+    private static final String[] DUMMY_ADDRESSES = {
+            "전남 순천시 성동3길 5",
+            "전남 순천시 성동3길 8",
+            "전남 순천시 성동2길 12",
+            "전남 순천시 조례동 45",
+            "전남 순천시 왕지동 78",
+            "전남 순천시 해룡면 신기리 34",
+            "전남 순천시 연향동 123",
+            "전남 순천시 매곡동 56",
+            "전남 순천시 왕조2길 67",
+            "전남 순천시 풍덕동 89",
+            "전남 순천시 상사동 11",
+            "전남 순천시 조례동 12",
+            "전남 순천시 왕지동 34",
+            "전남 순천시 해룡면 신기리 56",
+            "전남 순천시 연향동 78",
+            "전남 순천시 매곡동 90",
+            "전남 순천시 왕조2길 45",
+            "전남 순천시 풍덕동 67",
+            "전남 순천시 상사동 23",
+            "전남 순천시 조례동 89",
+            "전남 순천시 왕지동 12",
+            "전남 순천시 해룡면 신기리 78",
+            "전남 순천시 연향동 34",
+            "전남 순천시 매곡동 12",
+            "전남 순천시 왕조2길 89",
+            "전남 순천시 풍덕동 34",
+            "전남 순천시 상사동 45",
+            "전남 순천시 조례동 23",
+            "전남 순천시 왕지동 56",
+            "전남 순천시 해룡면 신기리 12"
+    };
+
+    private static final double[] DUMMY_LATITUDES = {
+            34.9485, 34.9486, 34.9487, 34.9574, 34.9532, 34.9316, 34.9516, 34.9378, 34.9512, 34.9310,
+            34.9510, 34.9570, 34.9530, 34.9318, 34.9515, 34.9379, 34.9511, 34.9312, 34.9512, 34.9572,
+            34.9531, 34.9319, 34.9514, 34.9377, 34.9513, 34.9311, 34.9511, 34.9571, 34.9533, 34.9317
+    };
+
+    private static final double[] DUMMY_LONGITUDES = {
+            127.4942, 127.4945, 127.4935, 127.5206, 127.4968, 127.4662, 127.5188, 127.4745, 127.4879, 127.4973,
+            127.4852, 127.5200, 127.4965, 127.4665, 127.5185, 127.4748, 127.4875, 127.4970, 127.4855, 127.5208,
+            127.4967, 127.4668, 127.5186, 127.4746, 127.4878, 127.4971, 127.4853, 127.5204, 127.4969, 127.4669
+    };
+
+    private static final String[] DUMMY_INTRODUCTIONS = {
+            "안녕하세요! 따뜻한 마음으로 어르신을 돌보며 정성껏 케어하겠습니다.",
+            "안녕하세요! 밝은 미소로 어르신과 소통하며 케어하겠습니다.",
+            "안녕하세요! 건강하고 즐거운 일상을 위해 최선을 다하겠습니다.",
+            "안녕하세요! 어르신의 안전과 행복을 최우선으로 생각하며 케어하겠습니다.",
+            "안녕하세요! 세심한 배려로 편안한 돌봄을 제공하겠습니다.",
+            "안녕하세요! 항상 친절하고 책임감 있게 케어하겠습니다.",
+            "안녕하세요! 어르신의 생활 만족도를 높이는 케어를 하겠습니다.",
+            "안녕하세요! 어르신과 가족의 신뢰를 소중히 여기며 돌봄을 제공하겠습니다.",
+            "안녕하세요! 즐거운 마음과 따뜻한 손길로 케어하겠습니다.",
+            "안녕하세요! 전문적이고 성실한 돌봄을 약속드립니다."
+    };
 }
