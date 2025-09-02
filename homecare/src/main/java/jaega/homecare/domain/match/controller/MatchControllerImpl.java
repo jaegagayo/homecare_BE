@@ -18,15 +18,13 @@ public class MatchControllerImpl implements MatchController {
 
     private final CaregiverMatchingService caregiverMatchingService;
     private final MatchingService matchingService;
-    private final RestTemplate restTemplate;
 
     @Override
-    public ResponseEntity<MatchingResponseDTO> matchingProcess(UUID serviceRequestId) {
+    public ResponseEntity<MatchingResponse> matchingProcess(UUID serviceRequestId) {
 
-        return null;
+        MatchingResponse response = caregiverMatchingService.callRecommend(serviceRequestId);
+        return ResponseEntity.ok(response);
     }
-
-
 
     @Override
     public ResponseEntity<MatchingResponse> matchingProcessLogging(UUID serviceRequestId) {
@@ -36,16 +34,5 @@ public class MatchControllerImpl implements MatchController {
 
         return ResponseEntity.ok(loggingResult);
     }
-    /*
-    @Override
-    public ResponseEntity<MatchingResponseDTO> matchingProcess(UUID serviceRequestId) {
 
-         MatchingResponseDTO response = caregiverMatchingService.recommendCaregivers(serviceRequestId);
-         return ResponseEntity.ok(response);
-
-
-
-        return null;
-    }
-    */
 }

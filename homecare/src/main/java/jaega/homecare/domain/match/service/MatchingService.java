@@ -76,8 +76,6 @@ public class MatchingService {
             return null; // 혹은 예외 처리
         }
 
-        String serviceType = sr.getServiceType().toString();
-
         List<CaregiverInfo> updatedCaregivers =  originalResponse.matchedCaregivers().stream()
                 .map(c -> {
                     var caregiver = caregiverRepository.findByCaregiverId(c.caregiverId())
@@ -107,7 +105,7 @@ public class MatchingService {
                             caregiver.getUser().getGender().toString(),
                             age,
                             caregiver.getCareer(),
-                            avgRating, // rating 하드코딩
+                            avgRating,
                             caregiver.getKoreanProficiency().toString(),
                             new SpecialCaseExperience(dementia, bedridden),
                             caregiver.isAccompanyOuting(),

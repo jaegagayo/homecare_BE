@@ -1,187 +1,118 @@
 package jaega.homecare.domain.match.service;
 
-import jaega.homecare.domain.caregiver.entity.Caregiver;
-import jaega.homecare.domain.caregiverCenter.entity.CaregiverStatus;
-import jaega.homecare.domain.caregiverCenter.repository.CaregiverCenterQueryRepository;
-import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
-import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
-import jaega.homecare.domain.match.dto.req.CaregiverDTO;
-import jaega.homecare.domain.match.dto.req.MatchRequest;
+import jaega.homecare.domain.caregiver.repository.CaregiverRepository;
+import jaega.homecare.domain.caregiverPreference.repository.CaregiverPreferenceRepository;
 import jaega.homecare.domain.match.dto.req.ServiceRequestDTO;
-import jaega.homecare.domain.match.dto.res.MatchedCaregiverDTO;
-import jaega.homecare.domain.match.dto.res.MatchingResponseDTO;
-import jaega.homecare.domain.match.infra.MatchingGrpcClient;
+import jaega.homecare.domain.match.dto.res.*;
+import jaega.homecare.domain.review.repository.ReviewRepository;
+import jaega.homecare.domain.serviceMatch.repository.ServiceMatchRepository;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
-import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
+import jaega.homecare.domain.users.entity.Disease;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CaregiverMatchingService {
-    /*
 
+    private final RestTemplate restTemplate;
     private final ServiceRequestQueryService serviceRequestQueryService;
-    private final CaregiverCenterQueryRepository caregiverCenterQueryRepository;
-    private final CaregiverPreferenceQueryService caregiverPreferenceQueryService;
-    private final MatchingGrpcClient matchingGrpcClient;
+    private final CaregiverRepository caregiverRepository;
+    private final CaregiverPreferenceRepository caregiverPreferenceRepository;
+    private final ReviewRepository reviewRepository;
+    private final ServiceMatchRepository serviceMatchRepository;
 
-    public MatchingResponseDTO recommendCaregivers(UUID serviceRequestId) {
-        ServiceRequest request = serviceRequestQueryService.getServiceRequest(serviceRequestId);
-        List<Caregiver> caregiverList = caregiverCenterQueryRepository.findAllByStatus(CaregiverStatus.ACTIVE);
+    public MatchingResponse callRecommend(UUID serviceRequestId) {
+        String url = "http://localhost:8000/matching/recommend";
 
-        List<CaregiverDTO> candidateCaregivers = convertCaregiverToDTO(caregiverList);
-        ServiceRequestDTO serviceRequestDTO = convertServiceRequestToDto(request);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        MatchRequest matchRequest = new MatchRequest(
-                serviceRequestDTO,
-                candidateCaregivers
+        ServiceRequest sr = serviceRequestQueryService.getServiceRequest(serviceRequestId);
+
+
+        Map<String, Object> location = new HashMap<>();
+        location.put("latitude", sr.getLocation().getLatitude());
+        location.put("longitude", sr.getLocation().getLongitude());
+
+        ServiceRequestDTO dto = new ServiceRequestDTO(
+                sr.getServiceRequestId(),
+                sr.getConsumer().getConsumerId(),
+                sr.getServiceAddress(),
+                sr.getAddressType().toString(),
+                location,
+                sr.getRequestDate().toString(),
+                sr.getPreferredStartTime().toString(),
+                sr.getPreferredEndTime().toString(),
+                sr.getDuration(),
+                sr.getServiceType().toString(),
+                sr.getAdditionalInformation()
         );
 
-        MatchingServiceOuterClass.MatchingRequest grpcRequest =
-                toProto(serviceRequestDTO, candidateCaregivers);
+        Map<String, Object> body = Map.of("serviceRequest", dto);
 
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        ResponseEntity<MatchingResponse> response = restTemplate.postForEntity(url, request, MatchingResponse.class);
 
-        MatchingServiceOuterClass.MatchingResponse response = matchingGrpcClient.getMatchingRecommendations(grpcRequest);
-        return toDto(response);
-    }
+        MatchingResponse originalResponse = response.getBody();
 
-    private List<CaregiverDTO> convertCaregiverToDTO(List<Caregiver> caregivers) {
-        if (caregivers == null || caregivers.isEmpty()) {
-            return List.of();
+        if (originalResponse == null) {
+            return null; // 혹은 예외 처리
         }
 
-        return caregivers.stream()
-                .map(caregiver -> {
-                    // CaregiverPreference 조회
-                    CaregiverPreference preference = caregiverPreferenceQueryService
-                            .findCaregiverPreferenceByCaregiver(caregiver.getCaregiverId());
+        List<CaregiverInfo> updatedCaregivers =  originalResponse.matchedCaregivers().stream()
+                .map(c -> {
+                    var caregiver = caregiverRepository.findByCaregiverId(c.caregiverId())
+                            .orElseThrow(() -> new RuntimeException("Caregiver not found: " + c.caregiverId()));
 
-                    String addressType = (preference != null) ? preference.getAddressType().toString() : null;
+                    var preferences = caregiverPreferenceRepository.findByCaregiver_CaregiverId(c.caregiverId());
 
-                    // DTO 변환
-                    List<Double> baseLocation = (preference != null && preference.getLocation() != null)
-                            ? List.of(preference.getLocation().getLatitude(), preference.getLocation().getLongitude())
-                            : List.of(0.0, 0.0);
+                    boolean dementia = preferences.stream().anyMatch(p -> p.getSupportedConditions().contains(Disease.DEMENTIA));
+                    boolean bedridden = preferences.stream().anyMatch(p -> p.getSupportedConditions().contains(Disease.BEDRIDDEN));
 
-                    String workArea = (preference != null) ? preference.getWorkArea() : null;
+                    int age = Period.between(caregiver.getUser().getBirthDate(), LocalDate.now()).getYears();
 
-                    return new CaregiverDTO(
-                            caregiver.getCaregiverId().toString(),
-                            caregiver.getUser().getUserId().toString(),
+                    Double avgRating = reviewRepository.findAverageScoreByCaregiverId(c.caregiverId());
+
+                    if (avgRating == 0.0) {
+                        avgRating = 5.0;
+                    }
+
+                    Long totalMatches = serviceMatchRepository.countByCaregiverId(c.caregiverId());
+                    Long cancelledMatches = serviceMatchRepository.countCancelledByCaregiverId(c.caregiverId());
+
+                    double rejectionRate = (totalMatches == 0) ? 0.0 : (double) cancelledMatches / totalMatches * 100;
+
+                    return new CaregiverInfo(
+                            caregiver.getCaregiverId(),
                             caregiver.getUser().getName(),
-                            workArea,
-                            addressType,
-                            baseLocation,
-                            caregiver.getCareer().toString(),
+                            caregiver.getUser().getGender().toString(),
+                            age,
+                            caregiver.getCareer(),
+                            avgRating,
                             caregiver.getKoreanProficiency().toString(),
+                            new SpecialCaseExperience(dementia, bedridden),
                             caregiver.isAccompanyOuting(),
-                            caregiver.getSelfIntroduction(),
-                            caregiver.getVerifiedStatus().toString(),
-                            preference
+                            rejectionRate,
+                            caregiver.getSelfIntroduction()
                     );
-                })
-                .toList();
-    }
+                }).toList();
 
-    private ServiceRequestDTO convertServiceRequestToDto(ServiceRequest serviceRequest){
-        return new ServiceRequestDTO(
-                serviceRequest.getServiceRequestId().toString(),
-                serviceRequest.getConsumer().getConsumerId().toString(),
-                serviceRequest.getServiceAddress(),
-                serviceRequest.getAddressType().toString(),
-                List.of(
-                        serviceRequest.getLocation().getLatitude(),
-                        serviceRequest.getLocation().getLongitude()
-                ),
-                serviceRequest.getRequestDate().toString(),
-                serviceRequest.getPreferredStartTime().toString(),
-                serviceRequest.getPreferredEndTime().toString(),
-                serviceRequest.getDuration().toString(),
-                serviceRequest.getServiceType().toString(),
-                serviceRequest.getAdditionalInformation()
+        return new MatchingResponse(
+                originalResponse.serviceRequestId(),
+                updatedCaregivers
         );
+
     }
 
-    public static MatchingServiceOuterClass.MatchingRequest toProto(
-            ServiceRequestDTO serviceRequestDTO,
-            List<CaregiverDTO> caregivers
-    ) {
-        // ServiceRequest 변환
-        MatchingServiceOuterClass.ServiceRequest serviceRequest =
-                MatchingServiceOuterClass.ServiceRequest.newBuilder()
-                        .setServiceRequestId(serviceRequestDTO.serviceRequestId())
-                        .setConsumerId(serviceRequestDTO.consumerId())
-                        .setServiceAddress(serviceRequestDTO.serviceAddress())
-                        .setAddressType(serviceRequestDTO.addressType() != null ? serviceRequestDTO.addressType() : "")
-                        .setPreferredStartTime(serviceRequestDTO.preferredStartTime())
-                        .setPreferredEndTime(serviceRequestDTO.preferredEndTime())
-                        .setDuration(serviceRequestDTO.duration())
-                        .setServiceType(serviceRequestDTO.serviceType())
-                        .setRequestStatus(ServiceRequestStatus.ASSIGNED.toString())
-                        .setRequestDate(serviceRequestDTO.requestDate())
-                        .setAdditionalInformation(serviceRequestDTO.additionalInformation() != null ? serviceRequestDTO.additionalInformation() : "")
-                        .setLocation(MatchingServiceOuterClass.Location.newBuilder()
-                                .setLatitude(serviceRequestDTO.location().get(0))
-                                .setLongitude(serviceRequestDTO.location().get(1))
-                                .build())
-                        .build();
-
-        // CaregiverDTO → CaregiverForMatching 변환
-        List<MatchingServiceOuterClass.CaregiverForMatching> protoCaregivers = caregivers.stream()
-                .map(c -> MatchingServiceOuterClass.CaregiverForMatching.newBuilder()
-                        .setCaregiverId(c.caregiverId())
-                        .setUserId(c.userId())
-                        .setName(c.name())
-                        .setAddress(c.address() != null ? c.address() : "")
-                        .setAddressType(c.addressType() != null ? c.addressType() : "")
-                        .setServiceType(c.preferences().getServiceTypes() != null ? c.preferences().getServiceTypes().toString() : "")
-                        .setCareer(c.career() != null ? c.career() : "")
-                        .setKoreanProficiency(c.koreanProficiency() != null ? c.koreanProficiency() : "")
-                        .setIsAccompanyOuting(c.isAccompanyOuting())
-                        .setSelfIntroduction(c.selfIntroduction() != null ? c.selfIntroduction() : "")
-                        .setVerifiedStatus(c.verifiedStatus() != null ? c.verifiedStatus() : "")
-                        .build())
-                .toList();
-
-        return MatchingServiceOuterClass.MatchingRequest.newBuilder()
-                .setServiceRequest(serviceRequest)
-                .addAllCandidateCaregivers(protoCaregivers)
-                .build();
-    }
-
-    public static MatchingResponseDTO toDto(MatchingServiceOuterClass.MatchingResponse response) {
-        if (response == null) {
-            return null;
-        }
-
-        List<MatchedCaregiverDTO> matchedCaregivers = response.getMatchedCaregiversList().stream()
-                .map(c -> new MatchedCaregiverDTO(
-                        c.getCaregiverId(),
-                        c.getName(),
-                        c.getDistanceKm(),
-                        c.getEstimatedTravelTime(),
-                        c.getMatchScore(),
-                        c.getAddress(),
-                        c.getAddressType(),
-                        List.of(c.getLocation().getLatitude(), c.getLocation().getLongitude())
-                                .stream().map(Object::toString).collect(Collectors.toList()),
-                        c.getCareer(),
-                        c.getSelfIntroduction()
-                ))
-                .collect(Collectors.toList());
-
-        return new MatchingResponseDTO(
-                "", // serviceRequestId는 필요하면 별도로 매핑
-                matchedCaregivers,
-                matchedCaregivers.size(),
-                response.getTotalMatches()
-        );
-    }
-
-     */
 }
