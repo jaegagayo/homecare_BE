@@ -15,7 +15,6 @@ import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import lombok.RequiredArgsConstructor;
-import matching.MatchingServiceOuterClass;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

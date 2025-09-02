@@ -4,8 +4,6 @@ import io.grpc.ManagedChannel;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import jaega.homecare.domain.match.dto.req.MatchRequest;
 import jaega.homecare.domain.match.dto.res.MatchingResponseDTO;
-import matching.MatchingServiceGrpc;
-import matching.MatchingServiceOuterClass;
 import org.springframework.stereotype.Service;
 
 @Service
