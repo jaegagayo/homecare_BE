@@ -35,7 +35,7 @@ public class CaregiverPreference {
 
     // 근무 가능 요일
     @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "caregiver_day_of_week", joinColumns = @JoinColumn(name = "caregiver_id"))
+    @CollectionTable(name = "caregiver_day_of_week", joinColumns = @JoinColumn(name = "caregiver_preference_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week")
     private Set<DayOfWeek> dayOfWeek = new HashSet<>();
