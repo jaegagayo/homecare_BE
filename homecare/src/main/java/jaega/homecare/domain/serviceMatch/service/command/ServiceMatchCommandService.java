@@ -48,4 +48,9 @@ public class ServiceMatchCommandService {
 
         return serviceMatch.getServiceMatchId();
     }
+
+    public void rejectMatchStatus(ServiceMatch serviceMatch){
+        serviceMatch.changeMatchStatus(MatchStatus.CANCELLED);
+        serviceMatch.getServiceRequest().changeRequestStatus(ServiceRequestStatus.CANCELED);
+    }
 }
