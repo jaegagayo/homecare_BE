@@ -106,6 +106,11 @@ public interface CaregiverController {
     @GetMapping("/home/next-schedule")
     ResponseEntity<List<CaregiverScheduleResponse>> getTomorrowSchedule(@RequestParam UUID caregiverId);
 
+    @Operation(summary = "요양보호사 일정 거절 API", description = "요양보호사가 선택된 단발 일정을 거절합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사 일정 거절 성공")
+    @PostMapping("/schedule/reject")
+    ResponseEntity<Void> rejectScheduleReject(@RequestParam UUID serviceMatchId);
+
     /**
      *
      * 리뷰 조회 API

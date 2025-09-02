@@ -520,14 +520,16 @@ public class DummyDataService {
                 } else {
                     serviceMatch.changeMatchStatus(MatchStatus.COMPLETED);
 
-                    // COMPLETED이면 리뷰 생성
-                    Review review = Review.builder()
-                            .reviewId(UUID.randomUUID())
-                            .serviceMatch(serviceMatch)
-                            .reviewScore(5.0)
-                            .reviewContent("테스트용 리뷰")
-                            .build();
-                    reviewRepository.save(review);
+                    if (random.nextBoolean()) {
+                        // COMPLETED이면 리뷰 생성
+                        Review review = Review.builder()
+                                .reviewId(UUID.randomUUID())
+                                .serviceMatch(serviceMatch)
+                                .reviewScore(5.0)
+                                .reviewContent("테스트용 리뷰")
+                                .build();
+                        reviewRepository.save(review);
+                    }
                 }
 
                 // ServiceRequest 상태 동기화

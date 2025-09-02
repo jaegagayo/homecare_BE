@@ -14,6 +14,7 @@ import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewSummaryResponse;
 import jaega.homecare.domain.review.service.query.ReviewQueryService;
 import jaega.homecare.domain.serviceMatch.entity.ServiceMatch;
+import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandService;
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
@@ -38,6 +39,7 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final SettlementCommandService settlementCommandService;
     private final SettlementQueryService settlementQueryService;
     private final ServiceMatchQueryService serviceMatchQueryService;
+    private final ServiceMatchCommandService serviceMatchCommandService;
     private final CaregiverCenterQueryService caregiverCenterQueryService;
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
@@ -157,6 +159,16 @@ public class CaregiverControllerImpl implements CaregiverController {
         List<CaregiverScheduleResponse> responses = serviceMatchQueryService.getCaregiverScheduleByDate(caregiverId, tomorrow);
         return ResponseEntity.ok(responses);
     }
+
+    // 요양보호사에게 확정된 단발 일정을 거절
+    @Override
+    public ResponseEntity<Void> rejectScheduleReject(UUID serviceMatchId) {
+        ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+        serviceMatchCommandService.rejectMatchStatus(serviceMatch);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     /**
      *  리뷰 조회 API

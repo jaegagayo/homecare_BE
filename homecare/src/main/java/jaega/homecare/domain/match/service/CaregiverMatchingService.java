@@ -8,18 +8,23 @@ import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferen
 import jaega.homecare.domain.match.dto.req.CaregiverDTO;
 import jaega.homecare.domain.match.dto.req.MatchRequest;
 import jaega.homecare.domain.match.dto.req.ServiceRequestDTO;
+import jaega.homecare.domain.match.dto.res.MatchedCaregiverDTO;
 import jaega.homecare.domain.match.dto.res.MatchingResponseDTO;
 import jaega.homecare.domain.match.infra.MatchingGrpcClient;
 import jaega.homecare.domain.serviceRequest.entity.ServiceRequest;
+import jaega.homecare.domain.serviceRequest.entity.ServiceRequestStatus;
 import jaega.homecare.domain.serviceRequest.service.query.ServiceRequestQueryService;
 import lombok.RequiredArgsConstructor;
+import matching.MatchingServiceOuterClass;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CaregiverMatchingService {
+    /*
 
     private final ServiceRequestQueryService serviceRequestQueryService;
     private final CaregiverCenterQueryRepository caregiverCenterQueryRepository;
@@ -38,7 +43,12 @@ public class CaregiverMatchingService {
                 candidateCaregivers
         );
 
-        return matchingGrpcClient.getMatchingRecommendations(matchRequest);
+        MatchingServiceOuterClass.MatchingRequest grpcRequest =
+                toProto(serviceRequestDTO, candidateCaregivers);
+
+
+        MatchingServiceOuterClass.MatchingResponse response = matchingGrpcClient.getMatchingRecommendations(grpcRequest);
+        return toDto(response);
     }
 
     private List<CaregiverDTO> convertCaregiverToDTO(List<Caregiver> caregivers) {
@@ -97,4 +107,82 @@ public class CaregiverMatchingService {
                 serviceRequest.getAdditionalInformation()
         );
     }
+
+    public static MatchingServiceOuterClass.MatchingRequest toProto(
+            ServiceRequestDTO serviceRequestDTO,
+            List<CaregiverDTO> caregivers
+    ) {
+        // ServiceRequest 변환
+        MatchingServiceOuterClass.ServiceRequest serviceRequest =
+                MatchingServiceOuterClass.ServiceRequest.newBuilder()
+                        .setServiceRequestId(serviceRequestDTO.serviceRequestId())
+                        .setConsumerId(serviceRequestDTO.consumerId())
+                        .setServiceAddress(serviceRequestDTO.serviceAddress())
+                        .setAddressType(serviceRequestDTO.addressType() != null ? serviceRequestDTO.addressType() : "")
+                        .setPreferredStartTime(serviceRequestDTO.preferredStartTime())
+                        .setPreferredEndTime(serviceRequestDTO.preferredEndTime())
+                        .setDuration(serviceRequestDTO.duration())
+                        .setServiceType(serviceRequestDTO.serviceType())
+                        .setRequestStatus(ServiceRequestStatus.ASSIGNED.toString())
+                        .setRequestDate(serviceRequestDTO.requestDate())
+                        .setAdditionalInformation(serviceRequestDTO.additionalInformation() != null ? serviceRequestDTO.additionalInformation() : "")
+                        .setLocation(MatchingServiceOuterClass.Location.newBuilder()
+                                .setLatitude(serviceRequestDTO.location().get(0))
+                                .setLongitude(serviceRequestDTO.location().get(1))
+                                .build())
+                        .build();
+
+        // CaregiverDTO → CaregiverForMatching 변환
+        List<MatchingServiceOuterClass.CaregiverForMatching> protoCaregivers = caregivers.stream()
+                .map(c -> MatchingServiceOuterClass.CaregiverForMatching.newBuilder()
+                        .setCaregiverId(c.caregiverId())
+                        .setUserId(c.userId())
+                        .setName(c.name())
+                        .setAddress(c.address() != null ? c.address() : "")
+                        .setAddressType(c.addressType() != null ? c.addressType() : "")
+                        .setServiceType(c.preferences().getServiceTypes() != null ? c.preferences().getServiceTypes().toString() : "")
+                        .setCareer(c.career() != null ? c.career() : "")
+                        .setKoreanProficiency(c.koreanProficiency() != null ? c.koreanProficiency() : "")
+                        .setIsAccompanyOuting(c.isAccompanyOuting())
+                        .setSelfIntroduction(c.selfIntroduction() != null ? c.selfIntroduction() : "")
+                        .setVerifiedStatus(c.verifiedStatus() != null ? c.verifiedStatus() : "")
+                        .build())
+                .toList();
+
+        return MatchingServiceOuterClass.MatchingRequest.newBuilder()
+                .setServiceRequest(serviceRequest)
+                .addAllCandidateCaregivers(protoCaregivers)
+                .build();
+    }
+
+    public static MatchingResponseDTO toDto(MatchingServiceOuterClass.MatchingResponse response) {
+        if (response == null) {
+            return null;
+        }
+
+        List<MatchedCaregiverDTO> matchedCaregivers = response.getMatchedCaregiversList().stream()
+                .map(c -> new MatchedCaregiverDTO(
+                        c.getCaregiverId(),
+                        c.getName(),
+                        c.getDistanceKm(),
+                        c.getEstimatedTravelTime(),
+                        c.getMatchScore(),
+                        c.getAddress(),
+                        c.getAddressType(),
+                        List.of(c.getLocation().getLatitude(), c.getLocation().getLongitude())
+                                .stream().map(Object::toString).collect(Collectors.toList()),
+                        c.getCareer(),
+                        c.getSelfIntroduction()
+                ))
+                .collect(Collectors.toList());
+
+        return new MatchingResponseDTO(
+                "", // serviceRequestId는 필요하면 별도로 매핑
+                matchedCaregivers,
+                matchedCaregivers.size(),
+                response.getTotalMatches()
+        );
+    }
+
+     */
 }
