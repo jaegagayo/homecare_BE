@@ -4,9 +4,6 @@ import java.util.UUID;
 
 public record ConfirmCaregiverRequest(
         UUID serviceRequestId,
-        UUID caregiverId,
-
-        String location,
-        Double distanceLog
+        UUID caregiverId
 ) {
 }
