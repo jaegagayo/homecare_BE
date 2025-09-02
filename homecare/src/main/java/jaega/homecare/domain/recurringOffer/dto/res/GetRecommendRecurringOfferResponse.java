@@ -11,6 +11,7 @@ import java.util.UUID;
 public record GetRecommendRecurringOfferResponse(
         UUID serviceMatchId,
         UUID caregiverId,
+        String caregiverName,
         LocalDate serviceDate,
 
         @Schema(type = "string", format = "time", example = "09:00:00")

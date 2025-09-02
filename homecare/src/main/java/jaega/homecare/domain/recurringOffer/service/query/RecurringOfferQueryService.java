@@ -76,6 +76,7 @@ public class RecurringOfferQueryService {
                 .map(sm -> new GetRecommendRecurringOfferResponse(
                         sm.getServiceMatchId(),
                         sm.getCaregiver().getCaregiverId(),
+                        sm.getCaregiver().getUser().getName(),
                         sm.getServiceDate(),
                         sm.getServiceStartTime(),
                         sm.getServiceEndTime(),
