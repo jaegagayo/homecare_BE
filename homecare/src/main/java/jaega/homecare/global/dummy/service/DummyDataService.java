@@ -112,40 +112,47 @@ public class DummyDataService {
                 "강채영", "조민아", "서지수", "신재혁", "배유림",
                 "노지민", "황서현", "문지호", "임지훈", "정예원",
                 "김도윤", "박서준", "이하늘", "최유나", "장민석",
+
                 "정다은", "김수현", "이준호", "박서연", "윤재민",
                 "강민지", "조윤호", "서예린", "신하준", "배지우",
                 "노하은", "황민재", "문예준", "임서진", "정시윤",
                 "김유진", "박지훈", "이서현", "최준서", "장서윤",
                 "정하윤", "김민성", "이하윤", "박민성", "윤서진",
+
                 "강예진", "조민재", "서지훈", "신유나", "배준혁",
                 "노예림", "황지호", "문채원", "임준호", "정서연",
                 "김지우", "박예준", "이수민", "최지후", "장예린",
                 "정민재", "김서연", "이유진", "박하준", "윤채원",
                 "강서윤", "조하늘", "서민재", "신서윤", "배하은",
+
                 "노지호", "황서진", "문하윤", "임채원", "정민지",
                 "김지훈", "박서윤", "이예준", "최서연", "장하준",
                 "정유나", "김채원"
         );
 
-// 이름에 맞는 정확한 성별 배열
+        // 이름에 맞는 정확한 성별 배열
         Gender[] genders = {
                 Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
                 Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
                 Gender.FEMALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
-                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
                 Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
+
                 Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
                 Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
                 Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
                 Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.MALE,
+
                 Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
-                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.MALE,
-                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
-                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE,
-                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
-                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
-                Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
-                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE
+                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
+
+                Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.FEMALE,
+                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
+                Gender.FEMALE, Gender.FEMALE
         };
 
         String name = koreanNames.get(index % koreanNames.size());
