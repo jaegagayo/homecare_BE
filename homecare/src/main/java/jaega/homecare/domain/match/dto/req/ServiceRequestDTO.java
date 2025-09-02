@@ -1,17 +1,20 @@
 package jaega.homecare.domain.match.dto.req;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Map;
+import java.util.UUID;
 
 public record ServiceRequestDTO(
-        String serviceRequestId,
-        String consumerId,
+        UUID serviceRequestId,
+        UUID consumerId,
         String serviceAddress,
         String addressType,
-        List<Double> location,
+        Map<String, Object> location,
         String requestDate,
         String preferredStartTime,
         String preferredEndTime,
-        String duration,
+        int duration,
         String serviceType,
         String additionalInformation
 ) {}

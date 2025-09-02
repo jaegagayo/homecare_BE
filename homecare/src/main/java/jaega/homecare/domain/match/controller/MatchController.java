@@ -3,8 +3,10 @@ package jaega.homecare.domain.match.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jaega.homecare.domain.match.dto.res.MatchingResponse;
 import jaega.homecare.domain.match.dto.res.MatchingResponseDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -19,4 +21,9 @@ public interface MatchController {
     @ApiResponse(responseCode = "200", description = "신청 조건에 적합한 요양보호사 후보 조회 성공")
     @PostMapping("/recommend")
     ResponseEntity<MatchingResponseDTO> matchingProcess(UUID serviceRequestId);
+
+    @Operation(summary = "매칭 알고리즘 로깅 API", description = "수요자 service매칭 알고리즘용 로깅 API를 호출합니다.")
+    @ApiResponse(responseCode = "200", description = "수요자의 serviceRequestID를 기반으로 매칭 알고리즘 호출용 로깅 API 성공")
+    @PostMapping("/recommend-logging")
+    ResponseEntity<MatchingResponse> matchingProcessLogging(UUID serviceRequestId);
 }

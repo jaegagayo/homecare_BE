@@ -1,7 +1,6 @@
 package jaega.homecare.domain.match.infra;
 
 import jaega.homecare.domain.match.dto.req.CaregiverDTO;
-import jaega.homecare.domain.match.dto.req.ServiceRequestDTO;
 import jaega.homecare.domain.match.dto.res.MatchingResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -15,6 +14,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class AiRecommendation {
+    /*
 
     private final WebClient webClient;
 
@@ -38,4 +38,6 @@ public class AiRecommendation {
                 .bodyToMono(MatchingResponseDTO.class)
                 .block();
     }
+
+     */
 }
