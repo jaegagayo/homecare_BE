@@ -105,24 +105,61 @@ public class DummyDataService {
     }
 
     private void createDummyUser(int index) {
+        // 87명의 이름 리스트
+// 87명의 이름 리스트
         List<String> koreanNames = List.of(
                 "김기현", "박지성", "이재민", "최유진", "장서연",
                 "정하늘", "김소희", "이수환", "박민재", "윤지영",
                 "강채영", "조민아", "서지수", "신재혁", "배유림",
-                "노지민", "황서현", "문지호", "임지훈", "정예원"
+                "노지민", "황서현", "문지호", "임지훈", "정예원",
+                "김도윤", "박서준", "이하늘", "최유나", "장민석",
+                "정다은", "김수현", "이준호", "박서연", "윤재민",
+                "강민지", "조윤호", "서예린", "신하준", "배지우",
+                "노하은", "황민재", "문예준", "임서진", "정시윤",
+                "김유진", "박지훈", "이서현", "최준서", "장서윤",
+                "정하윤", "김민성", "이하윤", "박민성", "윤서진",
+                "강예진", "조민재", "서지훈", "신유나", "배준혁",
+                "노예림", "황지호", "문채원", "임준호", "정서연",
+                "김지우", "박예준", "이수민", "최지후", "장예린",
+                "정민재", "김서연", "이유진", "박하준", "윤채원",
+                "강서윤", "조하늘", "서민재", "신서윤", "배하은",
+                "노지호", "황서진", "문하윤", "임채원", "정민지",
+                "김지훈", "박서윤", "이예준", "최서연", "장하준",
+                "정유나", "김채원"
         );
 
-        String name = koreanNames.get(index % koreanNames.size());
+// 이름에 맞는 성별 배열 (남/여)
+        Gender[] genders = {
+                Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
+                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
+                Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
+                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
+                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE,
+                Gender.FEMALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
+                Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE,
+                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
+                Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE, Gender.MALE,
+                Gender.MALE, Gender.FEMALE, Gender.MALE, Gender.FEMALE, Gender.FEMALE,
+                Gender.MALE, Gender.MALE, Gender.MALE, Gender.FEMALE, Gender.MALE,
+                Gender.FEMALE, Gender.FEMALE
+        };
 
-        // 이메일 생성: 이름을 영어로 단순 변환 + 인덱스 붙이기
-        String emailPrefix = "user" + index;
-        String email = emailPrefix + "@dummy.com";
+        String name = koreanNames.get(index % koreanNames.size());
+        Gender gender = genders[index % genders.length];
+
+        // 이메일 생성
+        String email = "user" + index + "@dummy.com";
 
         UserRole role;
         if (index == 0) {
             role = UserRole.ROLE_CENTER; // 0번은 센터
         } else {
-            // 나머지는 CAREGIVER 또는 CONSUMER로 분기
             role = (index % 2 == 0) ? UserRole.ROLE_CAREGIVER : UserRole.ROLE_CONSUMER;
         }
 
@@ -132,7 +169,7 @@ public class DummyDataService {
                 .password("$2a$10$vvUzhakZH7BQ0fpo8RfS/u3Ip54VLNHAQSoBCnCIYKSxVBmAhxaVG")
                 .phone("010-1234-" + String.format("%04d", index))
                 .birthDate(LocalDate.of(1970 + random.nextInt(30), random.nextInt(12) + 1, random.nextInt(28) + 1))
-                .gender(Gender.values()[random.nextInt(Gender.values().length)])
+                .gender(gender)
                 .build();
 
         user.setUser(UUID.randomUUID(), role, LocalDateTime.now());
@@ -292,7 +329,7 @@ public class DummyDataService {
             if (index >= 15 && index < 21) {
                 workArea = pickNonSuncheonAddress(index - 15);
             } else {
-                workArea = DUMMY_ADDRESSES[new Random().nextInt(DUMMY_ADDRESSES.length)];
+                workArea = DUMMY_ADDRESSES[index];
             }
 
             if (index >= 21 && index < 26) {
@@ -316,7 +353,7 @@ public class DummyDataService {
                     .career(1 + new Random().nextInt(20))
                     .koreanProficiency(KoreanProficiency.values()[new Random().nextInt(KoreanProficiency.values().length)])
                     .isAccompanyOuting(new Random().nextBoolean())
-                    .selfIntroduction(DUMMY_INTRODUCTIONS[index % DUMMY_INTRODUCTIONS.length])
+                    .selfIntroduction(DUMMY_INTRODUCTIONS[index])
                     .build();
             caregiver.changeVerifiedStatus(VerifiedStatus.APPROVED);
             caregiverRepository.save(caregiver);
@@ -709,48 +746,37 @@ public class DummyDataService {
     }
 
     private static final String[] DUMMY_ADDRESSES = {
-            "전라남도 순천시 성동3길 5",
-            "전라남도 순천시 성동3길 8",
-            "전라남도 순천시 성동2길 12",
-            "전라남도 순천시 조례동 45",
-            "전라남도 순천시 왕지동 78",
-            "전라남도 순천시 해룡면 신기리 34",
-            "전라남도 순천시 연향동 123",
-            "전라남도 순천시 매곡동 56",
-            "전라남도 순천시 왕조2길 67",
-            "전라남도 순천시 풍덕동 89",
-            "전라남도 순천시 상사동 11",
-            "전라남도 순천시 조례동 12",
-            "전라남도 순천시 왕지동 34",
-            "전라남도 순천시 해룡면 신기리 56",
-            "전라남도 순천시 연향동 78",
-            "전라남도 순천시 매곡동 90",
-            "전라남도 순천시 왕조2길 45",
-            "전라남도 순천시 풍덕동 67",
-            "전라남도 순천시 상사동 23",
-            "전라남도 순천시 조례동 89",
-            "전라남도 순천시 왕지동 12",
-            "전라남도 순천시 해룡면 신기리 78",
-            "전라남도 순천시 연향동 34",
-            "전라남도 순천시 매곡동 12",
-            "전라남도 순천시 왕조2길 89",
-            "전라남도 순천시 풍덕동 34",
-            "전라남도 순천시 상사동 45",
-            "전라남도 순천시 조례동 23",
-            "전라남도 순천시 왕지동 56",
-            "전라남도 순천시 해룡면 신기리 12"
+            "전라남도 순천시 조례동 12", "전라남도 순천시 풍덕동 34", "전라남도 순천시 상사동 45",
+            "전라남도 순천시 연향동 56", "전라남도 순천시 매곡동 78", "전라남도 순천시 왕지동 23",
+            "전라남도 순천시 해룡면 신기리 67", "전라남도 순천시 성동3길 89", "전라남도 순천시 성동2길 45",
+            "전라남도 순천시 왕조2길 12", "전라남도 순천시 조례동 34", "전라남도 순천시 풍덕동 56",
+            "전라남도 순천시 상사동 78", "전라남도 순천시 연향동 23", "전라남도 순천시 매곡동 12",
+            "전라남도 순천시 왕지동 90", "전라남도 순천시 해룡면 신기리 34", "전라남도 순천시 성동3길 67",
+            "전라남도 순천시 성동2길 89", "전라남도 순천시 왕조2길 45", "전라남도 순천시 조례동 56",
+            "전라남도 순천시 풍덕동 12", "전라남도 순천시 상사동 34", "전라남도 순천시 연향동 89",
+            "전라남도 순천시 매곡동 67", "전라남도 순천시 왕지동 45", "전라남도 순천시 해룡면 신기리 12",
+            "전라남도 순천시 성동3길 23", "전라남도 순천시 성동2길 56", "전라남도 순천시 왕조2길 78",
+            "전라남도 순천시 조례동 89", "전라남도 순천시 풍덕동 23", "전라남도 순천시 상사동 12",
+            "전라남도 순천시 연향동 34", "전라남도 순천시 매곡동 90", "전라남도 순천시 왕지동 56",
+            "전라남도 순천시 해룡면 신기리 78", "전라남도 순천시 성동3길 45", "전라남도 순천시 성동2길 34",
+            "전라남도 순천시 왕조2길 23", "전라남도 순천시 조례동 67", "전라남도 순천시 풍덕동 89",
+            "전라남도 순천시 상사동 56", "전라남도 순천시 연향동 12", "전라남도 순천시 매곡동 34"
     };
 
     private static final double[] DUMMY_LATITUDES = {
-            34.9485, 34.9486, 34.9487, 34.9574, 34.9532, 34.9316, 34.9516, 34.9378, 34.9512, 34.9310,
-            34.9510, 34.9570, 34.9530, 34.9318, 34.9515, 34.9379, 34.9511, 34.9312, 34.9512, 34.9572,
-            34.9531, 34.9319, 34.9514, 34.9377, 34.9513, 34.9311, 34.9511, 34.9571, 34.9533, 34.9317
+            34.9485, 34.9492, 34.9501, 34.9510, 34.9518, 34.9523, 34.9531, 34.9539, 34.9544, 34.9550,
+            34.9556, 34.9561, 34.9567, 34.9572, 34.9578, 34.9583, 34.9589, 34.9594, 34.9600, 34.9605,
+            34.9611, 34.9616, 34.9622, 34.9627, 34.9633, 34.9638, 34.9644, 34.9649, 34.9655, 34.9660,
+            34.9666, 34.9671, 34.9677, 34.9682, 34.9688, 34.9693, 34.9699, 34.9704, 34.9710, 34.9715,
+            34.9721, 34.9726, 34.9732
     };
 
     private static final double[] DUMMY_LONGITUDES = {
-            127.4942, 127.4945, 127.4935, 127.5206, 127.4968, 127.4662, 127.5188, 127.4745, 127.4879, 127.4973,
-            127.4852, 127.5200, 127.4965, 127.4665, 127.5185, 127.4748, 127.4875, 127.4970, 127.4855, 127.5208,
-            127.4967, 127.4668, 127.5186, 127.4746, 127.4878, 127.4971, 127.4853, 127.5204, 127.4969, 127.4669
+            127.4662, 127.4670, 127.4675, 127.4682, 127.4687, 127.4693, 127.4698, 127.4704, 127.4709, 127.4715,
+            127.4720, 127.4726, 127.4731, 127.4737, 127.4742, 127.4748, 127.4753, 127.4759, 127.4764, 127.4770,
+            127.4775, 127.4781, 127.4786, 127.4792, 127.4797, 127.4803, 127.4808, 127.4814, 127.4819, 127.4825,
+            127.4830, 127.4836, 127.4841, 127.4847, 127.4852, 127.4858, 127.4863, 127.4869, 127.4874, 127.4880,
+            127.4885, 127.4891, 127.4896
     };
 
     private static final String[] DUMMY_INTRODUCTIONS = {
@@ -763,7 +789,40 @@ public class DummyDataService {
             "안녕하세요! 어르신의 생활 만족도를 높이는 케어를 하겠습니다.",
             "안녕하세요! 어르신과 가족의 신뢰를 소중히 여기며 돌봄을 제공하겠습니다.",
             "안녕하세요! 즐거운 마음과 따뜻한 손길로 케어하겠습니다.",
-            "안녕하세요! 전문적이고 성실한 돌봄을 약속드립니다."
+            "안녕하세요! 전문적이고 성실한 돌봄을 약속드립니다.",
+            "안녕하세요! 밝고 따뜻한 마음으로 어르신을 보살피겠습니다.",
+            "안녕하세요! 세심하게 어르신을 돌보며 안전을 지키겠습니다.",
+            "안녕하세요! 항상 웃음과 친절로 케어하겠습니다.",
+            "안녕하세요! 어르신의 행복한 일상을 위해 노력하겠습니다.",
+            "안녕하세요! 정성과 책임감으로 안전한 케어를 제공합니다.",
+            "안녕하세요! 친절과 배려로 편안한 돌봄을 약속드립니다.",
+            "안녕하세요! 즐겁고 행복한 마음으로 케어하겠습니다.",
+            "안녕하세요! 어르신과 가족의 만족을 최우선으로 하겠습니다.",
+            "안녕하세요! 따뜻하고 세심한 마음으로 케어하겠습니다.",
+            "안녕하세요! 전문성과 정성으로 신뢰받는 돌봄을 제공합니다.",
+            "안녕하세요! 웃음과 친절로 안전한 케어를 약속드립니다.",
+            "안녕하세요! 행복하고 편안한 일상을 위해 최선을 다하겠습니다.",
+            "안녕하세요! 따뜻한 마음과 책임감으로 케어하겠습니다.",
+            "안녕하세요! 즐겁고 안전하게 어르신을 보살피겠습니다.",
+            "안녕하세요! 어르신과 가족을 소중히 여기며 케어하겠습니다.",
+            "안녕하세요! 전문적이고 친절한 돌봄을 제공합니다.",
+            "안녕하세요! 행복한 일상을 위해 세심하게 돌보겠습니다.",
+            "안녕하세요! 따뜻한 마음과 성실함으로 케어하겠습니다.",
+            "안녕하세요! 안전하고 즐거운 돌봄을 제공하겠습니다.",
+            "안녕하세요! 어르신의 건강과 행복을 최우선으로 하겠습니다.",
+            "안녕하세요! 책임감과 배려로 편안한 케어를 제공합니다.",
+            "안녕하세요! 밝은 마음과 전문성으로 돌봄하겠습니다.",
+            "안녕하세요! 친절하고 세심하게 어르신을 보살피겠습니다.",
+            "안녕하세요! 즐겁고 안전한 일상을 위해 케어하겠습니다.",
+            "안녕하세요! 정성과 신뢰로 어르신을 돌보겠습니다.",
+            "안녕하세요! 행복과 안전을 최우선으로 케어하겠습니다.",
+            "안녕하세요! 따뜻한 마음으로 친절하게 돌봄하겠습니다.",
+            "안녕하세요! 전문적이고 세심하게 어르신을 케어하겠습니다.",
+            "안녕하세요! 웃음과 친절로 일상을 행복하게 만들겠습니다.",
+            "안녕하세요! 책임감 있고 즐거운 마음으로 케어하겠습니다.",
+            "안녕하세요! 안전하고 따뜻한 돌봄을 제공합니다.",
+            "안녕하세요! 어르신과 가족의 행복을 위해 최선을 다하겠습니다.",
+            "안녕하세요! 세심하고 친절하게 안전한 케어를 제공합니다."
     };
 
     // 예시: 순천 외 주소 선택 함수
