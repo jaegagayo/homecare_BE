@@ -14,6 +14,7 @@ import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.service.command.CaregiverPreferenceCommandService;
 import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
 import jaega.homecare.domain.recurringOffer.dto.res.GetCaregiverRecurringOfferSummaryResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailResponse;
 import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
 import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
@@ -243,6 +244,13 @@ public class CaregiverControllerImpl implements CaregiverController {
         List<GetCaregiverRecurringOfferSummaryResponse> responses = recurringOfferQueryService.findByRecurringOfferSummaryByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
     }
+
+    @Override
+    public ResponseEntity<GetRecurringOfferDetailResponse> getRecurringOfferDetail(@PathVariable UUID recurringId){
+        GetRecurringOfferDetailResponse response = recurringOfferQueryService.findRecurringOfferDetail(recurringId);
+        return ResponseEntity.ok(response);
+    }
+
 
     @Override
     public ResponseEntity<Void> approveRecurringStatus(@RequestBody UUID recurringStatusId){
