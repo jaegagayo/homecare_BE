@@ -10,6 +10,7 @@ import jaega.homecare.domain.caregiver.dto.res.*;
 import jaega.homecare.domain.caregiverPreference.dto.req.CreateCaregiverPreferenceRequest;
 import jaega.homecare.domain.caregiverPreference.dto.req.UpdateCaregiverPreferenceRequest;
 import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.GetCaregiverRecurringOfferSummaryResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
@@ -152,4 +153,23 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 상세 조회 성공")
     @GetMapping("/review/{reviewId}")
     ResponseEntity<CaregiverReviewDetailResponse> getReviewDetail(@PathVariable UUID reviewId);
+
+    /**
+     * 정기 제안 관련 API
+     */
+
+    @Operation(summary = "(메인 페이지) 요양보호사의 정기 제안 알림용 조회 API", description = "메인 페이지에서 요양보호사의 신규 정기 제안을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사의 정기 제안 알림 조회 성공")
+    @GetMapping("/recurring")
+    ResponseEntity<List<GetCaregiverRecurringOfferSummaryResponse>> getRecurringOfferSummaryByCaregiver(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "요양보호사의 정기 제안 승인 API", description = "요양보호사의 해당 정기 제안을 승인하여 일정에 반영합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 해당 정기 제안을 승인하여 일정 반영 성공")
+    @PostMapping("/recurring/approve")
+    ResponseEntity<Void> approveRecurringStatus(@RequestBody UUID recurringStatusId);
+
+    @Operation(summary = "요양보호사의 정기 제안 거절 API", description = "요양보호사가 해당 정기 제안을 거절합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 해당 정기 제안을 거절 성공")
+    @PostMapping("/recurring/reject")
+    ResponseEntity<Void> rejectRecurringStatus(@RequestParam UUID recurringStatusId);
 }

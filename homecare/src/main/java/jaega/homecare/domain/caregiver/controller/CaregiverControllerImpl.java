@@ -13,6 +13,9 @@ import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceR
 import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
 import jaega.homecare.domain.caregiverPreference.service.command.CaregiverPreferenceCommandService;
 import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
+import jaega.homecare.domain.recurringOffer.dto.res.GetCaregiverRecurringOfferSummaryResponse;
+import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
+import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
@@ -52,6 +55,8 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final ReviewQueryService reviewQueryService;
     private final CaregiverPreferenceCommandService caregiverPreferenceCommandService;
     private final CaregiverPreferenceQueryService caregiverPreferenceQueryService;
+    private final RecurringOfferQueryService recurringOfferQueryService;
+    private final RecurringOfferCommandService recurringOfferCommandService;
 
     // 요양보호사 회원가입
     @Override
@@ -221,4 +226,28 @@ public class CaregiverControllerImpl implements CaregiverController {
         CaregiverReviewDetailResponse response = reviewQueryService.getReviewDetail(reviewId);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 정기 제안 관련 API
+     */
+
+
+    @Override
+    public ResponseEntity<List<GetCaregiverRecurringOfferSummaryResponse>> getRecurringOfferSummaryByCaregiver(@RequestParam UUID caregiverId){
+        List<GetCaregiverRecurringOfferSummaryResponse> responses = recurringOfferQueryService.findByRecurringOfferSummaryByCaregiver(caregiverId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @Override
+    public ResponseEntity<Void> approveRecurringStatus(@RequestBody UUID recurringStatusId){
+        recurringOfferCommandService.approveRecurringStatus(recurringStatusId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> rejectRecurringStatus(@RequestParam UUID recurringStatusId){
+        recurringOfferCommandService.rejectRecurringStatus(recurringStatusId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
