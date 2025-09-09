@@ -7,6 +7,12 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
+import jaega.homecare.domain.caregiverPreference.dto.req.CreateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.req.UpdateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
+import jaega.homecare.domain.caregiverPreference.service.command.CaregiverPreferenceCommandService;
+import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
@@ -44,6 +50,8 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
     private final ReviewQueryService reviewQueryService;
+    private final CaregiverPreferenceCommandService caregiverPreferenceCommandService;
+    private final CaregiverPreferenceQueryService caregiverPreferenceQueryService;
 
     // 요양보호사 회원가입
     @Override
@@ -86,6 +94,33 @@ public class CaregiverControllerImpl implements CaregiverController {
     public ResponseEntity<List<GetCaregiverCenterSettlementResponse>> getSettlementByCaregiver(UUID caregiverId){
         List<GetCaregiverCenterSettlementResponse> responses = settlementQueryService.getSettlementHistoryByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * 요양보호사 근무조건 API
+     */
+
+    @Override
+    public ResponseEntity<Void> createCaregiverPreference(
+            @RequestParam UUID caregiverId,
+            @RequestBody CreateCaregiverPreferenceRequest request){
+        caregiverPreferenceCommandService.createCaregiverPreference(request, caregiverId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateCaregiverPreference(
+            @RequestParam UUID caregiverId,
+            @RequestBody UpdateCaregiverPreferenceRequest request){
+        CaregiverPreference caregiverPreference = caregiverPreferenceQueryService.findCaregiverPreferenceByCaregiver(caregiverId);
+        caregiverPreferenceCommandService.updateCaregiverPreference(caregiverPreference, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<GetCaregiverPreferenceResponse> getCaregiverPreferenceByCaregiver(@RequestParam UUID caregiverId){
+        GetCaregiverPreferenceResponse response = caregiverPreferenceQueryService.getCaregiverPreferenceByCaregiver(caregiverId);
+        return ResponseEntity.ok(response);
     }
 
     /**
