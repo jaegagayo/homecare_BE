@@ -138,6 +138,11 @@ public interface CaregiverController {
     @PostMapping("/schedule/reject")
     ResponseEntity<Void> rejectScheduleReject(@RequestParam UUID serviceMatchId);
 
+    @Operation(summary = "정기 일정 스킵", description = "요양보호사가 확정된 특정 정기 회차 일정을 스킵합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 확정된 특정 정기 회차 일정 스킵 성공")
+    @PostMapping("/recurring/skip")
+    ResponseEntity<Void> skipRecurring(UUID serviceMatchId);
+
     /**
      *
      * 리뷰 조회 API

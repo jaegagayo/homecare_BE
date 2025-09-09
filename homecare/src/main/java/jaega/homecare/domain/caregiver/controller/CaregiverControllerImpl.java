@@ -27,8 +27,6 @@ import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandSer
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
-import jaega.homecare.domain.settlement.dto.res.GetSettlementByCaregiverResponse;
-import jaega.homecare.domain.settlement.dto.res.GetSettlementResponse;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
@@ -209,6 +207,14 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
+    public ResponseEntity<Void> skipRecurring(UUID serviceMatchId){
+        ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+        serviceMatchCommandService.skipRecurring(serviceMatch);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     /**
      *  리뷰 조회 API
@@ -249,5 +255,4 @@ public class CaregiverControllerImpl implements CaregiverController {
         recurringOfferCommandService.rejectRecurringStatus(recurringStatusId);
         return ResponseEntity.noContent().build();
     }
-
 }
