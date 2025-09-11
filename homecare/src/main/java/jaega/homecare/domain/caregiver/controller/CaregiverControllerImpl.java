@@ -7,6 +7,16 @@ import jaega.homecare.domain.caregiver.service.command.CaregiverCommandService;
 import jaega.homecare.domain.caregiver.service.query.CaregiverQueryService;
 import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.service.query.CaregiverCenterQueryService;
+import jaega.homecare.domain.caregiverPreference.dto.req.CreateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.req.UpdateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
+import jaega.homecare.domain.caregiverPreference.entity.CaregiverPreference;
+import jaega.homecare.domain.caregiverPreference.service.command.CaregiverPreferenceCommandService;
+import jaega.homecare.domain.caregiverPreference.service.query.CaregiverPreferenceQueryService;
+import jaega.homecare.domain.recurringOffer.dto.res.GetCaregiverRecurringOfferSummaryResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailResponse;
+import jaega.homecare.domain.recurringOffer.service.command.RecurringOfferCommandService;
+import jaega.homecare.domain.recurringOffer.service.query.RecurringOfferQueryService;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
@@ -18,8 +28,6 @@ import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandSer
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
-import jaega.homecare.domain.settlement.dto.res.GetSettlementByCaregiverResponse;
-import jaega.homecare.domain.settlement.dto.res.GetSettlementResponse;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
@@ -44,6 +52,10 @@ public class CaregiverControllerImpl implements CaregiverController {
     private final CaregiverCommandService caregiverCommandService;
     private final CaregiverQueryService caregiverQueryService;
     private final ReviewQueryService reviewQueryService;
+    private final CaregiverPreferenceCommandService caregiverPreferenceCommandService;
+    private final CaregiverPreferenceQueryService caregiverPreferenceQueryService;
+    private final RecurringOfferQueryService recurringOfferQueryService;
+    private final RecurringOfferCommandService recurringOfferCommandService;
 
     // 요양보호사 회원가입
     @Override
@@ -86,6 +98,33 @@ public class CaregiverControllerImpl implements CaregiverController {
     public ResponseEntity<List<GetCaregiverCenterSettlementResponse>> getSettlementByCaregiver(UUID caregiverId){
         List<GetCaregiverCenterSettlementResponse> responses = settlementQueryService.getSettlementHistoryByCaregiver(caregiverId);
         return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * 요양보호사 근무조건 API
+     */
+
+    @Override
+    public ResponseEntity<Void> createCaregiverPreference(
+            @RequestParam UUID caregiverId,
+            @RequestBody CreateCaregiverPreferenceRequest request){
+        caregiverPreferenceCommandService.createCaregiverPreference(request, caregiverId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateCaregiverPreference(
+            @RequestParam UUID caregiverId,
+            @RequestBody UpdateCaregiverPreferenceRequest request){
+        CaregiverPreference caregiverPreference = caregiverPreferenceQueryService.findCaregiverPreferenceByCaregiver(caregiverId);
+        caregiverPreferenceCommandService.updateCaregiverPreference(caregiverPreference, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<GetCaregiverPreferenceResponse> getCaregiverPreferenceByCaregiver(@RequestParam UUID caregiverId){
+        GetCaregiverPreferenceResponse response = caregiverPreferenceQueryService.getCaregiverPreferenceByCaregiver(caregiverId);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -169,6 +208,14 @@ public class CaregiverControllerImpl implements CaregiverController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
+    public ResponseEntity<Void> skipRecurring(UUID serviceMatchId){
+        ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
+        serviceMatchCommandService.skipRecurring(serviceMatch);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     /**
      *  리뷰 조회 API
@@ -185,5 +232,35 @@ public class CaregiverControllerImpl implements CaregiverController {
     public ResponseEntity<CaregiverReviewDetailResponse> getReviewDetail(@PathVariable UUID reviewId) {
         CaregiverReviewDetailResponse response = reviewQueryService.getReviewDetail(reviewId);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 정기 제안 관련 API
+     */
+
+
+    @Override
+    public ResponseEntity<List<GetCaregiverRecurringOfferSummaryResponse>> getRecurringOfferSummaryByCaregiver(@RequestParam UUID caregiverId){
+        List<GetCaregiverRecurringOfferSummaryResponse> responses = recurringOfferQueryService.findByRecurringOfferSummaryByCaregiver(caregiverId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @Override
+    public ResponseEntity<GetRecurringOfferDetailResponse> getRecurringOfferDetail(@PathVariable UUID recurringId){
+        GetRecurringOfferDetailResponse response = recurringOfferQueryService.findRecurringOfferDetail(recurringId);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @Override
+    public ResponseEntity<Void> approveRecurringStatus(@RequestBody UUID recurringStatusId){
+        recurringOfferCommandService.approveRecurringStatus(recurringStatusId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> rejectRecurringStatus(@RequestParam UUID recurringStatusId){
+        recurringOfferCommandService.rejectRecurringStatus(recurringStatusId);
+        return ResponseEntity.noContent().build();
     }
 }

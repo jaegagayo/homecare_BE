@@ -53,4 +53,11 @@ public class ServiceMatchCommandService {
         serviceMatch.changeMatchStatus(MatchStatus.CANCELLED);
         serviceMatch.getServiceRequest().changeRequestStatus(ServiceRequestStatus.CANCELED);
     }
+
+    public void skipRecurring(ServiceMatch serviceMatch){
+        if(!serviceMatch.getServiceRequest().getRequestStatus().equals(ServiceRequestStatus.RECURRING)){
+            throw new IllegalArgumentException("정기 제안 관련 일정만 스킵 가능합니다.");
+        }
+        serviceMatch.changeMatchStatus(MatchStatus.CANCELLED);
+    }
 }

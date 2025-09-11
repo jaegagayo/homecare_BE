@@ -7,6 +7,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jaega.homecare.domain.caregiver.dto.req.CaregiverSignupRequest;
 import jaega.homecare.domain.caregiver.dto.req.ChoiceCaregiverCenterRequest;
 import jaega.homecare.domain.caregiver.dto.res.*;
+import jaega.homecare.domain.caregiverPreference.dto.req.CreateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.req.UpdateCaregiverPreferenceRequest;
+import jaega.homecare.domain.caregiverPreference.dto.res.GetCaregiverPreferenceResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.GetCaregiverRecurringOfferSummaryResponse;
+import jaega.homecare.domain.recurringOffer.dto.res.GetRecurringOfferDetailResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewItem;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailResponse;
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
@@ -57,6 +62,29 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "200", description = "마이페이지의 요양보호사 기관 소속별 정산 내역 조회 성공")
     @GetMapping("/my-page/settlement")
     ResponseEntity<List<GetCaregiverCenterSettlementResponse>> getSettlementByCaregiver(UUID caregiverId);
+
+    /**
+     *
+     * 요양보호사 근무 조건 API
+     */
+
+    @Operation(summary = "요양보호사 선호(근무) 조건 작성 API", description = "입력받은 정보로 요양보호사의 선호(근무) 조건을 생성합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사의 선호(근무) 조건 생성 성공")
+    @PostMapping("/preference")
+    ResponseEntity<Void> createCaregiverPreference(
+            @RequestParam UUID caregiverId,
+            @RequestBody CreateCaregiverPreferenceRequest request);
+
+    @Operation(summary = "요양보호사의 선호(근무) 조건 조회 API", description = "요양보호사가 자신의 선호(근무) 조건을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사의 선호(근무)조건 조회 성공")
+    @GetMapping("/preference")
+    ResponseEntity<GetCaregiverPreferenceResponse> getCaregiverPreferenceByCaregiver(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "(마이페이지) 요양보호사 선호 조건 수정 API", description = "요양보호사가 자신의 선호(근무) 조건을 조회합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사 선호(근무)조건 수정 성공")
+    @PutMapping("/preference")
+    ResponseEntity<Void> updateCaregiverPreference(@RequestParam UUID caregiverId,
+                                                   @RequestBody UpdateCaregiverPreferenceRequest request);
 
     /**
      *
@@ -111,6 +139,11 @@ public interface CaregiverController {
     @PostMapping("/schedule/reject")
     ResponseEntity<Void> rejectScheduleReject(@RequestParam UUID serviceMatchId);
 
+    @Operation(summary = "정기 일정 스킵", description = "요양보호사가 확정된 특정 정기 회차 일정을 스킵합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 확정된 특정 정기 회차 일정 스킵 성공")
+    @PostMapping("/recurring/skip")
+    ResponseEntity<Void> skipRecurring(UUID serviceMatchId);
+
     /**
      *
      * 리뷰 조회 API
@@ -126,4 +159,30 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "200", description = "요양보호사에게 등록된 리뷰 상세 조회 성공")
     @GetMapping("/review/{reviewId}")
     ResponseEntity<CaregiverReviewDetailResponse> getReviewDetail(@PathVariable UUID reviewId);
+
+    /**
+     * 정기 제안 관련 API
+     */
+
+    @Operation(summary = "(메인 페이지) 요양보호사의 정기 제안 알림용 조회 API", description = "메인 페이지에서 요양보호사의 신규 정기 제안을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "요양보호사의 정기 제안 알림 조회 성공")
+    @GetMapping("/recurring")
+    ResponseEntity<List<GetCaregiverRecurringOfferSummaryResponse>> getRecurringOfferSummaryByCaregiver(@RequestParam UUID caregiverId);
+
+    @Operation(summary = "정기 제안 상세 조회 API", description = "작성된 정기 제안 신청서를 상세 조회합니다.<br>" +
+            "정기 신청의 1회 서비스 소요 시간이 다음과 같은 형식으로 조회됩니다." +
+            "ex) 3h30m : 3시간 30분, 3h : 3시간")
+    @ApiResponse(responseCode = "200", description = "정기 제안 신청 상세 조회 성공")
+    @GetMapping("/recurring/{recurringId}")
+    ResponseEntity<GetRecurringOfferDetailResponse> getRecurringOfferDetail(@PathVariable UUID recurringId);
+
+    @Operation(summary = "요양보호사의 정기 제안 승인 API", description = "요양보호사의 해당 정기 제안을 승인하여 일정에 반영합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 해당 정기 제안을 승인하여 일정 반영 성공")
+    @PostMapping("/recurring/approve")
+    ResponseEntity<Void> approveRecurringStatus(@RequestBody UUID recurringStatusId);
+
+    @Operation(summary = "요양보호사의 정기 제안 거절 API", description = "요양보호사가 해당 정기 제안을 거절합니다.")
+    @ApiResponse(responseCode = "204", description = "요양보호사가 해당 정기 제안을 거절 성공")
+    @PostMapping("/recurring/reject")
+    ResponseEntity<Void> rejectRecurringStatus(@RequestParam UUID recurringStatusId);
 }
