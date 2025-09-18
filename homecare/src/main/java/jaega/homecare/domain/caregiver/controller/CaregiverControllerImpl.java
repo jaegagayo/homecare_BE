@@ -28,6 +28,7 @@ import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandSer
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
+import jaega.homecare.domain.settlement.dto.res.GetCaregiverSettlementStatsResponse;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
@@ -93,6 +94,13 @@ public class CaregiverControllerImpl implements CaregiverController {
         List<CaregiverReviewItem> response = reviewQueryService.getReviewByCaregiver(caregiverId);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<GetCaregiverSettlementStatsResponse> getSettlementStatsByCaregiver(UUID caregiverId){
+        GetCaregiverSettlementStatsResponse responses = settlementQueryService.getSettlementStatsByCaregiver(caregiverId);
+        return ResponseEntity.ok(responses);
+    }
+
 
     @Override
     public ResponseEntity<List<GetCaregiverCenterSettlementResponse>> getSettlementByCaregiver(UUID caregiverId){

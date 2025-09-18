@@ -18,6 +18,7 @@ import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewSummaryResponse;
 import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
+import jaega.homecare.domain.settlement.dto.res.GetCaregiverSettlementStatsResponse;
 import jaega.homecare.domain.settlement.dto.res.GetSettlementByCaregiverResponse;
 import jaega.homecare.domain.settlement.dto.res.GetSettlementResponse;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
@@ -57,6 +58,11 @@ public interface CaregiverController {
     @ApiResponse(responseCode = "200", description = "마이페이지에서 요양보호사의 리뷰 리스트 조회 성공")
     @GetMapping("/my-page/review")
     ResponseEntity<List<CaregiverReviewItem>> getReviewByCaregiver(UUID caregiverId);
+
+    @Operation(summary = "(마이페이지) 요양보호사 정산 요약 조회 API", description = "요양보호사에게 정산 요약 내용들을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "마이페이지에서 요양보호사의 정산 요약 내용 조회 성공")
+    @GetMapping("/my-page/settlement/summary")
+    ResponseEntity<GetCaregiverSettlementStatsResponse> getSettlementStatsByCaregiver(UUID caregiverId);
 
     @Operation(summary = "(마이페이지) 요양보호사 기관 소속별 정산 내역 조회 API", description = "(마이페이지) 요양보호사의 기관 소속별 정산 내역을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "마이페이지의 요양보호사 기관 소속별 정산 내역 조회 성공")

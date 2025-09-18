@@ -38,6 +38,62 @@ public class SettlementQueryService {
      * Caregiver
      */
 
+    public GetCaregiverSettlementStatsResponse getSettlementStatsByCaregiver(UUID caregiverId) {
+        // caregiverId 기준으로 settlement 모두 조회
+        List<Settlement> settlements = settlementRepository.findByCaregiverCenter_Caregiver_CaregiverId(caregiverId);
+
+        if (settlements.isEmpty()) {
+            return new GetCaregiverSettlementStatsResponse(
+                    BigDecimal.ZERO, 0L, 0.0, 0L, 0L
+            );
+        }
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        long totalMinutes = 0L;
+        double totalDistance = 0.0;
+        long completed = 0L;
+        long pending = 0L;
+
+        for (Settlement settlement : settlements) {
+            // 금액
+            if (settlement.getSettlementAmount() != null) {
+                totalAmount = totalAmount.add(settlement.getSettlementAmount());
+            }
+
+            // 근무시간 (분 단위)
+            if (settlement.getServiceMatch() != null &&
+                    settlement.getServiceMatch().getServiceStartTime() != null &&
+                    settlement.getServiceMatch().getServiceEndTime() != null) {
+
+                long minutes = java.time.Duration.between(
+                        settlement.getServiceMatch().getServiceStartTime(),
+                        settlement.getServiceMatch().getServiceEndTime()
+                ).toMinutes();
+                totalMinutes += minutes;
+            }
+
+            // 이동거리
+            if (settlement.getDistanceLog() != null) {
+                totalDistance += settlement.getDistanceLog();
+            }
+
+            // 상태
+            if (settlement.isPaid()) {
+                completed++;
+            } else {
+                pending++;
+            }
+        }
+
+        return new GetCaregiverSettlementStatsResponse(
+                totalAmount,
+                totalMinutes,
+                totalDistance,
+                completed,
+                pending
+        );
+    }
+
 
     public List<GetCaregiverCenterSettlementResponse> getSettlementHistoryByCaregiver(UUID caregiverId) {
         // 1. caregiverId로 소속 기관 조회
