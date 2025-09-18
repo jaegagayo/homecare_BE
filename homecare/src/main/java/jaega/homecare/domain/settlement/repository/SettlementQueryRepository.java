@@ -3,9 +3,11 @@ package jaega.homecare.domain.settlement.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jaega.homecare.domain.caregiver.entity.Caregiver;
 import jaega.homecare.domain.caregiver.entity.QCaregiver;
+import jaega.homecare.domain.caregiverCenter.entity.CaregiverCenter;
 import jaega.homecare.domain.caregiverCenter.entity.QCaregiverCenter;
 import jaega.homecare.domain.serviceMatch.entity.MatchStatus;
 import jaega.homecare.domain.serviceMatch.entity.QServiceMatch;
@@ -366,6 +368,29 @@ public class SettlementQueryRepository {
                                 .and(settlement.caregiverCenter.center.centerId.eq(centerId))
                 )
                 .fetchOne();
+    }
+
+    public List<Settlement> findByCaregiverCenterWithFilters(
+            CaregiverCenter caregiverCenter,
+            LocalDate startDate,
+            LocalDate endDate,
+            Boolean isPaid
+    ) {
+        QSettlement settlement = QSettlement.settlement;
+        BooleanExpression predicate = settlement.caregiverCenter.eq(caregiverCenter);
+
+        if (startDate != null && endDate != null) {
+            predicate = predicate.and(settlement.serviceMatch.serviceDate.between(startDate, endDate));
+        }
+
+        if (isPaid != null) {
+            predicate = predicate.and(settlement.isPaid.eq(isPaid));
+        }
+
+        return queryFactory.selectFrom(settlement)
+                .where(predicate)
+                .orderBy(settlement.serviceMatch.serviceDate.asc())
+                .fetch();
     }
 
 }
