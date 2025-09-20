@@ -19,7 +19,7 @@ public class DummyCenterService {
     private final CenterRepository centerRepository;
     private final UserRepository userRepository;
 
-    public void generateDummyCenter(){
+    protected void generateDummyCenter(){
         createDummyCenter(0);
     }
 

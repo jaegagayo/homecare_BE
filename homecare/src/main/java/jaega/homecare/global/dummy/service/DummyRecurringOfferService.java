@@ -9,6 +9,7 @@ import jaega.homecare.domain.recurringOffer.repository.RecurringOfferRepository;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.ServiceType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DummyRecurringOfferService {
     private final CaregiverRepository caregiverRepository;
     private final RecurringOfferRepository recurringOfferRepository;

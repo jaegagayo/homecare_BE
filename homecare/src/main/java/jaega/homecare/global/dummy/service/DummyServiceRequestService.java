@@ -25,6 +25,7 @@ import jaega.homecare.domain.settlement.service.command.SettlementCommandService
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.users.entity.Location;
 import jaega.homecare.domain.users.entity.ServiceType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,7 @@ import static jaega.homecare.global.dummy.service.DummyData.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DummyServiceRequestService {
 
     private final ConsumerRepository consumerRepository;
@@ -57,8 +59,9 @@ public class DummyServiceRequestService {
     private final Random random = new Random();
 
     private final DummyRecurringOfferService dummyRecurringOfferService;
+    private final DummyServiceMatchCommandService dummyServiceMatchCommandService;
 
-    public void generateDummyServiceRequest(){
+    protected void generateDummyServiceRequest(){
         IntStream.range(0, 30).forEach(this::createDummyServiceRequest);
     }
 
@@ -114,68 +117,20 @@ public class DummyServiceRequestService {
         if (activeCaregiverCenters.isEmpty()) return;
 
         // --- 1️⃣ 첫 번째 요양보호사 확정 생성 ---
-        createDummyServiceRequestForCaregiver(activeCaregiverCenters.get(0), serviceRequest, requestedDate, serviceStartTime, serviceEndTime,
+        dummyServiceMatchCommandService.createDummyServiceMatchForCaregiver(activeCaregiverCenters.get(0), serviceRequest, requestedDate, serviceStartTime, serviceEndTime,
                 87.0 + (random.nextDouble() * 38.0));
 
         // --- 2️⃣ 나머지 요양보호사는 랜덤 생성 ---
         for (int i = 1; i < activeCaregiverCenters.size(); i++) {
             if (random.nextBoolean()) {
                 CaregiverCenter caregiverCenter = activeCaregiverCenters.get(i);
-                createDummyServiceRequestForCaregiver(caregiverCenter, serviceRequest, requestedDate, serviceStartTime, serviceEndTime,
+                dummyServiceMatchCommandService.createDummyServiceMatchForCaregiver(caregiverCenter, serviceRequest, requestedDate, serviceStartTime, serviceEndTime,
                         87.0 + (random.nextDouble() * 38.0));
             }
         }
     }
 
-
-    public void createDummyServiceRequestForCaregiver(CaregiverCenter caregiverCenter,
-                                                      ServiceRequest serviceRequest,
-                                                      LocalDate requestedDate,
-                                                      LocalTime startTime,
-                                                      LocalTime endTime,
-                                                      double distanceLog) {
-
-        UUID caregiverId = caregiverCenter.getCaregiver().getCaregiverId();
-
-        // ServiceMatch 생성
-        CreateServiceMatchRequest matchRequest = new CreateServiceMatchRequest(
-                serviceRequest.getServiceRequestId(),
-                caregiverId,
-                startTime,
-                endTime,
-                requestedDate
-        );
-        UUID serviceMatchId = serviceMatchCommandService.createServiceMatch(matchRequest);
-
-        // ServiceMatch 상태 업데이트
-        ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(serviceMatchId);
-        MatchStatus matchStatus = requestedDate.isAfter(LocalDate.now()) ? MatchStatus.CONFIRMED : MatchStatus.COMPLETED;
-        serviceMatch.changeMatchStatus(matchStatus);
-
-        // 리뷰 생성 (COMPLETED인 경우만)
-        if (matchStatus == MatchStatus.COMPLETED) {
-            Review review = Review.builder()
-                    .reviewId(UUID.randomUUID())
-                    .serviceMatch(serviceMatch)
-                    .reviewScore(4.5 + (0.5 * random.nextDouble()))
-                    .reviewContent("더미 리뷰 내용입니다.")
-                    .build();
-            reviewRepository.save(review);
-        }
-
-        // ServiceRequest 상태 동기화
-        serviceRequest.changeRequestStatus(ServiceRequestStatus.ASSIGNED);
-
-        // 정산 생성
-        CreateSettlementRequest settlementRequest = new CreateSettlementRequest(
-                caregiverCenter.getCaregiverCenterId(),
-                serviceMatchId,
-                distanceLog
-        );
-        settlementCommandService.createSettlement(settlementRequest);
-    }
-
-    public void createDummyServiceRequestForConsumer(Consumer consumer) {
+    protected void createDummyServiceRequestForConsumer(Consumer consumer) {
         // 전체 ACTIVE 요양보호사 조회
         List<Caregiver> activeCaregivers = caregiverCenterRepository.findByStatus(CaregiverStatus.ACTIVE)
                 .stream()

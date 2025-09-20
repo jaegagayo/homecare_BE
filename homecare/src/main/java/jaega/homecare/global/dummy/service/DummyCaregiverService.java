@@ -17,6 +17,7 @@ import jaega.homecare.domain.center.repository.CenterRepository;
 import jaega.homecare.domain.serviceRequest.entity.AddressType;
 import jaega.homecare.domain.users.entity.*;
 import jaega.homecare.domain.users.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ import static jaega.homecare.global.dummy.service.DummyData.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DummyCaregiverService {
 
     private final UserRepository userRepository;
@@ -39,7 +41,7 @@ public class DummyCaregiverService {
     private final CertificationRepository certificationRepository;
     private final Random random = new Random();
 
-    public void generateDummyCaregiverForLogging(){
+    protected void generateDummyCaregiverForLogging(){
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
         createDummyCaregiversWithConditions(caregivers);
     }

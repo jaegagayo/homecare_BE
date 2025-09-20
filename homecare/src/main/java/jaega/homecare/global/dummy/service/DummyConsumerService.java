@@ -10,6 +10,7 @@ import jaega.homecare.domain.users.repository.UserRepository;
 import jaega.homecare.domain.voucher.entity.Voucher;
 import jaega.homecare.domain.voucher.repository.VoucherRepository;
 import jaega.homecare.domain.voucher.service.command.VoucherCommandService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import static jaega.homecare.global.dummy.service.DummyData.DUMMY_ADDRESSES;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DummyConsumerService {
 
     private final UserRepository userRepository;
@@ -33,7 +35,7 @@ public class DummyConsumerService {
 
     private final DummyRecurringOfferService dummyRecurringOfferService;
 
-    public void generateDummyConsumer(){
+    protected void generateDummyConsumer(){
         List<User> consumers = userRepository.findByUserRole(UserRole.ROLE_CONSUMER);
         IntStream.range(0, consumers.size()).forEach(index -> createDummyConsumer(index, consumers));
     }

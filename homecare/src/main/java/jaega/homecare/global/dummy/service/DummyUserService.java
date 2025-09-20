@@ -23,7 +23,7 @@ public class DummyUserService {
     private final UserRepository userRepository;
     private final Random random = new Random();
 
-    public void generateDummyUsers() {
+    protected void generateDummyUsers() {
         IntStream.range(0, 87).forEach(this::createDummyUser);
     }
 
