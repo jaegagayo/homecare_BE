@@ -4,6 +4,7 @@ import jaega.homecare.domain.users.entity.Gender;
 import jaega.homecare.domain.users.entity.User;
 import jaega.homecare.domain.users.entity.UserRole;
 import jaega.homecare.domain.users.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +13,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DummyUserService {
 
     private final UserRepository userRepository;
     private final Random random = new Random();
 
-    protected void createDummyUser(int index) {
+    public void generateDummyUsers() {
+        IntStream.range(0, 87).forEach(this::createDummyUser);
+    }
+
+    private void createDummyUser(int index) {
         // 87명의 이름 리스트
         List<String> koreanNames = List.of(
                 "김기현", "박지성", "이재민", "최유진", "장서연",

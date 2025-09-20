@@ -79,16 +79,17 @@ public class DummyDataService {
     private final Random random = new Random();
 
     private final DummyUserService dummyUserService;
+    private final DummyCenterService dummyCenterService;
 
     @Transactional
     public void generateAllDummyData() {
         // 1. 모든 사용자 데이터 먼저 생성
-        IntStream.range(0, 87).forEach(this::createDummyUser);
+        dummyUserService.generateDummyUsers();
 
         // 2. Center와 Caregiver는 USER 데이터에 의존하므로, USER 생성 후 실행
 
         // 더미 센터 생성
-        createDummyCenter(0);
+        dummyCenterService.generateDummyCenter();
 
         // 3. 더미 요양보호사 생성
         List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
@@ -107,13 +108,6 @@ public class DummyDataService {
 
         // 5. ServiceRequest 생성 (Consumer 기반)
         IntStream.range(0, 30).forEach(this::createDummyServiceRequest);
-    }
-
-    private void createDummyCenter(int index) {
-        User user = userRepository.findByUserRole(UserRole.ROLE_CENTER).get(index);
-        Center center = new Center();
-        center.setCenter(UUID.randomUUID(), user, "순천시재가노인지원센터" + index, "전라남도 순천시 매곡동 1213 ", "061-749-1114" + String.format("%04d", index));
-        centerRepository.save(center);
     }
 
     private void createDummyCaregiversWithConditions(List<User> users) {
