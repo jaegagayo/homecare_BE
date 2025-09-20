@@ -80,6 +80,8 @@ public class DummyDataService {
 
     private final DummyUserService dummyUserService;
     private final DummyCenterService dummyCenterService;
+    private final DummyCaregiverService dummyCaregiverService;
+    private final DummyConsumerService dummyConsumerService;
 
     @Transactional
     public void generateAllDummyData() {
@@ -92,12 +94,10 @@ public class DummyDataService {
         dummyCenterService.generateDummyCenter();
 
         // 3. 더미 요양보호사 생성
-        List<User> caregivers = userRepository.findByUserRole(UserRole.ROLE_CAREGIVER);
-        createDummyCaregiversWithConditions(caregivers);
+        dummyCaregiverService.generateDummyCaregiver();
 
         // 4. Consumer 생성
-        List<User> consumers = userRepository.findByUserRole(UserRole.ROLE_CONSUMER);
-        IntStream.range(0, consumers.size()).forEach(index -> createDummyConsumer(index, consumers));
+        dummyConsumerService.generateDummyConsumer();
 
         // 4-1. dummy1@user.com 전용 Consumer 보장 생성
         User dummyUser = userRepository.findByEmail("user1@dummy.com");
@@ -108,183 +108,6 @@ public class DummyDataService {
 
         // 5. ServiceRequest 생성 (Consumer 기반)
         IntStream.range(0, 30).forEach(this::createDummyServiceRequest);
-    }
-
-    private void createDummyCaregiversWithConditions(List<User> users) {
-        Center center = centerRepository.findAll().get(0);
-
-        // 각 조건별 카운트
-        List<Caregiver> dayOfWeekFiltered = new ArrayList<>();
-        List<Caregiver> timeFiltered = new ArrayList<>();
-        List<Caregiver> areaFiltered = new ArrayList<>();
-        List<Caregiver> conditionFiltered = new ArrayList<>();
-        List<Caregiver> serviceTypeFiltered = new ArrayList<>();
-
-        for (int index = 0; index < users.size(); index++) {
-            User user = users.get(index);
-
-            Set<DayOfWeek> dayOfWeek = new HashSet<>();
-            LocalTime startTime = LocalTime.of(9, 0);
-            LocalTime endTime = LocalTime.of(18, 0);
-            String workArea;
-            Set<Disease> supportedConditions = new HashSet<>();
-            Set<ServiceType> serviceTypes = new HashSet<>();
-
-            // --- 조건별 배정 ---
-
-            if (index < 8) {
-                dayOfWeek.addAll(List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY));
-            } else {
-                dayOfWeek.addAll(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
-            }
-
-            if (index >= 8 && index < 15) {
-                startTime = LocalTime.of(15, 0);
-                endTime = LocalTime.of(18, 0);
-            } else {
-                startTime = LocalTime.of(9,0);
-                endTime = LocalTime.of(12,0);
-            }
-
-            if (index >= 15 && index < 21) {
-                workArea = pickNonSuncheonAddress(index - 15);
-            } else {
-                workArea = DUMMY_ADDRESSES[index];
-            }
-
-            if (index >= 21 && index < 26) {
-                supportedConditions.add(Disease.HYPERTENSION); // 조건 없는 사람
-            } else {
-                supportedConditions.add(Disease.DEMENTIA);
-                supportedConditions.add(Disease.BEDRIDDEN);
-            }
-
-            if (index >= 26 && index < 33) {
-                serviceTypes.add(ServiceType.VISITING_CARE); // 다른 유형
-            } else {
-                serviceTypes.add(ServiceType.IN_HOME_SUPPORT);
-            }
-
-            // --- Caregiver 생성 ---
-            Caregiver caregiver = Caregiver.builder()
-                    .caregiverId(UUID.randomUUID())
-                    .user(user)
-                    .address(workArea)
-                    .career(1 + new Random().nextInt(20))
-                    .koreanProficiency(KoreanProficiency.values()[new Random().nextInt(KoreanProficiency.values().length)])
-                    .isAccompanyOuting(new Random().nextBoolean())
-                    .selfIntroduction(DUMMY_INTRODUCTIONS[index])
-                    .build();
-            caregiver.changeVerifiedStatus(VerifiedStatus.APPROVED);
-            caregiverRepository.save(caregiver);
-
-            // CaregiverCenter 생성 (상태 랜덤)
-            CaregiverStatus status;
-            if (index == 0) {
-                status = CaregiverStatus.ACTIVE; // 첫 번째는 무조건 ACTIVE
-            } else {
-                status = CaregiverStatus.values()[random.nextInt(CaregiverStatus.values().length)];
-            }
-
-            // CaregiverCenter 생성
-            CaregiverCenter caregiverCenter = CaregiverCenter.builder()
-                    .caregiverCenterId(UUID.randomUUID())
-                    .caregiver(caregiver)
-                    .center(center)
-                    .status(status)
-                    .build();
-            caregiverCenterRepository.save(caregiverCenter);
-
-            // CaregiverPreference 생성
-            CaregiverPreference preference = CaregiverPreference.builder()
-                    .caregiverPreferenceId(UUID.randomUUID())
-                    .caregiver(caregiver)
-                    .serviceTypes(serviceTypes)
-                    .dayOfWeek(dayOfWeek)
-                    .workStartTime(startTime)
-                    .workEndTime(endTime)
-                    .workMinTime(2 + new Random().nextInt(2))
-                    .workMaxTime(4 + new Random().nextInt(4))
-                    .availableTime(30 + new Random().nextInt(91))
-                    .workArea(workArea)
-                    .addressType(new Random().nextBoolean() ? AddressType.ROAD : AddressType.JIBUN)
-                    .location(new Location(DUMMY_LATITUDES[index % DUMMY_LATITUDES.length],
-                            DUMMY_LONGITUDES[index % DUMMY_LONGITUDES.length]))
-                    .transportation(new Random().nextBoolean() ? "자가차량" : "대중교통")
-                    .lunchBreak(30)
-                    .bufferTime(15)
-                    .supportedConditions(supportedConditions)
-                    .preferredMinAge(40 + new Random().nextInt(20))
-                    .preferredMaxAge(60 + new Random().nextInt(20))
-                    .preferredGender(PreferredGender.values()[new Random().nextInt(PreferredGender.values().length)])
-                    .build();
-            caregiverPreferenceRepository.save(preference);
-
-            // Certification 생성
-            Certification certification = Certification.builder()
-                    .certificationId(UUID.randomUUID())
-                    .caregiver(caregiver)
-                    .certificationNumber("CERT-2025-" + String.format("%04d", index))
-                    .certificationDate(LocalDate.of(2020 + new Random().nextInt(5),
-                            1 + new Random().nextInt(12),
-                            1 + new Random().nextInt(28)))
-                    .trainStatus(new Random().nextBoolean())
-                    .build();
-            certificationRepository.save(certification);
-
-            // --- 조건별 필터링 로그 ---
-            if (dayOfWeek.size() == 5) dayOfWeekFiltered.add(caregiver);
-            if (!(startTime.equals(LocalTime.of(9,0)) && endTime.equals(LocalTime.of(12,0))) ) timeFiltered.add(caregiver);
-            if (!workArea.startsWith("전라남도 순천시")) areaFiltered.add(caregiver);
-            if (supportedConditions.contains(Disease.HYPERTENSION)) conditionFiltered.add(caregiver);
-            if (serviceTypes.contains(ServiceType.VISITING_CARE)) serviceTypeFiltered.add(caregiver);
-        }
-
-        // --- 출력 ---
-        System.out.println("근무 요일 월~금 아닌 사람: " + dayOfWeekFiltered.size());
-        System.out.println("근무 시간이 9~12가 아닌 사람: " + timeFiltered.size());
-        System.out.println("근무 지역 순천 외 사람: " + areaFiltered.size());
-        System.out.println("지원 가능한 상태 조건이 없는 사람: " + conditionFiltered.size());
-        System.out.println("서비스 유형 VISITING_CARE인 사람: " + serviceTypeFiltered.size());
-    }
-
-    private void createDummyConsumer(int index, List<User> consumers) {
-        User user = consumers.get(index);
-
-        Consumer consumer = Consumer.builder()
-                .user(user)
-                .consumerId(UUID.randomUUID())
-                .residentialAddress(DUMMY_ADDRESSES[index % DUMMY_ADDRESSES.length])
-                .visitAddress(DUMMY_ADDRESSES[index % DUMMY_ADDRESSES.length])
-                .entranceType("공동현관 비밀번호: " + (1000 + random.nextInt(9000)))
-                .careGrade(random.nextInt(6) + 1)
-                .isMedicalAid(random.nextBoolean())
-                .weight(40 + random.nextInt(40)) // 40~80kg
-                .disease(Disease.values()[random.nextInt(Disease.values().length)])
-                .cognitiveStatus(CognitiveStatus.values()[random.nextInt(CognitiveStatus.values().length)])
-                .livingSituation("혼자 거주")
-                .guardianName("보호자" + index)
-                .guardianPhone("010-9999-" + String.format("%04d", index))
-                .build();
-
-        consumer.initializeConsumer(UUID.randomUUID());
-        consumerRepository.save(consumer);
-
-        // ✅ Consumer 생성 시 Voucher 생성
-        Long totalAmount = voucherCommandService.getTotalAmountByCareGrade(consumer.getCareGrade());
-
-        Voucher voucher = Voucher.builder()
-                .voucherId(UUID.randomUUID())
-                .consumer(consumer)
-                .voucherDate(LocalDate.now()) // 이번 달 바우처
-                .totalAmount(totalAmount)
-                .build();
-
-        voucherRepository.save(voucher);
-
-        // 첫 번째 Consumer → 무조건 첫 번째 Caregiver로 정기 제안 생성
-        boolean useFirstCaregiver = (index == 0);
-        createDummyRecurringOfferForConsumer(consumer, useFirstCaregiver);
     }
 
     private UUID createDummyRecurringOfferForConsumer(Consumer consumer, boolean useFirstCaregiver) {
@@ -662,64 +485,4 @@ public class DummyDataService {
             127.4830, 127.4836, 127.4841, 127.4847, 127.4852, 127.4858, 127.4863, 127.4869, 127.4874, 127.4880,
             127.4885, 127.4891, 127.4896
     };
-
-    private static final String[] DUMMY_INTRODUCTIONS = {
-            "안녕하세요! 따뜻한 마음과 세심한 관찰로 어르신의 안전을 최우선으로 케어하겠습니다.",
-            "안녕하세요! 밝은 미소와 긍정적인 에너지로 어르신과 소통하며 행복한 시간을 만들겠습니다.",
-            "안녕하세요! 20년 경력으로 안전하고 전문적인 돌봄을 제공합니다.",
-            "안녕하세요! 음악과 미술 활동을 통해 즐거운 일상을 만들어 드리겠습니다.",
-            "안녕하세요! 어르신의 건강 관리와 일상 생활 지원에 정성을 다하겠습니다.",
-            "안녕하세요! 산책과 운동을 함께하며 신체 건강과 활력을 챙기겠습니다.",
-            "안녕하세요! 가족처럼 따뜻하게 보살피며 신뢰받는 돌봄을 제공합니다.",
-            "안녕하세요! 약 챙기기와 식사 관리 등 세심한 케어를 약속드립니다.",
-            "안녕하세요! 어르신의 기분과 컨디션을 세심하게 관찰하며 돌봄하겠습니다.",
-            "안녕하세요! 즐겁고 안전한 환경에서 생활할 수 있도록 최선을 다하겠습니다.",
-            "안녕하세요! 밝고 친절한 태도로 어르신과 소통하며 편안함을 제공합니다.",
-            "안녕하세요! 전문적인 지식과 경험으로 건강과 안전을 지켜 드리겠습니다.",
-            "안녕하세요! 정성과 책임감으로 어르신의 하루를 행복하게 만들겠습니다.",
-            "안녕하세요! 웃음과 즐거움을 나누며 편안한 일상을 지원하겠습니다.",
-            "안녕하세요! 개인 맞춤형 케어로 어르신 만족도를 높이겠습니다.",
-            "안녕하세요! 어르신의 취향과 습관을 존중하며 신뢰받는 돌봄을 제공합니다.",
-            "안녕하세요! 세심한 배려와 전문성으로 안전한 환경을 조성하겠습니다.",
-            "안녕하세요! 따뜻한 손길과 밝은 미소로 하루를 즐겁게 만들어 드리겠습니다.",
-            "안녕하세요! 어르신과 가족 모두가 안심할 수 있는 돌봄을 제공합니다.",
-            "안녕하세요! 건강한 생활 습관을 유도하며 안전한 활동을 지원하겠습니다.",
-            "안녕하세요! 즐거운 대화와 관심으로 어르신의 마음을 케어하겠습니다.",
-            "안녕하세요! 전문적이고 성실한 돌봄으로 신뢰를 쌓겠습니다.",
-            "안녕하세요! 어르신의 행복과 안전을 동시에 고려하는 케어를 제공합니다.",
-            "안녕하세요! 취미 활동과 여가를 함께 즐기며 삶의 질을 높이겠습니다.",
-            "안녕하세요! 밝은 에너지와 친절함으로 즐거운 환경을 만들어 드리겠습니다.",
-            "안녕하세요! 정성 어린 돌봄과 책임감 있는 케어로 만족을 드리겠습니다.",
-            "안녕하세요! 어르신의 건강과 안전을 위해 세심하게 관찰하겠습니다.",
-            "안녕하세요! 즐거움과 편안함을 동시에 제공하는 맞춤형 케어를 제공합니다.",
-            "안녕하세요! 따뜻하고 신뢰할 수 있는 손길로 하루를 지켜 드리겠습니다.",
-            "안녕하세요! 안전하고 즐거운 활동으로 건강을 챙기며 케어하겠습니다.",
-            "안녕하세요! 어르신의 일상에 활기와 행복을 더하는 돌봄을 제공합니다.",
-            "안녕하세요! 친절과 배려로 어르신이 안심하고 생활할 수 있도록 하겠습니다.",
-            "안녕하세요! 웃음과 관심으로 하루를 행복하게 만드는 케어를 제공합니다.",
-            "안녕하세요! 전문성과 경험을 바탕으로 안전하고 신뢰받는 돌봄을 제공합니다.",
-            "안녕하세요! 어르신과 가족 모두가 만족할 수 있는 맞춤형 케어를 약속드립니다.",
-            "안녕하세요! 신체 활동과 사회적 교류를 함께하며 즐거움을 나누겠습니다.",
-            "안녕하세요! 따뜻한 마음과 세심한 배려로 하루를 안전하게 지켜 드리겠습니다.",
-            "안녕하세요! 즐거움과 안전을 동시에 고려한 케어로 행복을 만들어 드리겠습니다.",
-            "안녕하세요! 어르신의 편안함과 만족도를 최우선으로 생각하며 돌봄합니다.",
-            "안녕하세요! 긍정적인 에너지와 책임감으로 안정적인 돌봄을 제공합니다.",
-            "안녕하세요! 세심한 관찰과 배려로 어르신의 생활을 지원하겠습니다.",
-            "안녕하세요! 즐거운 마음과 친절함으로 하루를 안전하게 케어하겠습니다.",
-            "안녕하세요! 전문적이고 따뜻한 손길로 신뢰받는 돌봄을 약속드립니다.",
-            "안녕하세요! 어르신의 건강과 행복을 동시에 지키며 케어하겠습니다."
-    };
-
-    // 예시: 순천 외 주소 선택 함수
-    private String pickNonSuncheonAddress(int index) {
-        String[] otherAddresses = {
-                "경기도 수원시 팔달구 매산로 1",
-                "전라북도 전주시 완산구 전동 3",
-                "충청북도 청주시 상당구 사직로 5",
-                "충청남도 천안시 동남구 중앙로 12",
-                "경상북도 포항시 남구 대이로 45",
-                "경상남도 창원시 성산구 중앙대로 34"
-        };
-        return otherAddresses[index % otherAddresses.length];
-    }
 }
