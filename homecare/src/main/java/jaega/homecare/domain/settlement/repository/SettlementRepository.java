@@ -12,4 +12,6 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     Optional<Settlement> findBySettlementId(UUID settlementId);
 
     List<Settlement> findByCaregiverCenter(CaregiverCenter caregiverCenter);
+
+    List<Settlement> findByCaregiverCenter_Caregiver_CaregiverId(UUID caregiverId);
 }

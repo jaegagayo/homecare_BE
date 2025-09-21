@@ -17,10 +17,9 @@ import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleDetailRespons
 import jaega.homecare.domain.serviceMatch.dto.res.CaregiverScheduleResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewDetailResponse;
 import jaega.homecare.domain.review.dto.res.CaregiverReviewSummaryResponse;
-import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
-import jaega.homecare.domain.settlement.dto.res.GetSettlementByCaregiverResponse;
-import jaega.homecare.domain.settlement.dto.res.GetSettlementResponse;
+import jaega.homecare.domain.settlement.dto.res.*;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
+import jaega.homecare.domain.users.entity.DateFilter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,10 +57,19 @@ public interface CaregiverController {
     @GetMapping("/my-page/review")
     ResponseEntity<List<CaregiverReviewItem>> getReviewByCaregiver(UUID caregiverId);
 
+    @Operation(summary = "(마이페이지) 요양보호사 정산 요약 조회 API", description = "요양보호사에게 정산 요약 내용들을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "마이페이지에서 요양보호사의 정산 요약 내용 조회 성공")
+    @GetMapping("/my-page/settlement/summary")
+    ResponseEntity<GetCaregiverSettlementStatsResponse> getSettlementStatsByCaregiver(UUID caregiverId);
+
     @Operation(summary = "(마이페이지) 요양보호사 기관 소속별 정산 내역 조회 API", description = "(마이페이지) 요양보호사의 기관 소속별 정산 내역을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "마이페이지의 요양보호사 기관 소속별 정산 내역 조회 성공")
+    @ApiResponse(responseCode = "200", description = "정산 내역 조회 성공")
     @GetMapping("/my-page/settlement")
-    ResponseEntity<List<GetCaregiverCenterSettlementResponse>> getSettlementByCaregiver(UUID caregiverId);
+    ResponseEntity<List<GetCaregiverSettlementResponse>> getSettlementByCaregiver(
+            @RequestParam UUID caregiverCenterId,
+            @RequestParam(required = false, defaultValue = "ALL") DateFilter dateFilter,
+            @RequestParam(required = false) Boolean isPaid
+    );
 
     /**
      *

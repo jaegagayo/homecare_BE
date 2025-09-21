@@ -8,15 +8,19 @@ import jaega.homecare.domain.settlement.entity.Settlement;
 import jaega.homecare.domain.settlement.mapper.SettlementMapper;
 import jaega.homecare.domain.settlement.repository.SettlementQueryRepository;
 import jaega.homecare.domain.settlement.repository.SettlementRepository;
+import jaega.homecare.domain.users.entity.DateFilter;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,28 +42,139 @@ public class SettlementQueryService {
      * Caregiver
      */
 
+    public GetCaregiverSettlementStatsResponse getSettlementStatsByCaregiver(UUID caregiverId) {
+        // caregiverId 기준으로 settlement 모두 조회
+        List<Settlement> settlements = settlementRepository.findByCaregiverCenter_Caregiver_CaregiverId(caregiverId);
 
-    public List<GetCaregiverCenterSettlementResponse> getSettlementHistoryByCaregiver(UUID caregiverId) {
-        // 1. caregiverId로 소속 기관 조회
-        List<CaregiverCenter> caregiverCenters = caregiverCenterRepository.findByCaregiver_CaregiverId(caregiverId);
+        if (settlements.isEmpty()) {
+            return new GetCaregiverSettlementStatsResponse(
+                    BigDecimal.ZERO, 0L, 0.0, 0L, 0L
+            );
+        }
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        long totalMinutes = 0L;
+        double totalDistance = 0.0;
+        long completed = 0L;
+        long pending = 0L;
+
+        for (Settlement settlement : settlements) {
+            // 금액
+            if (settlement.getSettlementAmount() != null) {
+                totalAmount = totalAmount.add(settlement.getSettlementAmount());
+            }
+
+            // 근무시간 (분 단위)
+            if (settlement.getServiceMatch() != null &&
+                    settlement.getServiceMatch().getServiceStartTime() != null &&
+                    settlement.getServiceMatch().getServiceEndTime() != null) {
+
+                long minutes = java.time.Duration.between(
+                        settlement.getServiceMatch().getServiceStartTime(),
+                        settlement.getServiceMatch().getServiceEndTime()
+                ).toMinutes();
+                totalMinutes += minutes;
+            }
+
+            // 이동거리
+            if (settlement.getDistanceLog() != null) {
+                totalDistance += settlement.getDistanceLog();
+            }
+
+            // 상태
+            if (settlement.isPaid()) {
+                completed++;
+            } else {
+                pending++;
+            }
+        }
+
+        return new GetCaregiverSettlementStatsResponse(
+                totalAmount,
+                totalMinutes,
+                totalDistance,
+                completed,
+                pending
+        );
+    }
+
+
+    public List<GetCaregiverSettlementResponse> getSettlementHistoryByCaregiver(
+            UUID caregiverId,
+            DateFilter dateFilter,
+            Boolean isPaidFilter
+    ) {
+        List<CaregiverCenter> caregiverCenters =
+                caregiverCenterRepository.findByCaregiver_CaregiverId(caregiverId);
 
         if (caregiverCenters.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 2. 각 기관별로 Settlement 조회 후 그룹핑
+        LocalDate now = LocalDate.now();
+        final LocalDate startDate;
+        final LocalDate endDate;
+
+        switch (dateFilter) {
+            case THIS_WEEK -> {
+                startDate = now.with(DayOfWeek.MONDAY);
+                endDate = now.with(DayOfWeek.SUNDAY);
+            }
+            case THIS_MONTH -> {
+                startDate = now.withDayOfMonth(1);
+                endDate = now.withDayOfMonth(now.lengthOfMonth());
+            }
+            case LAST_MONTH -> {
+                LocalDate lastMonth = now.minusMonths(1);
+                startDate = lastMonth.withDayOfMonth(1);
+                endDate = lastMonth.withDayOfMonth(lastMonth.lengthOfMonth());
+            }
+            default -> {
+                startDate = null;
+                endDate = null;
+            }
+        }
+
         return caregiverCenters.stream()
                 .map(caregiverCenter -> {
-                    List<Settlement> settlements = settlementRepository.findByCaregiverCenter(caregiverCenter);
+                    // QueryDSL로 필터링된 Settlement 조회
+                    List<Settlement> settlements = settlementQueryRepository
+                            .findByCaregiverCenterWithFilters(caregiverCenter, startDate, endDate, isPaidFilter);
 
-                    List<GetSettlementByCaregiverResponse> settlementDtos = settlementMapper.toDtoList(settlements);
+                    // 디테일 매핑
+                    List<GetCaregiverSettlementDetailDto> details = settlements.stream()
+                            .map(s -> new GetCaregiverSettlementDetailDto(
+                                    s.getServiceMatch().getServiceDate(),
+                                    s.getServiceMatch().getServiceStartTime(),
+                                    s.getServiceMatch().getServiceEndTime(),
+                                    s.getDistanceLog(),
+                                    s.getSettlementAmount(),
+                                    s.isPaid()
+                            ))
+                            .collect(Collectors.toList());
 
-                    return new GetCaregiverCenterSettlementResponse(
+                    // 총합 계산
+                    Integer totalCount = details.size();
+                    Long totalHours = details.stream()
+                            .mapToLong(d -> Duration.between(d.serviceStartTime(), d.serviceEndTime()).toHours())
+                            .sum();
+                    Long totalDistanceLog = details.stream()
+                            .mapToLong(d -> d.distanceLog() != null ? d.distanceLog().longValue() : 0L)
+                            .sum();
+                    BigDecimal totalSettlementAmount = details.stream()
+                            .map(GetCaregiverSettlementDetailDto::settlementAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    return new GetCaregiverSettlementResponse(
                             caregiverCenter.getCenter().getName(),
-                            settlementDtos
+                            totalCount,
+                            totalHours,
+                            totalDistanceLog,
+                            totalSettlementAmount,
+                            details
                     );
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**

@@ -28,9 +28,12 @@ import jaega.homecare.domain.serviceMatch.service.command.ServiceMatchCommandSer
 import jaega.homecare.domain.serviceMatch.service.query.ServiceMatchQueryService;
 import jaega.homecare.domain.settlement.dto.req.CreateSettlementRequest;
 import jaega.homecare.domain.settlement.dto.res.GetCaregiverCenterSettlementResponse;
+import jaega.homecare.domain.settlement.dto.res.GetCaregiverSettlementResponse;
+import jaega.homecare.domain.settlement.dto.res.GetCaregiverSettlementStatsResponse;
 import jaega.homecare.domain.settlement.service.command.SettlementCommandService;
 import jaega.homecare.domain.settlement.service.query.SettlementQueryService;
 import jaega.homecare.domain.users.dto.req.UserLoginRequest;
+import jaega.homecare.domain.users.entity.DateFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,8 +98,15 @@ public class CaregiverControllerImpl implements CaregiverController {
     }
 
     @Override
-    public ResponseEntity<List<GetCaregiverCenterSettlementResponse>> getSettlementByCaregiver(UUID caregiverId){
-        List<GetCaregiverCenterSettlementResponse> responses = settlementQueryService.getSettlementHistoryByCaregiver(caregiverId);
+    public ResponseEntity<GetCaregiverSettlementStatsResponse> getSettlementStatsByCaregiver(UUID caregiverId){
+        GetCaregiverSettlementStatsResponse responses = settlementQueryService.getSettlementStatsByCaregiver(caregiverId);
+        return ResponseEntity.ok(responses);
+    }
+
+
+    @Override
+    public ResponseEntity<List<GetCaregiverSettlementResponse>> getSettlementByCaregiver(UUID caregiverId, DateFilter dateFilter, Boolean isPaid) {
+        List<GetCaregiverSettlementResponse> responses = settlementQueryService.getSettlementHistoryByCaregiver(caregiverId, dateFilter, isPaid);
         return ResponseEntity.ok(responses);
     }
 

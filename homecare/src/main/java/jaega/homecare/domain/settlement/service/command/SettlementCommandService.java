@@ -31,7 +31,7 @@ public class SettlementCommandService {
     /**
      * 요양보호사가 정산 내역을 관리할 센터 선정 후 정산 기록 생성
      */
-    public void createSettlement(CreateSettlementRequest request){
+    public UUID createSettlement(CreateSettlementRequest request){
         CaregiverCenter caregiverCenter = caregiverCenterQueryService.getCaregiverCenter(request.caregiverCenterId());
         ServiceMatch serviceMatch = serviceMatchQueryService.getServiceMatch(request.serviceMatchId());
 
@@ -40,6 +40,8 @@ public class SettlementCommandService {
         Settlement settlement = settlementMapper.toEntity(request, serviceMatch, caregiverCenter, settlementAmount);
         settlement.initializeSettlement(UUID.randomUUID());
         settlementRepository.save(settlement);
+
+        return settlement.getSettlementId();
     }
 
     /**
